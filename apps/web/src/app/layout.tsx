@@ -7,6 +7,9 @@ import { SiteWhatsAppFloat } from "@/components/site/site-whatsapp-float";
 
 import "./globals.css";
 
+/** Admin’den gelen ayarlar DB’de güncellenir; statik önbellekte kalmaması için dinamik render. */
+export const dynamic = "force-dynamic";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
