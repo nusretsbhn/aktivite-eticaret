@@ -1,0 +1,38 @@
+[
+  {
+    "id": "6bc10e24-a8be-4489-8628-18e35cf544e1",
+    "fullName": "Nusret Subuhan",
+    "email": "nusretblog@gmail.com",
+    "phone": "05536882734",
+    "passwordHash": "261e5391c6cf4fde319549bc0ff12f8764821587ce11a8fd39bbe6e64f9527b366d7e6203c50ee717bf08849eac48af28f12dc2288d70b515c10c98485f63b9a",
+    "passwordSalt": "d9b9ec055266057fcd91c2c21cd9c460",
+    "kvkkConsent": true,
+    "smsConsent": true,
+    "createdAt": "2026-03-26T08:13:14.943Z",
+    "updatedAt": "2026-03-26T08:13:14.943Z"
+  },
+  {
+    "id": "0c5552ee-06e6-48ce-a676-81e4fe36b506",
+    "fullName": "Şükriye Subuhan",
+    "email": "sukriye.batak@gmail.com",
+    "phone": "05551085024",
+    "passwordHash": "61877cae3a429e8eb69b3356f346ea85eaeaff7536f431aaae9b4e09882a23ba48e0412d6e20d1cfc0825c5d9779a2dd34a0cbe68351c6cb9b3801e99f03f4db",
+    "passwordSalt": "51665bd0a1c86a08d7722291d7e799f5",
+    "kvkkConsent": true,
+    "smsConsent": true,
+    "createdAt": "2026-03-27T20:14:45.129Z",
+    "updatedAt": "2026-03-27T20:14:45.129Z"
+  },
+  {
+    "id": "9a7cf199-af77-4c40-8a2d-e65cc22ce54a",
+    "fullName": "Nusret Subuhan",
+    "email": "info@banabigezi.com",
+    "phone": "+90 5536882734",
+    "passwordHash": "b1a6e046355f0dac2afb73b8f2ea5487417ce070b6d15e012c0b36037da5a1465e8200380dc091dc4afb1f8c59cee6f22cd89988dcd9e60c71445c8c8bd7b241",
+    "passwordSalt": "51110bff43792fa5da4dd058f76594d2",
+    "kvkkConsent": true,
+    "smsConsent": true,
+    "createdAt": "2026-04-01T14:16:14.745Z",
+    "updatedAt": "2026-04-01T14:16:14.745Z"
+  }
+]

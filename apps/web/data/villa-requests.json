@@ -1,0 +1,30 @@
+[
+  {
+    "id": "cb60ad6e-c321-4803-9a44-0f23713b28a1",
+    "userId": "9a7cf199-af77-4c40-8a2d-e65cc22ce54a",
+    "userEmail": "info@banabigezi.com",
+    "userName": "Nusret Subuhan",
+    "phone": "+90 5536882734",
+    "villaSlug": "nusret-villas",
+    "villaDisplayName": "Nusret Villas",
+    "checkIn": "2026-04-01",
+    "checkOut": "2026-04-04",
+    "guests": 3,
+    "isRead": false,
+    "createdAt": "2026-04-01T14:27:36.606Z"
+  },
+  {
+    "id": "53c6027d-b6dd-4e54-bd5d-1ec43a3d5d0d",
+    "userId": "9a7cf199-af77-4c40-8a2d-e65cc22ce54a",
+    "userEmail": "info@banabigezi.com",
+    "userName": "Nusret Subuhan",
+    "phone": "+90 5536882734",
+    "villaSlug": "nusret-villas",
+    "villaDisplayName": "Nusret Villas",
+    "checkIn": "2026-04-01",
+    "checkOut": "2026-04-04",
+    "guests": 1,
+    "isRead": false,
+    "createdAt": "2026-04-01T14:16:14.748Z"
+  }
+]

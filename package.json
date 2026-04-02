@@ -1,0 +1,14 @@
+{
+  "name": "bodrum-aktivite",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "echo \"Set up apps/api and apps/web first (see README).\"",
+    "lint": "echo \"lint not set up yet\"",
+    "test": "echo \"test not set up yet\""
+  }
+}
+

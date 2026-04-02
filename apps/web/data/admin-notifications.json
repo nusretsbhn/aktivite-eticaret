@@ -1,0 +1,65 @@
+[
+  {
+    "id": "19895bca-e159-4e0d-8b03-bb39c1c6830a",
+    "type": "cancel_request",
+    "refId": "4718f57b-195c-4850-97fa-da67cb6a7248",
+    "title": "İptal / iade talebi",
+    "message": "BDO-20260402-435555 · Ölüdeniz Tekne Turu",
+    "createdAt": "2026-04-02T13:05:33.114Z",
+    "readAt": null
+  },
+  {
+    "id": "11c101fe-9022-4a40-b4f4-a8ac9f71d84e",
+    "type": "new_order",
+    "refId": "c341d4cf-a15d-4a4c-b2bf-1a73d88fafa2",
+    "title": "Yeni Sor-Sat talebi",
+    "message": "BDO-20260402-63472F · Ölüdeniz Tekne Turu",
+    "createdAt": "2026-04-02T13:00:24.491Z",
+    "readAt": null
+  },
+  {
+    "id": "82d7418e-3bbb-44e6-b600-7506170d1a66",
+    "type": "new_order",
+    "refId": "a37b25e5-74b8-4e88-8afe-49447b6e9a74",
+    "title": "Yeni sipariş",
+    "message": "BDO-20260402-435555 · Ölüdeniz Tekne Turu",
+    "createdAt": "2026-04-02T12:36:09.641Z",
+    "readAt": null
+  },
+  {
+    "id": "f80d9177-2fc7-4cb9-acae-835fff1a4ff3",
+    "type": "new_order",
+    "refId": "fb6e7b33-cbdb-4fa2-9902-441739cb08f0",
+    "title": "Yeni sipariş",
+    "message": "BDO-20260402-69E875 · Ölüdeniz Tekne Turu",
+    "createdAt": "2026-04-02T11:24:05.808Z",
+    "readAt": null
+  },
+  {
+    "id": "7b65e040-d88b-4b6f-8ff5-07c4c63fe351",
+    "type": "cancel_request",
+    "refId": "23c33d03-7bb7-4ead-91b5-e367816fab20",
+    "title": "İptal / iade talebi",
+    "message": "BDO-20260328-D0A6B2 · 12 Adalar Tekne Turu",
+    "createdAt": "2026-03-28T16:39:08.697Z",
+    "readAt": "2026-03-31T06:30:35.713Z"
+  },
+  {
+    "id": "482d986e-3fa1-4dfc-b7cd-22c4f068cffc",
+    "type": "new_order",
+    "refId": "a56bfc68-585e-4d03-b015-91e503832164",
+    "title": "Yeni sipariş",
+    "message": "BDO-20260328-D0A6B2 · 12 Adalar Tekne Turu",
+    "createdAt": "2026-03-28T16:36:53.524Z",
+    "readAt": "2026-03-28T16:38:46.955Z"
+  },
+  {
+    "id": "060da1bc-dc57-4ac6-9fa3-f96298c08cb7",
+    "type": "new_order",
+    "refId": "f229a822-506d-463e-b37c-00ff389535d6",
+    "title": "Yeni sipariş",
+    "message": "BDO-20260328-3FA436 · Ölüdeniz Tekne Turu",
+    "createdAt": "2026-03-28T06:40:09.516Z",
+    "readAt": "2026-03-28T06:41:10.510Z"
+  }
+]

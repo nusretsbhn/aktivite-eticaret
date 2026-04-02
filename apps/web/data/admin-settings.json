@@ -1,0 +1,230 @@
+{
+  "dictionaries": [
+    {
+      "id": "ogle",
+      "icon": "",
+      "iconKey": "Utensils",
+      "label": "Öğle yemeği",
+      "group": "include"
+    },
+    {
+      "id": "transfer",
+      "icon": "",
+      "iconKey": "Bus",
+      "label": "Otel transferi",
+      "group": "include"
+    },
+    {
+      "id": "rehber",
+      "icon": "",
+      "iconKey": "User",
+      "label": "Profesyonel rehber",
+      "group": "include"
+    },
+    {
+      "id": "sigorta",
+      "icon": "",
+      "iconKey": "Shield",
+      "label": "Seyahat sigortası",
+      "group": "include"
+    },
+    {
+      "id": "icecek",
+      "icon": "",
+      "iconKey": "GlassWater",
+      "label": "İçecekler",
+      "group": "exclude"
+    },
+    {
+      "id": "bahsis",
+      "icon": "",
+      "iconKey": "Banknote",
+      "label": "Bahşişler",
+      "group": "exclude"
+    },
+    {
+      "id": "kisisel",
+      "icon": "",
+      "iconKey": "ShoppingBag",
+      "label": "Kişisel harcamalar",
+      "group": "exclude"
+    },
+    {
+      "id": "aile",
+      "icon": "",
+      "iconKey": "Users",
+      "label": "Aile dostu",
+      "group": "feature"
+    },
+    {
+      "id": "engelli",
+      "icon": "",
+      "iconKey": "Accessibility",
+      "label": "Engelli erişimi",
+      "group": "feature"
+    },
+    {
+      "id": "wifi",
+      "icon": "",
+      "iconKey": "Wifi",
+      "label": "Wi‑Fi",
+      "group": "feature"
+    },
+    {
+      "id": "fotograf",
+      "icon": "",
+      "iconKey": "Camera",
+      "label": "Fotoğraf dahil",
+      "group": "feature"
+    }
+  ],
+  "tags": [
+    {
+      "id": "cac70e8c-d0da-42c3-9c39-41a34a58fbdc",
+      "name": "Standart"
+    },
+    {
+      "id": "36d83ecc-1316-4cd9-a039-2fc2e8821d61",
+      "name": "Popüler Tercih"
+    },
+    {
+      "id": "970a6489-34b0-465b-9c70-444859816ea2",
+      "name": "En Çok Satan"
+    },
+    {
+      "id": "20880ab2-c734-474a-bbff-61fcd91103b3",
+      "name": "Evcil Hayvan Dostu"
+    },
+    {
+      "id": "e4fabc68-c2b3-4f02-a75d-92c0a6c74f55",
+      "name": "Balayı Villası"
+    },
+    {
+      "id": "468678a5-6e0d-40ba-8a9f-b1e928988ef0",
+      "name": "Fırsat Villası"
+    },
+    {
+      "id": "badf73d3-3d9d-44e8-b56f-339c81266bbe",
+      "name": "Aile Villası"
+    }
+  ],
+  "categories": [
+    {
+      "id": "tekne-turu",
+      "name": "Tekne Turu",
+      "subcategories": [
+        {
+          "id": "12-adalar-tekne-turu",
+          "name": "12 Adalar Tekne Turu",
+          "coverImageUrl": "/uploads/settings/subcategories/1774470434816-9de24092-Tekne-Turlar_.jpg",
+          "description": "Göcek Koylarında Eşsiz Bir Tur"
+        },
+        {
+          "id": "korsan-tekne-turu",
+          "name": "Korsan Tekne Turu",
+          "coverImageUrl": "/uploads/settings/subcategories/1774470487540-113dbaca-korsan-tekne-Turlar_.jpg",
+          "description": "Eğlence Dolu Bir Tekne Turu"
+        },
+        {
+          "id": "parti-tekne-turu",
+          "name": "Parti Tekne Turu",
+          "coverImageUrl": "/uploads/settings/subcategories/1774470523185-4b73c4ea-Parti-Tekne-Turlar_.jpg",
+          "description": "Bol parti, Sınırsız Eğlence"
+        },
+        {
+          "id": "relax-tekne-turu",
+          "name": "Relax Tekne Turu",
+          "coverImageUrl": "/uploads/settings/subcategories/1774470539717-837f069a-Relax-Tekne-Turlar_.jpg",
+          "description": "Rahatlatıcı Bir Tekne Turu Deneyimi"
+        },
+        {
+          "id": "ozel-tekne-turu",
+          "name": "Özel Tekne Turu",
+          "coverImageUrl": "/uploads/settings/subcategories/1774470558665-11998db6-O_zel-Tekne-Turlar_.jpg",
+          "description": "Size Özel Tekne Turları"
+        }
+      ]
+    }
+  ],
+  "blockManagement": {
+    "villaRegionBanners": {
+      "Ovacık": "/uploads/settings/blocks/1775117994528-e2328ebd-920f1525-bac1-444b-bff3-be52ccb6c396.jpg"
+    }
+  },
+  "contracts": {
+    "kvkkPolicy": "12adalartekneturu.com KİŞİSEL VERİLERİN İŞLENMESİ ve KORUNMASINA YÖNELİK AYDINLATMA METNİ\nA. Veri Sorumlusu Sıfatıyla Bilgilendirme\n\nAbakaya Turizm Ticaret Limited Şirketi (“Şirket”) olarak, 12adalartekneturu.com markası kapsamında kişisel verilerinizin güvenliğine azami hassasiyet göstermekteyiz.\n\nKişisel verileriniz, 6698 Sayılı Kişisel Verilerin Korunması Kanunu (“KVKK”) hükümlerine uygun olarak işlenmekte ve muhafaza edilmektedir.\n\nKVKK kapsamında veri sorumlusu sıfatıyla kişisel verileriniz; kaydedilecek, saklanacak, güncellenecek, mevzuatın izin verdiği hallerde üçüncü kişilerle paylaşılabilecek ve kanunda belirtilen şekillerde işlenebilecektir.\n\nB. İşlenen Kişisel Veriler ve Amaçları\n\nTarafımızla paylaştığınız kişisel veriler aşağıdaki kategorilerde işlenmektedir:\n\n1. Kimlik Bilgileri\n\nAd, soyad, doğum tarihi vb.\n➡️ Amaç: Rezervasyon işlemleri, yasal yükümlülüklerin yerine getirilmesi\n\n2. İletişim Bilgileri\n\nTelefon numarası, e-posta adresi, adres bilgisi\n➡️ Amaç: Rezervasyon onayı, bilgilendirme ve iletişim\n\n3. Görsel ve Multimedya Verileri\n\nTur sırasında çekilen fotoğraf/video kayıtları\n➡️ Amaç: Hizmet sunumu ve tanıtım faaliyetleri (açık rıza ile)\n\n4. Lokasyon Verileri\n\nAdres ve konum bilgileri\n➡️ Amaç: Hizmet organizasyonu ve operasyonel süreçlerin yürütülmesi\n\nC. Kişisel Verilerin Toplanma Yöntemi ve Hukuki Sebepler\n\nKişisel verileriniz;\n\nWeb sitesi (12adalartekneturu.com)\nTelefon / WhatsApp iletişimi\nSosyal medya kanalları\nRezervasyon formları\n\nüzerinden toplanmaktadır.\n\nHukuki Dayanaklar:\nSözleşmenin kurulması ve ifası\nYasal yükümlülüklerin yerine getirilmesi\nŞirketin meşru menfaatleri\nAçık rızanız\nD. Kişisel Verilerin Aktarılması\n\nKişisel verileriniz aşağıdaki taraflarla paylaşılabilir:\n\nTur organizasyonunu gerçekleştiren tekne işletmecileri\nİş ortakları ve hizmet sağlayıcılar\nYetkili kamu kurum ve kuruluşları\n\n➡️ Amaç:\n\nHizmetin eksiksiz sunulması\nRezervasyon ve operasyon süreçlerinin yürütülmesi\nYasal yükümlülüklerin yerine getirilmesi\nE. KVKK Kapsamındaki Haklarınız\n\nKVKK’nın 11. maddesi kapsamında aşağıdaki haklara sahipsiniz:\n\nKişisel veri işlenip işlenmediğini öğrenme\nİşlenmişse bilgi talep etme\nİşlenme amacını öğrenme\nAktarıldığı üçüncü kişileri öğrenme\nEksik/yanlış verilerin düzeltilmesini isteme\nSilinmesini veya yok edilmesini talep etme\nAktarılan üçüncü kişilere bildirilmesini isteme\nOtomatik sistemlere itiraz etme\nZarara uğramanız halinde tazminat talep etme\nF. Başvuru ve İletişim\n\nKVKK kapsamındaki taleplerinizi aşağıdaki iletişim kanallarından iletebilirsiniz:\n\n📞 Telefon: 0553 688 27 34\n📧 E-posta: info@12adalartekneturu.com\n\n🏢 Firma: Abakaya Turizm Ticaret Limited Şirketi\n\nG. Açık Rıza Beyanı\n\nBu metni okuduğumu, anladığımı ve aşağıdaki hususlara açık rıza verdiğimi kabul ederim:\n\nKişisel verilerimin belirtilen amaçlarla işlenmesi\nGerekli durumlarda üçüncü kişilerle paylaşılması\nHizmet kapsamında işlenmesi\n\nAd Soyad:\nİmza:",
+    "termsOfUse": "1. Taraflar ve Kapsam\n\nİşbu Kullanım Koşulları,\nAbakaya Turizm Ticaret Limited Şirketi (“Şirket”) tarafından işletilen 12adalartekneturu.com internet sitesinin kullanımına ilişkin şartları düzenler.\n\nSite üzerinden sunulan hizmetler;\ngünübirlik tekne turları, tur tanıtımları, online rezervasyon ve bilet satış işlemleri ile sınırlıdır.\n\n2. Site Kullanımı\n\nSiteyi kullanan herkes aşağıdaki kuralları kabul etmiş sayılır:\n\nSiteyi yalnızca hukuka uygun amaçlarla kullanacağını,\nYanıltıcı, eksik veya başkalarının haklarını ihlal eden işlem yapmayacağını,\nSite altyapısına zarar verecek herhangi bir girişimde bulunmayacağını kabul eder.\n\nŞirket, gerekli gördüğü durumlarda kullanıcıların siteye erişimini kısıtlama veya tamamen sonlandırma hakkını saklı tutar.\n\n3. Rezervasyon ve Satın Alma\n\nSite üzerinden yapılan tüm rezervasyon ve satın alma işlemleri, kullanıcının beyan ettiği bilgiler doğrultusunda gerçekleştirilir.\n\nYanlış, eksik veya hatalı bilgi verilmesinden kaynaklanan sorunlardan kullanıcı sorumludur.\nSatın alma işlemi tamamlandığında kullanıcı;\nMesafeli Satış Sözleşmesi\nİptal & İade Politikası\nhükümlerini okumuş ve kabul etmiş sayılır.\n4. Hizmetin Niteliği\n\nSitede sunulan tekne turları;\n\nŞirket tarafından doğrudan\nveya\nAnlaşmalı üçüncü taraf tekne işletmecileri aracılığıyla gerçekleştirilebilir.\n\nAşağıdaki durumlarda tur programında değişiklik yapılabilir veya tur iptal edilebilir:\n\nHava koşulları\nDeniz şartları\nOperasyonel zorunluluklar\nMücbir sebepler (doğal afet, resmi kararlar vb.)\nGüvenlik gereklilikleri\n5. Sorumluluğun Sınırlandırılması\n\nŞirket;\n\nTur sırasında oluşabilecek gecikmelerden,\nÜçüncü taraf hizmet sağlayıcılardan kaynaklanan aksaklıklardan,\nKullanıcının kendi kusurundan doğan zararlardan\n\nhukuken sorumlu tutulamaz.\n\n6. Fikri Mülkiyet Hakları\n\nSite içerisinde yer alan;\n\nTüm içerikler\nTasarımlar\nMetinler\nLogo ve görseller\n\nAbakaya Turizm Ticaret Limited Şirketi’ne aittir.\n\nİzinsiz olarak kopyalanamaz, çoğaltılamaz, dağıtılamaz veya ticari amaçla kullanılamaz.\n\n7. Kişisel Verilerin Korunması (KVKK)\n\nKullanıcıların site üzerinden paylaştığı kişisel veriler,\n6698 Sayılı Kişisel Verilerin Korunması Kanunu kapsamında işlenmektedir.\n\nDetaylı bilgi için KVKK Aydınlatma Metni incelenmelidir.\n\nSiteyi kullanan herkes, KVKK metnini okuduğunu ve kabul ettiğini beyan eder.\n\n8. Değişiklik Hakkı\n\nŞirket, işbu Kullanım Koşulları’nı önceden bildirimde bulunmaksızın güncelleme hakkını saklı tutar.\n\nGüncellenmiş koşullar, sitede yayınlandığı tarihten itibaren geçerli olur.\n\n9. Uyuşmazlık ve Yetkili Mahkeme\n\nİşbu Kullanım Koşulları’nın uygulanmasında Türk Hukuku geçerlidir.\n\nTaraflar arasında doğabilecek uyuşmazlıklarda\nFethiye / Muğla Mahkemeleri ve İcra Daireleri yetkilidir.\n\n10. Yürürlük\n\nİşbu Kullanım Koşulları, 12adalartekneturu.com internet sitesinde yayınlandığı tarihte yürürlüğe girer.",
+    "cookiePolicy": "I. Veri Sorumlusu Hakkında Bilgilendirme\n\nAbakaya Turizm Ticaret Limited Şirketi olarak,\n12adalartekneturu.com internet sitesi üzerinden kullanıcı deneyimini geliştirmek ve hizmetlerimizi daha iyi sunabilmek amacıyla çerezler (cookies) kullanmaktayız.\n\nKişisel verileriniz,\n6698 Sayılı Kişisel Verilerin Korunması Kanunu (“KVKK”) kapsamında korunmakta ve işlenmektedir.\n\nII. Çerez Nedir?\n\nÇerezler, ziyaret ettiğiniz internet siteleri tarafından cihazınıza kaydedilen küçük veri dosyalarıdır.\n\nBu dosyalar sayesinde:\n\nSite tercihlerinizi hatırlayabiliriz\nDaha hızlı ve kolay kullanım sağlarız\nSize özel içerik sunabiliriz\nIII. Çerezlerin Kullanım Amaçları\n\nSitemizde kullanılan çerezler aşağıdaki amaçlarla kullanılmaktadır:\n\nWeb sitesinin düzgün çalışmasını sağlamak\nKullanıcı deneyimini geliştirmek\nSite performansını analiz etmek\nGüvenliği sağlamak ve sahte işlemleri önlemek\nReklam ve pazarlama faaliyetlerini yürütmek\nYasal yükümlülükleri yerine getirmek\nIV. Kullanılan Çerez Türleri\n1. Zorunlu Çerezler\n\nSite’nin çalışması için gereklidir.\n\n2. Performans ve Analitik Çerezler\n\nSite kullanımını analiz ederek hizmet kalitesini artırır.\n\n3. İşlevsellik Çerezleri\n\nTercihlerinizi (dil, cihaz vb.) hatırlar.\n\n4. Reklam ve Pazarlama Çerezleri\n\nSize ilgi alanlarınıza uygun içerik ve reklam sunar.\n\n5. Üçüncü Taraf Çerezleri\n\nGoogle gibi servis sağlayıcılar tarafından kullanılan çerezlerdir.\n\nV. Çerezlerin Yönetimi ve Engellenmesi\n\nTarayıcı ayarlarınızı değiştirerek çerezleri:\n\nKabul edebilir\nReddedebilir\nSilme işlemi yapabilirsiniz\n\n⚠️ Ancak çerezleri devre dışı bırakmanız durumunda, sitenin bazı özellikleri düzgün çalışmayabilir.\n\nVI. Çerez Politikası Değişiklikleri\n\nŞirket, işbu Çerez Politikası’nı önceden bildirim yapmaksızın güncelleme hakkını saklı tutar.\n\nGüncel politika, sitede yayınlandığı tarihten itibaren geçerli olur.\n\nVII. İletişim Bilgileri\n\nÇerez politikası ile ilgili talepleriniz için:\n\n📞 Telefon: 0553 688 27 34\n📧 E-posta: info@12adalartekneturu.com\n\n🏢 Firma: Abakaya Turizm Ticaret Limited Şirketi",
+    "onlineVisitorsClarification": "1. Veri Sorumlusu\n\nİşbu aydınlatma metni,\n6698 Sayılı Kişisel Verilerin Korunması Kanunu (“KVKK”) uyarınca, veri sorumlusu sıfatıyla\n\nAbakaya Turizm Ticaret Limited Şirketi\ntarafından hazırlanmıştır.\n\n2. İşlenen Kişisel Veriler\n\nİnternet sitemizi ziyaret etmeniz sırasında aşağıdaki kişisel veriler işlenebilmektedir:\n\nIP adresi\nCihaz, tarayıcı ve işletim sistemi bilgileri\nSite ziyaret tarih ve saati\nSayfa görüntüleme ve gezinme hareketleri\nÇerez (cookie) verileri\n3. Kişisel Verilerin İşlenme Amaçları\n\nToplanan kişisel verileriniz aşağıdaki amaçlarla işlenmektedir:\n\nİnternet sitesinin güvenliğinin sağlanması\nSite performansının ve işlevselliğinin artırılması\nKullanıcı deneyiminin geliştirilmesi\nHizmet kalitesinin artırılması ve analiz yapılması\nHukuki yükümlülüklerin yerine getirilmesi\n4. Kişisel Verilerin Toplanma Yöntemi ve Hukuki Sebebi\n\nKişisel verileriniz;\n\n12adalartekneturu.com internet sitesi\nÇerezler (cookies)\nLog kayıtları\n\naracılığıyla otomatik yöntemlerle toplanmaktadır.\n\nKVKK’nın 5. maddesi uyarınca;\n\nŞirketin meşru menfaatleri\nHukuki yükümlülüklerin yerine getirilmesi\n\nhukuki sebeplerine dayanılarak işlenmektedir.\n\n5. Kişisel Verilerin Aktarılması\n\nKişisel verileriniz;\n\nYetkili kamu kurum ve kuruluşlarına\nYasal yükümlülükler kapsamında\n\nKVKK’ya uygun şekilde aktarılabilir.\n\n6. Kişisel Verilerin Saklanma Süresi\n\nKişisel verileriniz;\n\nİşlenme amaçları için gerekli süre boyunca\nİlgili mevzuatta öngörülen süreler kapsamında\n\nsaklanır.\n\nSüre sonunda veriler;\nsilinir, yok edilir veya anonim hale getirilir.\n\n7. KVKK Kapsamındaki Haklarınız\n\nKVKK’nın 11. maddesi kapsamında;\n\nKişisel verilerinizin işlenip işlenmediğini öğrenme\nİşlenmişse bilgi talep etme\nAmacına uygun kullanılıp kullanılmadığını öğrenme\nEksik veya yanlış verilerin düzeltilmesini isteme\nSilinmesini veya yok edilmesini talep etme\n\nhaklarına sahipsiniz.\n\nBu haklarınızı kullanmak için bizimle iletişime geçebilirsiniz.\n\n8. İlgili Dokümanlar\n\nDetaylı bilgi için aşağıdaki politikaları inceleyebilirsiniz:\n\nKVKK Aydınlatma Metni\nÇerez (Cookie) Politikası\nKullanım Koşulları\n9. İletişim Bilgileri\n\n📞 Telefon: 0553 688 27 34\n📧 E-posta: info@12adalartekneturu.com\n\n🏢 Firma: Abakaya Turizm Ticaret Limited Şirketi\n\n10. Yürürlük\n\nİşbu Çevrimiçi Ziyaretçi Aydınlatma Metni,\n12adalartekneturu.com internet sitesinde yayınlandığı tarihte yürürlüğe girer.",
+    "commercialElectronicConsent": "Tarafıma,\nAbakaya Turizm Ticaret Limited Şirketi\ntarafından; kampanya, indirim, tanıtım, bilgilendirme ve pazarlama amaçlı olarak SMS, e-posta ve telefon araması yoluyla ticari elektronik ileti gönderilmesini kabul ediyorum.\n\nKişisel verilerimin bu kapsamda işlenmesine ilişkin detaylı bilgilere\n6698 Sayılı Kişisel Verilerin Korunması Kanunu kapsamında hazırlanan KVKK Aydınlatma Metni üzerinden ulaşabileceğimi biliyorum.\n\nBu onayı dilediğim zaman geri alabileceğimi, tarafıma gönderilen iletilerde yer alan iletişim kanalları aracılığıyla iletişimi kolaylıkla durdurabileceğimi kabul, beyan ve taahhüt ederim.",
+    "preInformationForm": "1. KONU\n\nİşbu Ön Bilgilendirme Formu,\nAbakaya Turizm Ticaret Limited Şirketi (“SATICI”) ile hizmet satın alan kişi (“ALICI”) arasındaki hak ve yükümlülükleri düzenler.\n\nBu form,\n6502 Sayılı Tüketicinin Korunması Hakkında Kanun ve\nMesafeli Sözleşmeler Yönetmeliği hükümlerine uygun olarak hazırlanmıştır.\n\nALICI, bu formu onayladığında, siparişi tamamlaması halinde ödeme yükümlülüğü altına gireceğini kabul eder.\n\n2. SATICI BİLGİLERİ\n\nFirma: Abakaya Turizm Ticaret Limited Şirketi\n📞 Telefon: 0553 688 27 34\n📧 E-Posta: info@12adalartekneturu.com\n\n3. ALICI BİLGİLERİ\n\nAd Soyad:\nTelefon:\nE-posta:\n\n4. HİZMET BİLGİLERİ\n4.1 Hizmet Tanımı\n\nGünübirlik tekne turu / deniz seferi bilet satışı\n\n4.2 Hizmetin Kapsamı\nTur tarihi ve saatleri\nRota ve duraklar\nTekne ve hizmet detayları\n(Varsa) yemek ve içecek içerikleri\n4.3 Fiyatlandırma\nTüm fiyatlar KDV dahil satış fiyatıdır\nFiyatlar, güncellenene kadar geçerlidir\nKampanyalı fiyatlar süre ile sınırlıdır\n5. FATURA BİLGİLERİ\n\nFatura, elektronik ortamda (e-fatura / e-arşiv) olarak iletilir.\n\n6. GENEL HÜKÜMLER\n6.1\n\nALICI, satın aldığı hizmetin tüm detaylarını (tarih, saat, rota vb.) önceden inceleyerek satın alma yaptığını kabul eder.\n\n6.2\n\nYanlış veya eksik bilgi verilmesinden doğan sorunlardan ALICI sorumludur.\n\n6.3\n\nSistem hataları, fiyat hataları veya teknik aksaklıklardan doğan durumlarda SATICI sorumlu tutulamaz.\n\n6.4\n\nSATICI, gerekli gördüğü durumlarda fiyat ve hizmet içeriğinde değişiklik yapma hakkını saklı tutar.\n\n7. CAYMA HAKKI\n\nMesafeli Sözleşmeler Yönetmeliği uyarınca:\n\nBelirli bir tarihte gerçekleştirilecek tekne turu hizmetleri,\n👉 cayma hakkı kapsamı dışındadır.\nElektronik ortamda anında ifa edilen hizmetlerde cayma hakkı bulunmamaktadır.\n\nBu nedenle ALICI;\n\n👉 satın aldığı bilet için cayma hakkı kullanamayacağını ve iade talep edemeyeceğini kabul eder.\n\n⚠️ Ancak hizmetin SATICI tarafından iptal edilmesi durumunda, ücret iadesi yapılır.\n\n8. HİZMETİN SUNULAMAMASI\n\nMücbir sebepler (hava şartları, deniz koşulları, güvenlik vb.) nedeniyle hizmetin gerçekleştirilememesi halinde:\n\nALICI’ya bilgi verilir\nÜcret iadesi yapılır veya alternatif tarih sunulur\n9. MÜCBİR SEBEPLER\n\nAşağıdaki durumlar mücbir sebep sayılır:\n\nHava ve deniz koşulları\nDoğal afetler\nResmi makam kararları\nTeknik arızalar\nGüvenlik riskleri\n\nBu durumlarda SATICI sorumlu tutulamaz.\n\n10. KİŞİSEL VERİLERİN KORUNMASI\n\nALICI’ya ait kişisel veriler,\n6698 Sayılı Kişisel Verilerin Korunması Kanunu kapsamında işlenir.\n\nDetaylı bilgi için KVKK Aydınlatma Metni incelenmelidir.\n\n11. ŞİKAYET VE BAŞVURU\n\nALICI, taleplerini aşağıdaki iletişim üzerinden iletebilir:\n\n📧 info@12adalartekneturu.com\n\nUyuşmazlık durumunda tüketici hakem heyetlerine başvurulabilir.\n\n12. UYUŞMAZLIK VE YETKİ\n\nİşbu formda Türk Hukuku uygulanır.\n\nUyuşmazlıklarda:\n👉 Fethiye / Muğla Mahkemeleri ve İcra Daireleri yetkilidir.\n\n13. YÜRÜRLÜK\n\nİşbu Ön Bilgilendirme Formu,\n12adalartekneturu.com üzerinden onaylandığı anda yürürlüğe girer.",
+    "distanceSalesContract": "1. TARAFLAR\n\nİşbu Mesafeli Satış Sözleşmesi (“Sözleşme”);\n\nALICI:\nAd Soyad:\nTelefon:\nE-posta:\n\nile\n\nAbakaya Turizm Ticaret Limited Şirketi (“SATICI”) arasında elektronik ortamda akdedilmiştir.\n\n2. SÖZLEŞMENİN KONUSU\n\nBu sözleşme, ALICI’nın 12adalartekneturu.com üzerinden satın aldığı günübirlik tekne turu / deniz seferi hizmetine ilişkin hak ve yükümlülükleri düzenler.\n\nSözleşme,\n6502 Sayılı Tüketicinin Korunması Hakkında Kanun ve ilgili Mesafeli Sözleşmeler Yönetmeliği hükümlerine uygun olarak hazırlanmıştır.\n\n3. HİZMET BİLGİLERİ\n\nSatın alınan hizmet;\n\nTekne turu / deniz seferi bileti\nBelirli tarih ve saat için geçerli\nBelirli rota ve program kapsamında sunulur\n\nTüm detaylar, satın alma öncesinde kullanıcıya sunulmuştur.\n\n4. ALICININ BEYANLARI\n\nALICI;\n\n18 yaşından büyük olduğunu\nHizmetin tüm detaylarını incelediğini\nÖn Bilgilendirme Formu’nu okuduğunu\nİptal & iade şartlarını kabul ettiğini\n\nkabul ve beyan eder.\n\n5. HİZMETİN İFASI\nHizmet, belirtilen tarih ve saatte gerçekleştirilir\nHizmet, SATICI veya anlaşmalı üçüncü taraf tekne işletmecileri tarafından sunulabilir\nFatura elektronik ortamda iletilir\n6. ÖDEME ŞARTLARI\nHizmet bedeli, satın alma sırasında tamamen ödenir\nÖdeme yapılmadan rezervasyon kesinleşmez\nÖdeme yapılmadığı durumlarda SATICI hizmet sunma yükümlülüğünde değildir\n7. CAYMA HAKKI\n\n⚠️ ÖNEMLİ HÜKÜM\n\nMesafeli Sözleşmeler Yönetmeliği gereği:\n\n👉 Belirli tarihte yapılacak tur, etkinlik ve organizasyon hizmetlerinde cayma hakkı bulunmamaktadır.\n\nBu nedenle ALICI;\n\nSatın aldığı tekne turu biletinin\n👉 iptal edilemeyeceğini ve iade talep edemeyeceğini kabul eder.\n8. İPTAL VE MÜCBİR SEBEPLER\n\nAşağıdaki durumlarda:\n\nHava ve deniz koşulları\nTeknik arızalar\nGüvenlik gerekçeleri\nResmi makam kararları\n\nSATICI;\n\nTuru iptal edebilir\nAlternatif tarih sunabilir\nveya\nÜcret iadesi yapabilir\n9. SORUMLULUĞUN SINIRLANDIRILMASI\n\nSATICI;\n\nÜçüncü taraf hizmet sağlayıcılardan kaynaklı aksaklıklardan\nKullanıcının kendi kusurundan doğan zararlardan\nUlaşım, gecikme vb. durumlardan\n\nsorumlu değildir.\n\n10. KİŞİSEL VERİLER\n\nKişisel veriler,\n6698 Sayılı Kişisel Verilerin Korunması Kanunu kapsamında işlenir.\n\nDetaylar KVKK Aydınlatma Metni’nde yer almaktadır.\n\n11. MÜCBİR SEBEPLER\n\nAşağıdaki durumlar mücbir sebep sayılır:\n\nDoğal afetler\nFırtına, deniz koşulları\nTeknik arızalar\nResmi kararlar\n\nBu durumlarda taraflar sorumlu tutulamaz.\n\n12. UYUŞMAZLIK VE YETKİ\n\nİşbu sözleşmede Türk Hukuku uygulanır.\n\nUyuşmazlıklarda:\n👉 Fethiye / Muğla Mahkemeleri ve İcra Daireleri yetkilidir.\n\n13. YÜRÜRLÜK\n\nALICI, bu sözleşmeyi elektronik ortamda onayladığında yürürlüğe girer.\n\nEK: CAYMA FORMU (Bilgilendirme Amaçlı)\n\n(Not: Tekne turu hizmetleri için geçerli değildir)\n\nSözleşme tarihi:\nHizmet tarihi:\nAd Soyad:\nİmza:",
+    "transactionGuide": "1-Etkinlik seçimi\n2-Bilet türü ve adet belirleme\n3-Güvenli ödeme\n4-E-bilet teslimi",
+    "privacyAgreement": "1. Amaç ve Kapsam\n\nİşbu Gizlilik Politikası,\nAbakaya Turizm Ticaret Limited Şirketi tarafından işletilen 12adalartekneturu.com internet sitesini ziyaret eden ve/veya hizmet alan kullanıcıların kişisel bilgilerinin gizliliğinin korunmasına ilişkin esasları belirlemek amacıyla hazırlanmıştır.\n\n2. Toplanan Bilgiler\n\nİnternet sitemiz üzerinden aşağıdaki bilgiler toplanabilir:\n\nAd, soyad\nTelefon numarası\nE-posta adresi\nRezervasyon ve bilet bilgileri\nÖdeme işlemlerine ilişkin sınırlı bilgiler\nIP adresi, cihaz ve tarayıcı bilgileri\nÇerez (cookie) verileri\n3. Bilgilerin Kullanım Amaçları\n\nToplanan kişisel verileriniz;\n\nGünübirlik tekne turu ve bilet satış işlemlerinin gerçekleştirilmesi\nRezervasyon ve müşteri iletişiminin sağlanması\nÖdeme ve muhasebe süreçlerinin yürütülmesi\nSite güvenliğinin sağlanması\nHizmet kalitesinin artırılması\n\namaçlarıyla kullanılmaktadır.\n\n4. Bilgilerin Korunması\n\nKişisel verilerinizin güvenliği için gerekli teknik ve idari tedbirler alınmaktadır.\n\nYetkisiz erişim\nVeri kaybı\nHukuka aykırı veri işleme\n\ngibi risklere karşı koruma sağlanmaktadır.\n\n5. Bilgilerin Paylaşılması\n\nKişisel bilgileriniz;\n\nÖdeme hizmeti sağlayıcıları\nMuhasebe ve finans danışmanları\nTur hizmetini sağlayan tekne işletmecileri\nYetkili kamu kurum ve kuruluşları\n\nile yalnızca hizmetin sunulması ve yasal yükümlülükler kapsamında paylaşılabilir.\n\n6. Çerezler (Cookies)\n\nİnternet sitemizde çerezler kullanılmaktadır.\n\nÇerezlerin kullanımına ilişkin detaylı bilgi için Çerez Politikası incelenmelidir.\n\n7. KVKK Kapsamındaki Haklar\n\nKişisel verileriniz,\n6698 Sayılı Kişisel Verilerin Korunması Kanunu kapsamında korunmaktadır.\n\nBu kapsamda;\n\nVerilerinizin işlenip işlenmediğini öğrenme\nBilgi talep etme\nEksik/yanlış verilerin düzeltilmesini isteme\nSilinmesini veya yok edilmesini talep etme\n\nhaklarına sahipsiniz.\n\n8. Üçüncü Taraf Bağlantılar\n\nSitemiz, üçüncü taraf internet sitelerine yönlendirme içerebilir.\n\nBu sitelerin gizlilik politikalarından SATICI sorumlu değildir.\n\n9. Politika Değişiklikleri\n\nŞirket, işbu Gizlilik Politikası’nı dilediği zaman güncelleme hakkını saklı tutar.\n\nGüncellenen metin, yayınlandığı tarihten itibaren geçerli olur.\n\n10. İletişim Bilgileri\n\n📞 Telefon: 0553 688 27 34\n📧 E-posta: info@12adalartekneturu.com\n\n🏢 Firma: Abakaya Turizm Ticaret Limited Şirketi\n\n11. Yürürlük\n\nİşbu Gizlilik Politikası,\n12adalartekneturu.com internet sitesinde yayınlandığı tarihte yürürlüğe girer.",
+    "explicitConsentText": "Kişisel verilerimin,\nAbakaya Turizm Ticaret Limited Şirketi\ntarafından; pazarlama, kampanya, tanıtım ve müşteri bilgilendirme faaliyetleri kapsamında işlenmesine ve bu doğrultuda tarafıma SMS, e-posta ve telefon araması yoluyla ticari elektronik ileti gönderilmesine, özgür irademle ve bilgilendirilmiş şekilde açık rıza verdiğimi kabul ederim.\n\nKişisel verilerimin işlenmesine ilişkin detaylı bilgilere,\n6698 Sayılı Kişisel Verilerin Korunması Kanunu kapsamında hazırlanan KVKK Aydınlatma Metni üzerinden ulaşabileceğimi biliyorum.\n\nBu rızayı dilediğim zaman geri alabileceğimi ve tarafıma gönderilen iletilerde yer alan iletişim kanalları üzerinden iletişimi durdurabileceğimi kabul, beyan ve taahhüt ederim.",
+    "deliveryAndReturnTerms": "Teslimat ve İade Şartları"
+  },
+  "siteManagement": {
+    "logoUrl": "/uploads/settings/site/1774618419909-f89bd7f6-logo-laci.png",
+    "darkLogoUrl": "/uploads/settings/site/1774618423100-d53f6528-12adalar-tekne-turu-logo.png",
+    "enabledSiteProducts": [
+      "activity",
+      "villa_rental"
+    ],
+    "slides": [
+      {
+        "id": "home-1",
+        "imageUrl": "/uploads/settings/site/1774504705890-f07e3c43-banner-image3.webp",
+        "title": "Ege'nin Tüm Tekne Turları",
+        "subtitle": "Günlük turlar ve aktiviteleri kolayca keşfedin.",
+        "badge": "Güvenli ödeme"
+      }
+    ]
+  },
+  "bannerManagement": {
+    "sliderBanners": [
+      {
+        "id": "b247e479-adf8-462e-a230-b5484b96582f",
+        "imageUrl": "/uploads/settings/banners/1774507365905-4c94129e-slider-1.jpg",
+        "title": "Tüplü Dalış",
+        "subtitle": ""
+      },
+      {
+        "id": "aa831895-fbca-4ec3-a320-4c6c922d8630",
+        "imageUrl": "/uploads/settings/banners/1774507417205-793688fe-slider-2.jpg",
+        "title": "Yamaç Paraşütü",
+        "subtitle": ""
+      }
+    ],
+    "rightBanner": {
+      "imageUrl": "/uploads/settings/banners/1774507262974-0f4380cd-static-banner.jpg",
+      "storeBadges": {}
+    }
+  },
+  "paymentManagement": {
+    "creditCardEnabled": false,
+    "transferEnabled": true,
+    "askSellEnabled": true,
+    "transferBankName": "TEB BANKASI",
+    "transferAccountHolder": "Abakaya Turizm Ticaret Limited Şirketi",
+    "transferIban": "TR840003200000000142739535"
+  },
+  "mailManagement": {
+    "ticketEmailEnabled": true,
+    "ticketEmailSubject": "Rezervasyonunuz — Biletiniz ektedir ({{siparisNo}})",
+    "ticketEmailBody": "Merhaba {{adSoyad}},\n\n{{siparisNo}} numaralı rezervasyonunuz için PDF biletiniz ektedir.\n\nTur: {{turAdi}}\nTarih: {{tarih}}\nKalkış: {{kalkis}}\nKişi: {{kisi}}\nTutar: {{tutar}} TL\n\nBilet doğrulama bağlantısı: {{dogrulamaUrl}}\n\nİyi günler dileriz.",
+    "invoiceEmailEnabled": true,
+    "invoiceEmailSubject": "Faturanız — {{siparisNo}}",
+    "invoiceEmailBody": "Merhaba {{adSoyad}},\n\n{{siparisNo}} numaralı siparişiniz için PDF faturanız ektedir.\n\nTur: {{turAdi}}\nTutar: {{tutar}} TL\n\nFaturayı indirmek için: {{faturaUrl}}\n\nİyi günler dileriz."
+  },
+  "socialMedia": {
+    "instagramUrl": "#",
+    "facebookUrl": "#",
+    "googleUrl": "#",
+    "youtubeUrl": "#"
+  },
+  "footerManagement": {
+    "paymentMethodsImageUrl": "/uploads/settings/footer/1774679745795-1590f572-Ekran_Resmi_2026-03-28_09.35.36.png",
+    "footerBrandText": "12.adalartekneturu.com"
+  }
+}

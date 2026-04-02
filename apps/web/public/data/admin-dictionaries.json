@@ -1,0 +1,38 @@
+{
+  "mainCategories": [
+    { "id": "deniz", "label": "Deniz" },
+    { "id": "kara", "label": "Kara" },
+    { "id": "kultur", "label": "Kültür" }
+  ],
+  "subCategoriesByMain": {
+    "deniz": [
+      { "id": "tekne", "label": "Tekne Turları" },
+      { "id": "dalis", "label": "Dalış" }
+    ],
+    "kara": [
+      { "id": "jeep", "label": "Jeep Safari" },
+      { "id": "yuruyus", "label": "Yürüyüş" }
+    ],
+    "kultur": [
+      { "id": "sehir", "label": "Şehir Turları" },
+      { "id": "muzeler", "label": "Müzeler" }
+    ]
+  },
+  "includes": [
+    { "id": "ogle", "label": "Öğle yemeği" },
+    { "id": "transfer", "label": "Otel transferi" },
+    { "id": "rehber", "label": "Profesyonel rehber" },
+    { "id": "sigorta", "label": "Seyahat sigortası" }
+  ],
+  "excludes": [
+    { "id": "icecek", "label": "İçecekler" },
+    { "id": "bahsis", "label": "Bahşişler" },
+    { "id": "kisisel", "label": "Kişisel harcamalar" }
+  ],
+  "features": [
+    { "id": "aile", "label": "Aile dostu" },
+    { "id": "engelli", "label": "Engelli erişimi" },
+    { "id": "wifi", "label": "Wi‑Fi" },
+    { "id": "fotograf", "label": "Fotoğraf dahil" }
+  ]
+}
