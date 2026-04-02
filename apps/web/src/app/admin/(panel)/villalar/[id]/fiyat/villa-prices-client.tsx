@@ -45,6 +45,13 @@ export function VillaPricesClient({ villaId }: Props) {
   const [rangeTo, setRangeTo] = useState('');
   const [rangePrice, setRangePrice] = useState('');
 
+  const [legacyPricesFile, setLegacyPricesFile] = useState<File | null>(null);
+  const [legacyAvailabilityFile, setLegacyAvailabilityFile] = useState<File | null>(null);
+  const [legacyPriceMode, setLegacyPriceMode] = useState<'merge' | 'replace'>('merge');
+  const [legacyAvailabilityMode, setLegacyAvailabilityMode] = useState<'merge' | 'replace'>('merge');
+  const [importing, setImporting] = useState(false);
+  const [importMessage, setImportMessage] = useState<string | null>(null);
+
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -122,6 +129,47 @@ export function VillaPricesClient({ villaId }: Props) {
     const base = villa?.prices ?? [];
     const next = base.filter((p) => p.date !== date);
     await savePrices(next);
+  }
+
+  async function importLegacyCalendar() {
+    if (!legacyPricesFile && !legacyAvailabilityFile) {
+      setImportMessage('En az bir JSON dosyası seçin.');
+      return;
+    }
+    setImporting(true);
+    setImportMessage(null);
+    try {
+      const fd = new FormData();
+      if (legacyPricesFile) fd.append('prices', legacyPricesFile);
+      if (legacyAvailabilityFile) fd.append('availability', legacyAvailabilityFile);
+      fd.append('priceMode', legacyPriceMode);
+      fd.append('availabilityMode', legacyAvailabilityMode);
+
+      const res = await fetch(`/api/admin/villas/${villaId}/import-calendar`, {
+        method: 'POST',
+        credentials: 'include',
+        body: fd,
+      });
+      const data = (await res.json()) as { error?: string; summary?: { priceRows: number; availabilityDates: number } };
+      if (!res.ok) {
+        setImportMessage(data.error ?? 'Aktarılamadı');
+        return;
+      }
+      const parts: string[] = [];
+      if (data.summary && data.summary.priceRows > 0) {
+        parts.push(`${data.summary.priceRows} fiyat satırı`);
+      }
+      if (data.summary && data.summary.availabilityDates > 0) {
+        parts.push(`${data.summary.availabilityDates} müsaitlik günü`);
+      }
+      setImportMessage(parts.length ? `Aktarıldı: ${parts.join(', ')}.` : 'Kaydedildi.');
+      setLegacyPricesFile(null);
+      setLegacyAvailabilityFile(null);
+      void load();
+      router.refresh();
+    } finally {
+      setImporting(false);
+    }
   }
 
   const year = cursor.getFullYear();
@@ -218,6 +266,75 @@ export function VillaPricesClient({ villaId }: Props) {
             </button>
           </div>
         </div>
+      </div>
+
+      <div className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+        <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Eski siteden aktar (JSON)</p>
+        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+          Eski panelden export ettiğiniz <code className="rounded bg-zinc-100 px-1 dark:bg-zinc-800">prices.json</code> ve{' '}
+          <code className="rounded bg-zinc-100 px-1 dark:bg-zinc-800">availability.json</code> dosyalarını yükleyin. En az
+          biri zorunlu; ikisini birden seçebilirsiniz. Villa kimliği bu sayfadaki villa ile eşleştirilir (dosyadaki{' '}
+          <code className="rounded bg-zinc-100 px-1 dark:bg-zinc-800">villa_id</code> yok sayılır).
+        </p>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-300">
+            Fiyat JSON
+            <input
+              type="file"
+              accept="application/json,.json"
+              className="mt-1 block w-full text-sm text-zinc-600 file:mr-2 file:rounded-lg file:border-0 file:bg-zinc-100 file:px-3 file:py-1.5 file:text-sm file:font-medium dark:text-zinc-400 dark:file:bg-zinc-800"
+              onChange={(e) => setLegacyPricesFile(e.target.files?.[0] ?? null)}
+            />
+          </label>
+          <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-300">
+            Müsaitlik JSON
+            <input
+              type="file"
+              accept="application/json,.json"
+              className="mt-1 block w-full text-sm text-zinc-600 file:mr-2 file:rounded-lg file:border-0 file:bg-zinc-100 file:px-3 file:py-1.5 file:text-sm file:font-medium dark:text-zinc-400 dark:file:bg-zinc-800"
+              onChange={(e) => setLegacyAvailabilityFile(e.target.files?.[0] ?? null)}
+            />
+          </label>
+        </div>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-300">
+            Fiyatlar
+            <select
+              className="mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+              value={legacyPriceMode}
+              onChange={(e) => setLegacyPriceMode(e.target.value === 'replace' ? 'replace' : 'merge')}
+            >
+              <option value="merge">Mevcut fiyatlarla birleştir</option>
+              <option value="replace">Tüm fiyatları dosyayla değiştir</option>
+            </select>
+          </label>
+          <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-300">
+            Müsaitlik
+            <select
+              className="mt-1 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+              value={legacyAvailabilityMode}
+              onChange={(e) => setLegacyAvailabilityMode(e.target.value === 'replace' ? 'replace' : 'merge')}
+            >
+              <option value="merge">Mevcut kayıtlarla birleştir</option>
+              <option value="replace">Dosyada geçen tarihlerde yeniden uygula</option>
+            </select>
+          </label>
+        </div>
+        {importMessage && (
+          <p
+            className={`mt-3 text-sm ${importMessage.startsWith('Aktarıldı') || importMessage === 'Kaydedildi.' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}
+          >
+            {importMessage}
+          </p>
+        )}
+        <button
+          type="button"
+          disabled={importing || saving}
+          onClick={() => void importLegacyCalendar()}
+          className="mt-4 rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-900 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-100"
+        >
+          {importing ? 'Aktarılıyor…' : 'Dışardan aktar'}
+        </button>
       </div>
 
       <div className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
