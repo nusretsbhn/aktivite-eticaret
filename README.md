@@ -18,6 +18,12 @@ Bu repo, `apps/api` (NestJS) ve `apps/web` (Next.js) içerir. Başlangıç plan�
 4. Uygulama ayağa kalkınca tüm ayarlar/siparişler/aktiviteler/villa verileri PostgreSQL üstündeki `app_json_store` tablosundan okunur ve yazılır.
 5. Medya dosyaları (upload edilen görseller, ticket PDF) dosya sistemi üstünde kalır; URL ve metaveriler veritabanında tutulur.
 
+## Repo Hijyen (Canlı İçin)
+
+- `apps/web/data/*` runtime verileri git'e dahil edilmez (`.gitkeep` hariç).
+- `.tmp-home/` gibi lokal geçici klasörler git'e dahil edilmez.
+- Canlıda her deploy sonrası migration adımını çalıştırın: `npm run db:migrate`.
+
 ## Başlangıç
 
 1. `apps/api` iskeletini NestJS ile oluştur.

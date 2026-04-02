@@ -25,6 +25,8 @@
 
 # admin uploads (gallery)
 public/uploads/
+data/*
+!data/.gitkeep
 *.pem
 
 # debug
