@@ -1,9 +1,8 @@
 import { randomUUID } from 'node:crypto';
-import { join } from 'node:path';
-
 import { readJsonStore, writeJsonStore } from '@/lib/db-json-store';
+import { appDataFile } from '@/lib/next-public-dir';
 
-const DATA_PATH = join(process.cwd(), 'data', 'villa-requests.json');
+const DATA_PATH = appDataFile('villa-requests.json');
 
 /** Ön rezervasyon formundan gelen ek alanlar */
 export type VillaPreReservationFormDetails = {

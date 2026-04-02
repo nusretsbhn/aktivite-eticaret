@@ -151,7 +151,7 @@ export function VillaGalleryClient({ villaId }: Props) {
         <input
           ref={fileRef}
           type="file"
-          accept="image/*,video/*"
+          accept=".jpg,.jpeg,.png,.webp,.gif,.avif,.mp4,.webm,.mov,image/jpeg,image/png,image/webp,image/gif,image/avif,video/mp4,video/webm,video/quicktime"
           multiple
           className="hidden"
           onChange={(e) => void onUpload(e.target.files)}
@@ -159,6 +159,7 @@ export function VillaGalleryClient({ villaId }: Props) {
         <p className="text-sm text-zinc-600 dark:text-zinc-400">
           Resim veya video sürükleyip bırakın ya da dosya seçin.
         </p>
+        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">Desteklenen: JPG, PNG, WEBP, GIF, AVIF, MP4, WEBM, MOV</p>
         <button
           type="button"
           disabled={uploading}

@@ -1,10 +1,9 @@
-import { join } from 'node:path';
-
+import { appDataFile } from '@/lib/next-public-dir';
 import { readJsonStore, writeJsonStore } from '@/lib/db-json-store';
 import { DEFAULT_ENABLED_SITE_PRODUCTS, normalizeEnabledSiteProducts } from '@/lib/site-product-types';
 import type { AdminSettings } from '@/types/admin-settings';
 
-const DATA_PATH = join(process.cwd(), 'data', 'admin-settings.json');
+const DATA_PATH = appDataFile('admin-settings.json');
 
 export function getDefaultSettings(): AdminSettings {
   return {

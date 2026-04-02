@@ -1,11 +1,10 @@
-import { join } from 'node:path';
-
 import { normalizeGalleryPayload, normalizePricesPayload } from '@/lib/admin-villa-normalize';
 import { normalizeAvailabilityPayload } from '@/lib/availability-helpers';
 import { readJsonStore, writeJsonStore } from '@/lib/db-json-store';
+import { appDataFile } from '@/lib/next-public-dir';
 import type { AdminVilla } from '@/types/admin-villa';
 
-const DATA_PATH = join(process.cwd(), 'data', 'admin-villas.json');
+const DATA_PATH = appDataFile('admin-villas.json');
 
 export async function readVillas(): Promise<AdminVilla[]> {
   try {

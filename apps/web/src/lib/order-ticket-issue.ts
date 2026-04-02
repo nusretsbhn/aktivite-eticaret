@@ -1,7 +1,8 @@
 import { mkdir, writeFile } from 'node:fs/promises';
+import { sendTicketEmailWithPdf } from '@/lib/order-ticket-email';
 import { join } from 'node:path';
 
-import { sendTicketEmailWithPdf } from '@/lib/order-ticket-email';
+import { getNextAppRoot } from '@/lib/next-public-dir';
 import { buildOrderTicketPdfBuffer } from '@/lib/order-ticket-pdf';
 import { isOrderTicketEligible } from '@/lib/order-ticket-eligibility';
 import { readOrders, writeOrders } from '@/lib/orders-server';
@@ -18,7 +19,7 @@ export async function issueOrderTicketIfNeeded(orderId: string, verifyBaseUrl: s
   const base = verifyBaseUrl.replace(/\/$/, '');
   const verifyUrl = `${base}/bilet/${order.id}`;
   const buf = await buildOrderTicketPdfBuffer(order, verifyUrl);
-  const dir = join(process.cwd(), 'data', 'tickets');
+  const dir = join(getNextAppRoot(), 'data', 'tickets');
   await mkdir(dir, { recursive: true });
   await writeFile(join(dir, `${orderId}.pdf`), buf);
   const now = new Date().toISOString();

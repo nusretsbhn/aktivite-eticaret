@@ -7,6 +7,7 @@ import { NextResponse } from 'next/server';
 import { requireAdminSession } from '@/lib/admin-api-auth';
 import { sendInvoiceEmailWithPdf } from '@/lib/order-invoice-email';
 import { getRequestOrigin } from '@/lib/request-origin';
+import { getNextPublicDir } from '@/lib/next-public-dir';
 import { readOrders, writeOrders } from '@/lib/orders-server';
 
 function unauthorized() {
@@ -35,7 +36,7 @@ export async function POST(
     return NextResponse.json({ error: 'Sadece PDF yüklenebilir.' }, { status: 400 });
   }
 
-  const uploadDir = join(process.cwd(), 'public', 'uploads', 'orders', 'invoices');
+  const uploadDir = join(getNextPublicDir(), 'uploads', 'orders', 'invoices');
   await mkdir(uploadDir, { recursive: true });
   const filename = `${Date.now()}-${randomUUID().slice(0, 8)}-${safeFilename(file.name)}`;
   const bytes = Buffer.from(await file.arrayBuffer());

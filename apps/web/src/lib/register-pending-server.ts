@@ -1,9 +1,8 @@
 import { createHash, randomInt, randomUUID } from 'node:crypto';
-import { join } from 'node:path';
-
 import { readJsonStore, writeJsonStore } from '@/lib/db-json-store';
+import { appDataFile } from '@/lib/next-public-dir';
 
-const DATA_PATH = join(process.cwd(), 'data', 'register-pending.json');
+const DATA_PATH = appDataFile('register-pending.json');
 
 export type RegisterPending = {
   id: string;

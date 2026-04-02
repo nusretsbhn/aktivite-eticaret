@@ -7,6 +7,7 @@ import { NextResponse } from 'next/server';
 import { requireAdminSession } from '@/lib/admin-api-auth';
 import { readActivities, writeActivities } from '@/lib/admin-activities-server';
 import { formDataBlobName, getFormDataBlob } from '@/lib/form-data-file';
+import { getNextPublicDir } from '@/lib/next-public-dir';
 import type { GalleryItem } from '@/types/admin-activity';
 
 function unauthorized() {
@@ -20,6 +21,11 @@ function notFound() {
 function safeFilename(name: string): string {
   return name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 120);
 }
+
+const ALLOWED_IMAGE_MIME = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif']);
+const ALLOWED_VIDEO_MIME = new Set(['video/mp4', 'video/webm', 'video/quicktime']);
+const ALLOWED_IMAGE_EXT = /\.(jpe?g|png|webp|gif|avif)$/i;
+const ALLOWED_VIDEO_EXT = /\.(mp4|webm|mov)$/i;
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -38,20 +44,28 @@ export async function POST(request: Request, context: RouteContext) {
     return NextResponse.json({ error: 'Dosya gerekli.' }, { status: 400 });
   }
 
-  const mime = blob.type || '';
-  const isVideo = mime.startsWith('video/');
-  const isImage = mime.startsWith('image/');
+  const mime = blob.type.toLowerCase();
+  const originalName = formDataBlobName(blob);
+  let isImage = ALLOWED_IMAGE_MIME.has(mime);
+  let isVideo = ALLOWED_VIDEO_MIME.has(mime);
+  if (!isImage && !isVideo) {
+    isImage = ALLOWED_IMAGE_EXT.test(originalName);
+    isVideo = ALLOWED_VIDEO_EXT.test(originalName);
+  }
   if (!isVideo && !isImage) {
-    return NextResponse.json({ error: 'Sadece resim veya video yükleyin.' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Desteklenmeyen format. JPG, PNG, WEBP, GIF, AVIF veya MP4/WEBM/MOV yükleyin.' },
+      { status: 400 },
+    );
   }
 
   const buf = Buffer.from(await blob.arrayBuffer());
   const activity = all[idx];
   if (!activity) return notFound();
 
-  const uploadDir = join(process.cwd(), 'public', 'uploads', 'activities', activity.id);
+  const uploadDir = join(getNextPublicDir(), 'uploads', 'activities', activity.id);
   await mkdir(uploadDir, { recursive: true });
-  const filename = `${Date.now()}-${safeFilename(formDataBlobName(blob))}`;
+  const filename = `${Date.now()}-${safeFilename(originalName)}`;
   await writeFile(join(uploadDir, filename), buf);
 
   const publicUrl = `/uploads/activities/${activity.id}/${filename}`;

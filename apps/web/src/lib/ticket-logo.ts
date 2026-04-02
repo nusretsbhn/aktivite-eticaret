@@ -1,6 +1,8 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
+import { getNextPublicDir } from '@/lib/next-public-dir';
+
 function mimeFromPath(pathOrUrl: string): string {
   const ext = pathOrUrl.split('.').pop()?.toLowerCase() ?? '';
   if (ext === 'jpg' || ext === 'jpeg') return 'image/jpeg';
@@ -32,7 +34,7 @@ export async function resolveLogoDataUrlForPdf(logoUrl?: string | null): Promise
     if (raw.startsWith('/')) {
       const mime = mimeFromPath(raw);
       if (!isRasterMime(mime)) return null;
-      const diskPath = join(process.cwd(), 'public', raw.replace(/^\//, ''));
+      const diskPath = join(getNextPublicDir(), raw.replace(/^\//, ''));
       const buf = await readFile(diskPath);
       return `data:${mime};base64,${buf.toString('base64')}`;
     }

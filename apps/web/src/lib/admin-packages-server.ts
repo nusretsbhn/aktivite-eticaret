@@ -1,9 +1,8 @@
-import { join } from 'node:path';
-
 import { readJsonStore, writeJsonStore } from '@/lib/db-json-store';
+import { appDataFile } from '@/lib/next-public-dir';
 import type { AdminPackage } from '@/types/admin-package';
 
-const DATA_PATH = join(process.cwd(), 'data', 'admin-packages.json');
+const DATA_PATH = appDataFile('admin-packages.json');
 
 export async function readPackages(): Promise<AdminPackage[]> {
   try {

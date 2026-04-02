@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!villa) return { title: 'Villa' };
   const desc = villa.description?.trim();
   return {
-    title: `${villa.displayName} · Villa`,
+    title: villa.displayName,
     ...(desc ? { description: desc.slice(0, 160) } : {}),
   };
 }

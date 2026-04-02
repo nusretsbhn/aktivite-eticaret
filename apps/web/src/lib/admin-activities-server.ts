@@ -1,10 +1,9 @@
-import { join } from 'node:path';
-
 import { normalizeAvailabilityPayload } from '@/lib/availability-helpers';
 import { readJsonStore, writeJsonStore } from '@/lib/db-json-store';
+import { appDataFile } from '@/lib/next-public-dir';
 import type { AdminActivity } from '@/types/admin-activity';
 
-const DATA_PATH = join(process.cwd(), 'data', 'admin-activities.json');
+const DATA_PATH = appDataFile('admin-activities.json');
 
 export async function readActivities(): Promise<AdminActivity[]> {
   try {

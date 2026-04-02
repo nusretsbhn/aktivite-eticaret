@@ -3,6 +3,8 @@ import { join } from 'node:path';
 
 import { Font } from '@react-pdf/renderer';
 
+import { getNextPublicDir } from '@/lib/next-public-dir';
+
 let notoRegisterOk: boolean | null = null;
 
 /** Noto Sans (Türkçe) — `public/fonts/*.ttf` yoksa veya kayıt hata verirse Helvetica. */
@@ -10,8 +12,9 @@ export function registerTicketFonts(): 'NotoSans' | 'Helvetica' {
   if (notoRegisterOk === false) return 'Helvetica';
   if (notoRegisterOk === true) return 'NotoSans';
 
-  const regular = join(process.cwd(), 'public', 'fonts', 'NotoSans-Regular.ttf');
-  const bold = join(process.cwd(), 'public', 'fonts', 'NotoSans-Bold.ttf');
+  const pub = getNextPublicDir();
+  const regular = join(pub, 'fonts', 'NotoSans-Regular.ttf');
+  const bold = join(pub, 'fonts', 'NotoSans-Bold.ttf');
   if (!existsSync(regular)) {
     notoRegisterOk = false;
     return 'Helvetica';

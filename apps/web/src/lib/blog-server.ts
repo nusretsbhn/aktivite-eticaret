@@ -1,9 +1,8 @@
-import { join } from 'node:path';
-
 import { readJsonStore, writeJsonStore } from '@/lib/db-json-store';
+import { appDataFile } from '@/lib/next-public-dir';
 import type { BlogPost } from '@/types/blog';
 
-const DATA_PATH = join(process.cwd(), 'data', 'blog-posts.json');
+const DATA_PATH = appDataFile('blog-posts.json');
 
 export async function readBlogPosts(): Promise<BlogPost[]> {
   try {

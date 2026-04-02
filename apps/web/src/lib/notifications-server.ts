@@ -1,11 +1,10 @@
 import { randomUUID } from 'node:crypto';
-import { join } from 'node:path';
-
 import { readJsonStore, writeJsonStore } from '@/lib/db-json-store';
+import { appDataFile } from '@/lib/next-public-dir';
 import type { AdminNotification, AdminNotificationType, UserNotification, UserNotificationType } from '@/types/notification';
 
-const ADMIN_PATH = join(process.cwd(), 'data', 'admin-notifications.json');
-const USER_PATH = join(process.cwd(), 'data', 'user-notifications.json');
+const ADMIN_PATH = appDataFile('admin-notifications.json');
+const USER_PATH = appDataFile('user-notifications.json');
 
 export async function readAdminNotifications(): Promise<AdminNotification[]> {
   try {

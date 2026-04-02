@@ -6,6 +6,7 @@ import { NextResponse } from 'next/server';
 
 import { requireAdminSession } from '@/lib/admin-api-auth';
 import { formDataBlobName, getFormDataBlob } from '@/lib/form-data-file';
+import { getNextPublicDir } from '@/lib/next-public-dir';
 import { readVillas, writeVillas } from '@/lib/admin-villas-server';
 import type { GalleryItem } from '@/types/admin-activity';
 
@@ -20,6 +21,11 @@ function notFound() {
 function safeFilename(name: string): string {
   return name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 120);
 }
+
+const ALLOWED_IMAGE_MIME = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif']);
+const ALLOWED_VIDEO_MIME = new Set(['video/mp4', 'video/webm', 'video/quicktime']);
+const ALLOWED_IMAGE_EXT = /\.(jpe?g|png|webp|gif|avif)$/i;
+const ALLOWED_VIDEO_EXT = /\.(mp4|webm|mov)$/i;
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -39,28 +45,31 @@ export async function POST(request: Request, context: RouteContext) {
       return NextResponse.json({ error: 'Dosya gerekli.' }, { status: 400 });
     }
 
-    const mime = blob.type || '';
-    let isVideo = mime.startsWith('video/');
-    let isImage = mime.startsWith('image/');
-    if (!isVideo && !isImage && !mime) {
-      const nm = formDataBlobName(blob).toLowerCase();
-      isImage = /\.(jpe?g|png|gif|webp|avif|bmp|heic|heif)$/i.test(nm);
-      isVideo = /\.(mp4|webm|mov|m4v)$/i.test(nm);
+    const mime = blob.type.toLowerCase();
+    const filename = formDataBlobName(blob);
+    let isImage = ALLOWED_IMAGE_MIME.has(mime);
+    let isVideo = ALLOWED_VIDEO_MIME.has(mime);
+    if (!isImage && !isVideo) {
+      isImage = ALLOWED_IMAGE_EXT.test(filename);
+      isVideo = ALLOWED_VIDEO_EXT.test(filename);
     }
     if (!isVideo && !isImage) {
-      return NextResponse.json({ error: 'Sadece resim veya video yükleyin.' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Desteklenmeyen format. JPG, PNG, WEBP, GIF, AVIF veya MP4/WEBM/MOV yükleyin.' },
+        { status: 400 },
+      );
     }
 
     const buf = Buffer.from(await blob.arrayBuffer());
     const villa = all[idx];
     if (!villa) return notFound();
 
-    const uploadDir = join(process.cwd(), 'public', 'uploads', 'villas', villa.id);
+    const uploadDir = join(getNextPublicDir(), 'uploads', 'villas', villa.id);
     await mkdir(uploadDir, { recursive: true });
-    const filename = `${Date.now()}-${safeFilename(formDataBlobName(blob))}`;
-    await writeFile(join(uploadDir, filename), buf);
+    const storedName = `${Date.now()}-${safeFilename(filename)}`;
+    await writeFile(join(uploadDir, storedName), buf);
 
-    const publicUrl = `/uploads/villas/${villa.id}/${filename}`;
+    const publicUrl = `/uploads/villas/${villa.id}/${storedName}`;
     const galleryItem: GalleryItem = {
       id: randomUUID(),
       url: publicUrl,

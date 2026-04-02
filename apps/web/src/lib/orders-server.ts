@@ -1,10 +1,9 @@
 import { randomUUID } from 'node:crypto';
-import { join } from 'node:path';
-
 import { readJsonStore, writeJsonStore } from '@/lib/db-json-store';
+import { appDataFile } from '@/lib/next-public-dir';
 import type { Order } from '@/types/order';
 
-const DATA_PATH = join(process.cwd(), 'data', 'orders.json');
+const DATA_PATH = appDataFile('orders.json');
 
 function toOrderNo() {
   const d = new Date();

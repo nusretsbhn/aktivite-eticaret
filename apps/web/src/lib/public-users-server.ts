@@ -1,9 +1,8 @@
 import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
-import { join } from 'node:path';
-
 import { readJsonStore, writeJsonStore } from '@/lib/db-json-store';
+import { appDataFile } from '@/lib/next-public-dir';
 
-const DATA_PATH = join(process.cwd(), 'data', 'public-users.json');
+const DATA_PATH = appDataFile('public-users.json');
 
 export type PublicUser = {
   id: string;

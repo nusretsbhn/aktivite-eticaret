@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { NextResponse } from 'next/server';
 
 import { requireAdminSession } from '@/lib/admin-api-auth';
+import { getNextPublicDir } from '@/lib/next-public-dir';
 
 function unauthorized() {
   return NextResponse.json({ error: 'Yetkisiz' }, { status: 401 });
@@ -34,7 +35,7 @@ export async function POST(request: Request) {
   }
 
   const folder = safePart(String(form.get('folder') ?? 'categories'));
-  const uploadDir = join(process.cwd(), 'public', 'uploads', 'settings', folder);
+  const uploadDir = join(getNextPublicDir(), 'uploads', 'settings', folder);
   await mkdir(uploadDir, { recursive: true });
 
   const filename = `${Date.now()}-${randomUUID().slice(0, 8)}-${safeFilename(file.name)}`;

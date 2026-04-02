@@ -1,9 +1,8 @@
-import { join } from 'node:path';
-
 import { readJsonStore, writeJsonStore } from '@/lib/db-json-store';
+import { appDataFile } from '@/lib/next-public-dir';
 import type { CancellationRequest } from '@/types/cancellation-request';
 
-const DATA_PATH = join(process.cwd(), 'data', 'cancellation-requests.json');
+const DATA_PATH = appDataFile('cancellation-requests.json');
 
 export async function readCancellationRequests(): Promise<CancellationRequest[]> {
   try {
