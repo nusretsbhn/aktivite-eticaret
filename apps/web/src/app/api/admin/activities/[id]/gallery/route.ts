@@ -7,7 +7,7 @@ import { NextResponse } from 'next/server';
 import { requireAdminSession } from '@/lib/admin-api-auth';
 import { readActivities, writeActivities } from '@/lib/admin-activities-server';
 import { formDataBlobName, getFormDataBlob } from '@/lib/form-data-file';
-import { getNextPublicDir } from '@/lib/next-public-dir';
+import { getUploadsDir } from '@/lib/next-public-dir';
 import type { GalleryItem } from '@/types/admin-activity';
 
 function unauthorized() {
@@ -63,7 +63,7 @@ export async function POST(request: Request, context: RouteContext) {
   const activity = all[idx];
   if (!activity) return notFound();
 
-  const uploadDir = join(getNextPublicDir(), 'uploads', 'activities', activity.id);
+  const uploadDir = join(getUploadsDir(), 'uploads', 'activities', activity.id);
   await mkdir(uploadDir, { recursive: true });
   const filename = `${Date.now()}-${safeFilename(originalName)}`;
   await writeFile(join(uploadDir, filename), buf);

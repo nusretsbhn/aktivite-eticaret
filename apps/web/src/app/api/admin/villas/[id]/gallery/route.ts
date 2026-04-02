@@ -6,7 +6,7 @@ import { NextResponse } from 'next/server';
 
 import { requireAdminSession } from '@/lib/admin-api-auth';
 import { formDataBlobName, getFormDataBlob } from '@/lib/form-data-file';
-import { getNextPublicDir } from '@/lib/next-public-dir';
+import { getUploadsDir } from '@/lib/next-public-dir';
 import { readVillas, writeVillas } from '@/lib/admin-villas-server';
 import type { GalleryItem } from '@/types/admin-activity';
 
@@ -64,7 +64,7 @@ export async function POST(request: Request, context: RouteContext) {
     const villa = all[idx];
     if (!villa) return notFound();
 
-    const uploadDir = join(getNextPublicDir(), 'uploads', 'villas', villa.id);
+    const uploadDir = join(getUploadsDir(), 'uploads', 'villas', villa.id);
     await mkdir(uploadDir, { recursive: true });
     const storedName = `${Date.now()}-${safeFilename(filename)}`;
     await writeFile(join(uploadDir, storedName), buf);
