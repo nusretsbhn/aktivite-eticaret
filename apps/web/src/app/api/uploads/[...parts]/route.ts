@@ -26,7 +26,8 @@ export async function GET(_request: Request, context: Ctx) {
   const { parts } = await context.params;
   const safeParts = (parts ?? []).filter((p) => p && !p.includes('..'));
   if (!safeParts.length) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-  const rel = join(...safeParts);
+  // URL /uploads/villas/... → /api/uploads/villas/... → parts = ['villas', ...] (uploads segment yok)
+  const rel = join('uploads', ...safeParts);
 
   for (const base of getPublicSearchDirs()) {
     const full = join(base, rel);
