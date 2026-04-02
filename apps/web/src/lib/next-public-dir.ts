@@ -42,6 +42,21 @@ export function getNextPublicDir(): string {
   return join(getNextAppRoot(), 'public');
 }
 
+/** Upload dosyaları için olası public klasörleri (öncelik sırasıyla). */
+export function getPublicSearchDirs(): string[] {
+  const dirs = [
+    getNextPublicDir(),
+    join(process.cwd(), 'public'),
+    join(process.cwd(), 'apps', 'web', 'public'),
+    join(process.cwd(), 'bodrum-aktivite', 'apps', 'web', 'public'),
+  ];
+  const uniq: string[] = [];
+  for (const d of dirs) {
+    if (d && !uniq.includes(d)) uniq.push(d);
+  }
+  return uniq;
+}
+
 /** JSON fallback ve geçici dosyalar için `data/` alt yolu. */
 export function appDataFile(filename: string): string {
   return join(getNextAppRoot(), 'data', filename);
