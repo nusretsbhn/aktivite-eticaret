@@ -356,6 +356,13 @@ export function VillasIndexClient() {
                   </Link>
                   <button
                     type="button"
+                    onClick={() => void copyVilla(v)}
+                    className={`${btn} border-blue-300 text-blue-700 dark:border-blue-700 dark:text-blue-300`}
+                  >
+                    Kopyala
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => void remove(v.id)}
                     className={`${btn} border-red-300 text-red-700 dark:border-red-800 dark:text-red-300`}
                   >
