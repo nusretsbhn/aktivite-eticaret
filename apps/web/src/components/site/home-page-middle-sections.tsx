@@ -28,6 +28,16 @@ import type { AdminSettings } from '@/types/admin-settings';
 import type { AdminVilla } from '@/types/admin-villa';
 import type { FaqItem } from '@/types/faq';
 
+/** Hero slider ile aynı kaynak — ilk dolu görsel URL’i (arka plan için). */
+function firstHeroSlideImageUrl(settings: AdminSettings): string | undefined {
+  const slides = settings.siteManagement?.slides ?? [];
+  for (const s of slides) {
+    const u = String(s.imageUrl ?? '').trim();
+    if (u) return u;
+  }
+  return undefined;
+}
+
 type Props = {
   settings: AdminSettings;
   activities: AdminActivity[];
@@ -82,7 +92,13 @@ function Section({
       return <HomeVillasSection villas={villas} settings={settings} />;
     case 'villasByFeature':
       if (!showVillaRental) return null;
-      return <HomeVillasByFeatureSection villas={villas} settings={settings} />;
+      return (
+        <HomeVillasByFeatureSection
+          villas={villas}
+          settings={settings}
+          heroBackgroundImageUrl={firstHeroSlideImageUrl(settings)}
+        />
+      );
     case 'benefits':
       return <HomeBenefitsSection />;
     case 'honeymoonVillas':
