@@ -151,6 +151,20 @@ export function VillasIndexClient() {
     router.refresh();
   }
 
+  async function copyVilla(v: AdminVilla) {
+    if (!confirm('Bu villayı kopyalamak istediğinize emin misiniz?')) return;
+    const res = await fetch(`/api/admin/villas/${v.id}/copy`, { method: 'POST', credentials: 'include' });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({} as unknown));
+      alert((data as { error?: string })?.error ?? 'Kopyalanamadı');
+      return;
+    }
+    const data = (await res.json()) as { villa?: AdminVilla };
+    void load();
+    router.refresh();
+    if (data.villa?.id) router.push(`/admin/villalar/${data.villa.id}/duzenle`);
+  }
+
   const rangeFrom = total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
   const rangeTo = total === 0 ? 0 : Math.min(page * PAGE_SIZE, total);
   const canPrev = !loading && page > 1;
@@ -289,6 +303,13 @@ export function VillasIndexClient() {
                 </Link>
                 <button
                   type="button"
+                  onClick={() => void copyVilla(v)}
+                  className={`${btn} border-blue-300 text-blue-700 dark:border-blue-700 dark:text-blue-300`}
+                >
+                  Kopyala
+                </button>
+                <button
+                  type="button"
                   onClick={() => void remove(v.id)}
                   className={`${btn} border-red-300 text-red-700 dark:border-red-800 dark:text-red-300`}
                 >
@@ -396,6 +417,13 @@ export function VillasIndexClient() {
                         <Link href={`/admin/villalar/${v.id}/duzenle`} className={`${btn} border-zinc-300 dark:border-zinc-600`}>
                           Düzenle
                         </Link>
+                        <button
+                          type="button"
+                          onClick={() => void copyVilla(v)}
+                          className={`${btn} border-blue-300 text-blue-700 dark:border-blue-700 dark:text-blue-300`}
+                        >
+                          Kopyala
+                        </button>
                         <button
                           type="button"
                           onClick={() => void remove(v.id)}
