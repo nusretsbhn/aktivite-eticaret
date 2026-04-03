@@ -38,7 +38,13 @@ const GROUPS: FooterGroup[] = [
   },
   {
     title: 'Bölgeler',
-    links: [{ label: 'Ege Bölgesi Tekne Turları', href: '/aktiviteler' }],
+    links: [
+      { label: 'Ovacık Bölgesi Villaları', href: `/villalar?region=${encodeURIComponent('Ovacık')}` },
+      { label: 'Faralya Bölgesi Villaları', href: `/villalar?region=${encodeURIComponent('Faralya')}` },
+      { label: 'Yalıkavak Bölgesi Villaları', href: `/villalar?region=${encodeURIComponent('Yalıkavak')}` },
+      { label: 'Göcek Bölgesi Villaları', href: `/villalar?region=${encodeURIComponent('Göcek')}` },
+      { label: 'Ölüdeniz Bölgesi Villaları', href: `/villalar?region=${encodeURIComponent('Ölüdeniz')}` },
+    ],
   },
 ];
 
