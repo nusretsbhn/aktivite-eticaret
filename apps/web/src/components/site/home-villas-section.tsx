@@ -1,11 +1,6 @@
 import Link from 'next/link';
 
-import { HomeVillaCard } from '@/components/site/home-villa-card';
-import {
-  formatVillaPrice,
-  getNightlyPriceForDate,
-  todayIsoLocal,
-} from '@/lib/villa-public-pricing';
+import { HomeVillasGridClient } from '@/components/site/home-villas-grid-client';
 import type { AdminVilla } from '@/types/admin-villa';
 import type { AdminSettings } from '@/types/admin-settings';
 
@@ -16,9 +11,7 @@ type Props = {
 
 /** @siteProduct SITE_PRODUCT_VILLA_RENTAL — Villa kiralama ana sayfa alanı */
 export function HomeVillasSection({ villas, settings }: Props) {
-  const active = villas.filter((v) => v.isActive).slice(0, 6);
-  const today = todayIsoLocal();
-  const tagMap = new Map((settings.tags ?? []).map((t) => [t.id, t.name]));
+  const active = villas.filter((v) => v.isActive);
 
   return (
     <section className="bg-white">
@@ -41,28 +34,7 @@ export function HomeVillasSection({ villas, settings }: Props) {
             Yakında listelenecek villalar burada görünecek. Yönetim panelinden aktif villa ekleyebilirsiniz.
           </div>
         ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {active.map((v) => {
-              const amount = getNightlyPriceForDate(v, today);
-              const priceLine = amount !== null ? formatVillaPrice(amount, v.paymentCurrency) : null;
-              const priceHint =
-                v.prices.length === 0
-                  ? 'Gecelik fiyat için takvimden bakın'
-                  : 'Bugün için fiyat tanımlı değil';
-              return (
-                <HomeVillaCard
-                  key={v.id}
-                  villa={v}
-                  priceLine={priceLine}
-                  priceHint={priceHint}
-                  tags={(v.tagIds ?? [])
-                    .map((id) => tagMap.get(id))
-                    .filter((x): x is string => Boolean(x))
-                    .slice(0, 3)}
-                />
-              );
-            })}
-          </div>
+          <HomeVillasGridClient villas={active} settings={settings} />
         )}
       </div>
     </section>

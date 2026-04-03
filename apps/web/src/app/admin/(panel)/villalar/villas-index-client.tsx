@@ -219,7 +219,7 @@ export function VillasIndexClient() {
             <span className="text-zinc-500 dark:text-zinc-400">Arama</span>
             <input
               className={filterInput}
-              placeholder="Ad, slug, belge no, il…"
+              placeholder="Takma ad, gerçek ad, slug, belge no, il…"
               value={q}
               onChange={(e) => setQ(e.target.value)}
               autoComplete="off"

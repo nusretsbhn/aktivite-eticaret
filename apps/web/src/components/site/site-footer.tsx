@@ -55,6 +55,9 @@ const SOCIAL_ORDER: {
 
 const DEFAULT_BRAND = '12.adalartekneturu.com';
 
+/** Google Play / App Store footer butonları — linkler hazır olunca `true` yapın. */
+const SHOW_FOOTER_STORE_BADGES = false;
+
 export function SiteFooter({
   socialMedia,
   footerManagement,
@@ -119,20 +122,22 @@ export function SiteFooter({
               </div>
             )}
 
-            <div className="space-y-3">
-              <a
-                href="#"
-                className="inline-flex w-full items-center justify-center rounded-xl border border-zinc-200 bg-zinc-900 px-4 py-3 text-sm font-semibold text-white hover:bg-zinc-800"
-              >
-                Google Play
-              </a>
-              <a
-                href="#"
-                className="inline-flex w-full items-center justify-center rounded-xl border border-zinc-200 bg-zinc-900 px-4 py-3 text-sm font-semibold text-white hover:bg-zinc-800"
-              >
-                App Store
-              </a>
-            </div>
+            {SHOW_FOOTER_STORE_BADGES && (
+              <div className="space-y-3">
+                <a
+                  href="#"
+                  className="inline-flex w-full items-center justify-center rounded-xl border border-zinc-200 bg-zinc-900 px-4 py-3 text-sm font-semibold text-white hover:bg-zinc-800"
+                >
+                  Google Play
+                </a>
+                <a
+                  href="#"
+                  className="inline-flex w-full items-center justify-center rounded-xl border border-zinc-200 bg-zinc-900 px-4 py-3 text-sm font-semibold text-white hover:bg-zinc-800"
+                >
+                  App Store
+                </a>
+              </div>
+            )}
 
             <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-600">
               TÜRSAB / İzin belgeleri alanı (sonradan görsel eklenebilir).

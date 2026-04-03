@@ -12,6 +12,7 @@ import { HomeLocationWidget } from '@/components/site/home-location-widget';
 import { HomePackagesSection } from '@/components/site/home-packages-section';
 import { HomeVillaRegionBannersSection } from '@/components/site/home-villa-region-banners-section';
 import { HomeVillaSpotlightWidget } from '@/components/site/home-villa-spotlight-widget';
+import { HomeVillasByFeatureSection } from '@/components/site/home-villas-by-feature-section';
 import { HomeVillasSection } from '@/components/site/home-villas-section';
 import type { HomePageSectionId } from '@/lib/home-page-sections';
 import { normalizeHomePageSectionOrder } from '@/lib/home-page-sections';
@@ -79,6 +80,9 @@ function Section({
     case 'villas':
       if (!showVillaRental) return null;
       return <HomeVillasSection villas={villas} settings={settings} />;
+    case 'villasByFeature':
+      if (!showVillaRental) return null;
+      return <HomeVillasByFeatureSection villas={villas} settings={settings} />;
     case 'benefits':
       return <HomeBenefitsSection />;
     case 'honeymoonVillas':

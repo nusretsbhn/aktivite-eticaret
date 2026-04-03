@@ -15,21 +15,24 @@ export async function GET(request: Request) {
   if (!session) return unauthorized();
 
   const { searchParams } = new URL(request.url);
-  const q = (searchParams.get('q') ?? '').trim().toLowerCase();
+  const qRaw = (searchParams.get('q') ?? '').trim();
+  const q = qRaw.toLocaleLowerCase('tr-TR');
   const isActiveParam = searchParams.get('isActive');
 
   let list = await readVillas();
 
   if (q) {
+    const hay = (s: unknown) => String(s ?? '').toLocaleLowerCase('tr-TR');
     list = list.filter(
       (v) =>
-        v.displayName.toLowerCase().includes(q) ||
-        v.legalName.toLowerCase().includes(q) ||
-        v.slug.toLowerCase().includes(q) ||
-        v.documentNo.toLowerCase().includes(q) ||
-        v.description.toLowerCase().includes(q) ||
-        v.city.toLowerCase().includes(q) ||
-        v.district.toLowerCase().includes(q),
+        hay(v.displayName).includes(q) ||
+        hay(v.legalName).includes(q) ||
+        hay(v.slug).includes(q) ||
+        hay(v.documentNo).includes(q) ||
+        hay(v.description).includes(q) ||
+        hay(v.city).includes(q) ||
+        hay(v.district).includes(q) ||
+        hay(v.region).includes(q),
     );
   }
   if (isActiveParam === 'true' || isActiveParam === 'false') {

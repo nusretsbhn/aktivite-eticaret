@@ -327,11 +327,11 @@ export function VillasListingClient({
             </div>
             <button
               type="button"
-              className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-zinc-300 px-3 py-2 text-sm lg:hidden"
+              className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-semibold text-zinc-900 lg:hidden dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-50"
               onClick={() => setMobileFiltersOpen(true)}
             >
-              <Filter className="h-4 w-4" />
-              Filtreler
+              <Filter className="h-4 w-4 shrink-0 text-zinc-800 dark:text-zinc-200" aria-hidden />
+              <span className="whitespace-nowrap">Filtreler</span>
             </button>
           </div>
         </div>
