@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { requireAdminSession } from '@/lib/admin-api-auth';
 import { readSettings, writeSettings } from '@/lib/admin-settings-server';
+import { normalizeHomePageSectionOrder } from '@/lib/home-page-sections';
 import { normalizeEnabledSiteProducts } from '@/lib/site-product-types';
 import type {
   AdminSettings,
@@ -146,11 +147,13 @@ function validateSettings(body: unknown): AdminSettings | null {
               };
             })
             .filter((x): x is NonNullable<typeof x> => Boolean(x));
+          const homePageSectionOrder = normalizeHomePageSectionOrder(o.homePageSectionOrder);
           return {
             ...(logoUrl ? { logoUrl } : {}),
             ...(darkLogoUrl ? { darkLogoUrl } : {}),
             enabledSiteProducts,
             slides,
+            homePageSectionOrder,
           } satisfies NonNullable<AdminSettings['siteManagement']>;
         })()
       : undefined;

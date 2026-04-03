@@ -70,6 +70,8 @@ export type AdminSettings = {
       subtitle: string;
       badge?: string;
     }[];
+    /** Ana sayfa: hero ve footer sabit; aradaki blokların sırası (id listesi). */
+    homePageSectionOrder?: string[];
   };
   bannerManagement?: {
     sliderBanners: {

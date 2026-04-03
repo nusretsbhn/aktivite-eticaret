@@ -34,6 +34,7 @@ const nav: NavItem[] = [
   { href: '/admin/uyeler', label: 'Üye Yönetimi' },
   { href: '/admin/sss', label: 'S.S.S. Yönetimi' },
   { href: '/admin/sozlesmeler', label: 'Sözleşme Yönetimi' },
+  { href: '/admin/sayfa-duzeni', label: 'Sayfa Düzeni' },
   { href: '/admin/ayarlar', label: 'Ayarlar' },
 ];
 
@@ -126,6 +127,7 @@ export function AdminShell({
               if (item.href === '/admin/siparisler/iptal-iade')
                 return pathname.startsWith('/admin/siparisler/iptal-iade');
               if (item.href === '/admin/villalar') return pathname.startsWith('/admin/villalar');
+              if (item.href === '/admin/sayfa-duzeni') return pathname.startsWith('/admin/sayfa-duzeni');
               return pathname === item.href || pathname.startsWith(`${item.href}/`);
             })();
 
