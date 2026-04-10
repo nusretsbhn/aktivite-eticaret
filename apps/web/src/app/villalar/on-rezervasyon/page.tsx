@@ -45,7 +45,11 @@ export default async function VillaOnRezervasyonPage({
   const checkIn = sp(p, 'checkIn');
   const checkOut = sp(p, 'checkOut');
   const guestsRaw = sp(p, 'guests');
+  const childrenRaw = sp(p, 'children');
+  const infantsRaw = sp(p, 'infants');
   const guests = Math.max(1, Number(guestsRaw) || 1);
+  const children = Math.max(0, Number(childrenRaw) || 0);
+  const infants = Math.max(0, Number(infantsRaw) || 0);
 
   if (!villaSlug || !checkIn || !checkOut) {
     return (
@@ -86,6 +90,8 @@ export default async function VillaOnRezervasyonPage({
       initialCheckIn={checkIn}
       initialCheckOut={checkOut}
       initialGuests={guests}
+      initialChildren={children}
+      initialBabies={infants}
       logoUrl={logoUrl}
     />
   );

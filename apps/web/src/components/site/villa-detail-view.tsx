@@ -28,9 +28,13 @@ import type { AdminVilla } from '@/types/admin-villa';
 type Props = {
   villa: AdminVilla;
   settings: AdminSettings;
+  initialDates?: {
+    checkIn?: string;
+    checkOut?: string;
+  };
 };
 
-export function VillaDetailView({ villa, settings }: Props) {
+export function VillaDetailView({ villa, settings, initialDates }: Props) {
   const logoUrl = settings.siteManagement?.logoUrl;
   const locationLine = [villa.city, villa.district, villa.region].filter(Boolean).join(' / ');
   const enabledProducts = settings.siteManagement?.enabledSiteProducts ?? [];
@@ -90,7 +94,7 @@ export function VillaDetailView({ villa, settings }: Props) {
       </header>
 
       <main className="min-w-0">
-        <VillaBookingDatesProvider villa={villa}>
+        <VillaBookingDatesProvider villa={villa} initialDates={initialDates}>
         <section className="border-b border-zinc-200 bg-white">
           <div className="mx-auto min-w-0 max-w-6xl px-4 py-8 sm:py-10">
             <nav className="mb-6 text-xs text-zinc-500">

@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CalendarRange, ChevronLeft, ChevronRight, Images, UserRound } from 'lucide-react';
+import { CalendarRange, ChevronLeft, ChevronRight, Images, Minus, Plus, UserRound } from 'lucide-react';
 
 import { averageNightly, nightDates, nightsBetween, sumNightlyPrices } from '@/lib/villa-booking-math';
 import { useVillaBookingDates } from '@/components/site/villa-booking-dates-context';
@@ -43,7 +43,9 @@ export function VillaDetailTopSection({ villa, children }: Props) {
   const [activeImg, setActiveImg] = useState(0);
   const mainUrl = images[activeImg]?.url ?? images[0]?.url;
 
-  const [guests, setGuests] = useState(1);
+  const [adultGuests, setAdultGuests] = useState(1);
+  const [childGuests, setChildGuests] = useState(0);
+  const [infantGuests, setInfantGuests] = useState(0);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [galleryLightboxOpen, setGalleryLightboxOpen] = useState(false);
 
@@ -52,12 +54,14 @@ export function VillaDetailTopSection({ villa, children }: Props) {
   const { sum: nightlySum, missingDates, byNight } = sumNightlyPrices(villa, dates);
   const avgNight = averageNightly(nightlySum, Math.max(1, nights));
 
-  const shortStayFee =
-    nights > 0 && nights < villa.minStayNights && villa.cleaningFee > 0 ? villa.cleaningFee : 0;
+  const cleaningFeeBase = nights > 0 && villa.cleaningFee > 0 ? villa.cleaningFee : 0;
+  const isCleaningFreeByThreshold =
+    nights > 0 && villa.freeCleaningThreshold > 0 && nights >= villa.freeCleaningThreshold;
+  const cleaningFee = isCleaningFreeByThreshold ? 0 : cleaningFeeBase;
 
   const lodgingSubtotal = nightlySum;
 
-  const total = lodgingSubtotal + shortStayFee;
+  const total = lodgingSubtotal + cleaningFee;
   const prepayment = villa.prepaymentPercent > 0 ? Math.round((total * villa.prepaymentPercent) / 100) : 0;
   const remainder = total - prepayment;
 
@@ -89,8 +93,8 @@ export function VillaDetailTopSection({ villa, children }: Props) {
     missingDates.length === 0 &&
     total > 0 &&
     stayAvailabilityOk &&
-    guests >= 1 &&
-    guests <= villa.guestCount;
+    adultGuests >= 1 &&
+    adultGuests <= villa.guestCount;
 
   return (
     <div className="grid min-w-0 grid-cols-1 gap-8 overflow-visible lg:grid-cols-[minmax(0,1fr)_minmax(0,400px)] lg:items-start lg:gap-x-8 lg:gap-y-0">
@@ -183,7 +187,9 @@ export function VillaDetailTopSection({ villa, children }: Props) {
             q.set('villa', villa.slug);
             q.set('checkIn', checkIn);
             q.set('checkOut', checkOut);
-            q.set('guests', String(guests));
+            q.set('guests', String(adultGuests));
+            q.set('children', String(childGuests));
+            q.set('infants', String(infantGuests));
             router.push(`/kayit?${q.toString()}`);
           }}
           onRequestWithoutAccount={() => {
@@ -192,7 +198,9 @@ export function VillaDetailTopSection({ villa, children }: Props) {
             q.set('villa', villa.slug);
             q.set('checkIn', checkIn);
             q.set('checkOut', checkOut);
-            q.set('guests', String(guests));
+            q.set('guests', String(adultGuests));
+            q.set('children', String(childGuests));
+            q.set('infants', String(infantGuests));
             router.push(`/villalar/on-rezervasyon?${q.toString()}`);
           }}
         />
@@ -239,17 +247,78 @@ export function VillaDetailTopSection({ villa, children }: Props) {
               Misafir
               <div className="mt-1.5 flex min-h-11 items-center gap-2 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2">
                 <UserRound className="h-4 w-4 shrink-0 text-teal-600" aria-hidden />
-                <select
-                  value={guests}
-                  onChange={(e) => setGuests(Number(e.target.value))}
-                  className="w-full rounded-md border border-zinc-200 bg-white px-2 py-1 text-sm font-medium text-zinc-900"
-                >
-                  {Array.from({ length: villa.guestCount }, (_, i) => i + 1).map((n) => (
-                    <option key={n} value={n}>
-                      {n} Misafir
-                    </option>
-                  ))}
-                </select>
+                <div className="w-full space-y-2">
+                  <div className="flex items-center justify-between gap-2 text-sm">
+                    <span className="font-medium text-zinc-900">Yetişkin (13+)</span>
+                    <div className="inline-flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setAdultGuests((n) => Math.max(1, n - 1))}
+                        disabled={adultGuests <= 1}
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-zinc-300 bg-white text-zinc-700 disabled:cursor-not-allowed disabled:opacity-50"
+                        aria-label="Yetişkin azalt"
+                      >
+                        <Minus className="h-4 w-4" aria-hidden />
+                      </button>
+                      <span className="min-w-6 text-center font-semibold text-zinc-900">{adultGuests}</span>
+                      <button
+                        type="button"
+                        onClick={() => setAdultGuests((n) => Math.min(villa.guestCount, n + 1))}
+                        disabled={adultGuests >= villa.guestCount}
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-zinc-300 bg-white text-zinc-700 disabled:cursor-not-allowed disabled:opacity-50"
+                        aria-label="Yetişkin artır"
+                      >
+                        <Plus className="h-4 w-4" aria-hidden />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between gap-2 text-sm">
+                    <span className="font-medium text-zinc-900">Çocuk (3-12)</span>
+                    <div className="inline-flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setChildGuests((n) => Math.max(0, n - 1))}
+                        disabled={childGuests <= 0}
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-zinc-300 bg-white text-zinc-700 disabled:cursor-not-allowed disabled:opacity-50"
+                        aria-label="Çocuk azalt"
+                      >
+                        <Minus className="h-4 w-4" aria-hidden />
+                      </button>
+                      <span className="min-w-6 text-center font-semibold text-zinc-900">{childGuests}</span>
+                      <button
+                        type="button"
+                        onClick={() => setChildGuests((n) => n + 1)}
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-zinc-300 bg-white text-zinc-700"
+                        aria-label="Çocuk artır"
+                      >
+                        <Plus className="h-4 w-4" aria-hidden />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between gap-2 text-sm">
+                    <span className="font-medium text-zinc-900">Bebek (0-2)</span>
+                    <div className="inline-flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setInfantGuests((n) => Math.max(0, n - 1))}
+                        disabled={infantGuests <= 0}
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-zinc-300 bg-white text-zinc-700 disabled:cursor-not-allowed disabled:opacity-50"
+                        aria-label="Bebek azalt"
+                      >
+                        <Minus className="h-4 w-4" aria-hidden />
+                      </button>
+                      <span className="min-w-6 text-center font-semibold text-zinc-900">{infantGuests}</span>
+                      <button
+                        type="button"
+                        onClick={() => setInfantGuests((n) => n + 1)}
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-zinc-300 bg-white text-zinc-700"
+                        aria-label="Bebek artır"
+                      >
+                        <Plus className="h-4 w-4" aria-hidden />
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </label>
           </div>
@@ -270,10 +339,10 @@ export function VillaDetailTopSection({ villa, children }: Props) {
                 <span className="font-medium tabular-nums text-zinc-900">{fmt(lodgingSubtotal)}</span>
               </div>
             )}
-            {shortStayFee > 0 && (
+            {nights > 0 && (
               <div className="flex justify-between gap-4">
-                <span className="text-zinc-600">Kısa konaklama ücreti</span>
-                <span className="font-medium tabular-nums text-zinc-900">{fmt(shortStayFee)}</span>
+                <span className="text-zinc-600">Temizlik ücreti</span>
+                <span className="font-medium tabular-nums text-zinc-900">{fmt(cleaningFee)}</span>
               </div>
             )}
           </div>
@@ -317,7 +386,9 @@ export function VillaDetailTopSection({ villa, children }: Props) {
                     villa: villa.slug,
                     checkIn,
                     checkOut,
-                    guests: String(guests),
+                    guests: String(adultGuests),
+                    children: String(childGuests),
+                    infants: String(infantGuests),
                   });
                   router.push(`/villalar/on-rezervasyon?${q.toString()}`);
                   return;
@@ -338,7 +409,9 @@ export function VillaDetailTopSection({ villa, children }: Props) {
                   villa: villa.slug,
                   checkIn,
                   checkOut,
-                  guests: String(guests),
+                  guests: String(adultGuests),
+                  children: String(childGuests),
+                  infants: String(infantGuests),
                 });
                 router.push(`/villalar/on-rezervasyon?${q.toString()}`);
               }}

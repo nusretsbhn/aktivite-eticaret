@@ -14,9 +14,9 @@ export type VillaPreReservationFormDetails = {
   paymentPreference: 'full' | 'prepayment';
   referralSource: string;
   phoneCountryCode: string;
+  identityNumber?: string;
   foreignPhone: boolean;
   notTurkishCitizen: boolean;
-  additionalGuests: { firstName: string; lastName: string }[];
   legalIdentityCommitment: boolean;
   distanceSalesAccepted: boolean;
   preInfoAccepted: boolean;

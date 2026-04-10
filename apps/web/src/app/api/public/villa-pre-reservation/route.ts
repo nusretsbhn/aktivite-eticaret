@@ -46,6 +46,7 @@ export async function POST(request: Request) {
   const lastName = String(body.lastName ?? '').trim();
   const phoneCountryCode = String(body.phoneCountryCode ?? '+90').trim() || '+90';
   const phoneDigits = String(body.phone ?? '').replace(/\D/g, '');
+  const identityNumber = String(body.identityNumber ?? '').replace(/\D/g, '');
   const phone = `${phoneCountryCode} ${phoneDigits}`.trim();
   const adults = Math.max(0, Number(body.adults ?? 0));
   const children = Math.max(0, Number(body.children ?? 0));
@@ -60,20 +61,6 @@ export async function POST(request: Request) {
   const distanceSalesAccepted = Boolean(body.distanceSalesAccepted);
   const preInfoAccepted = Boolean(body.preInfoAccepted);
   const recaptchaToken = String(body.recaptchaToken ?? '').trim();
-
-  const rawAdditional = body.additionalGuests;
-  const additionalGuests: { firstName: string; lastName: string }[] = [];
-  if (Array.isArray(rawAdditional)) {
-    for (const row of rawAdditional) {
-      if (row && typeof row === 'object') {
-        const o = row as Record<string, unknown>;
-        additionalGuests.push({
-          firstName: String(o.firstName ?? '').trim(),
-          lastName: String(o.lastName ?? '').trim(),
-        });
-      }
-    }
-  }
 
   const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? '';
   if (recaptchaSiteKey && !(await verifyRecaptcha(recaptchaToken))) {
@@ -91,6 +78,9 @@ export async function POST(request: Request) {
   }
   if (phoneDigits.length < 10) {
     return NextResponse.json({ success: false, message: 'Geçerli telefon girin.' }, { status: 400 });
+  }
+  if (!notTurkishCitizen && identityNumber.length !== 11) {
+    return NextResponse.json({ success: false, message: 'Geçerli bir T.C. Kimlik No girin.' }, { status: 400 });
   }
   if (adults < 1) {
     return NextResponse.json({ success: false, message: 'En az 1 yetişkin seçmelisiniz.' }, { status: 400 });
@@ -133,9 +123,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false, message: 'Villa bulunamadı.' }, { status: 404 });
   }
 
-  if (totalGuests > villa.guestCount) {
+  if (adults > villa.guestCount) {
     return NextResponse.json(
-      { success: false, message: `Misafir sayısı en fazla ${villa.guestCount} olabilir.` },
+      { success: false, message: `Yetişkin sayısı en fazla ${villa.guestCount} olabilir.` },
       { status: 400 },
     );
   }
@@ -147,23 +137,6 @@ export async function POST(request: Request) {
     );
   }
 
-  const extraCount = Math.max(0, totalGuests - 1);
-  if (additionalGuests.length !== extraCount) {
-    return NextResponse.json(
-      { success: false, message: 'Tüm misafir adlarını eksiksiz doldurun.' },
-      { status: 400 },
-    );
-  }
-  for (let i = 0; i < additionalGuests.length; i++) {
-    const g = additionalGuests[i];
-    if (!g || !g.firstName || !g.lastName) {
-      return NextResponse.json(
-        { success: false, message: `Misafir ${i + 1} için ad ve soyad zorunludur.` },
-        { status: 400 },
-      );
-    }
-  }
-
   const formDetails: VillaPreReservationFormDetails = {
     adults,
     children,
@@ -173,9 +146,9 @@ export async function POST(request: Request) {
     paymentPreference,
     referralSource,
     phoneCountryCode,
+    identityNumber: notTurkishCitizen ? '' : identityNumber,
     foreignPhone,
     notTurkishCitizen,
-    additionalGuests,
     legalIdentityCommitment,
     distanceSalesAccepted,
     preInfoAccepted,

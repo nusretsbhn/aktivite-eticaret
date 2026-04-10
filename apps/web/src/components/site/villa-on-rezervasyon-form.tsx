@@ -86,6 +86,8 @@ type Props = {
   initialCheckIn: string;
   initialCheckOut: string;
   initialGuests: number;
+  initialChildren?: number;
+  initialBabies?: number;
   logoUrl?: string | null;
 };
 
@@ -105,7 +107,15 @@ function parseProfilePhone(raw: string): { cc: string; national: string } | null
   return null;
 }
 
-export function VillaOnRezervasyonForm({ villa, initialCheckIn, initialCheckOut, initialGuests, logoUrl }: Props) {
+export function VillaOnRezervasyonForm({
+  villa,
+  initialCheckIn,
+  initialCheckOut,
+  initialGuests,
+  initialChildren = 0,
+  initialBabies = 0,
+  logoUrl,
+}: Props) {
   const router = useRouter();
   const { user } = useSiteAuth();
 
@@ -118,17 +128,16 @@ export function VillaOnRezervasyonForm({ villa, initialCheckIn, initialCheckOut,
   const maxCap = Math.max(1, villa.guestCount);
   const startAdults = Math.min(Math.max(1, initialGuests), maxCap);
   const [adults, setAdults] = useState(startAdults);
-  const [children, setChildren] = useState(0);
-  const [babies, setBabies] = useState(0);
+  const [children, setChildren] = useState(Math.max(0, initialChildren));
+  const [babies, setBabies] = useState(Math.max(0, initialBabies));
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phoneCountry, setPhoneCountry] = useState('+90');
   const [phone, setPhone] = useState('');
+  const [identityNumber, setIdentityNumber] = useState('');
   const [foreignPhone, setForeignPhone] = useState(false);
   const [notTurkishCitizen, setNotTurkishCitizen] = useState(false);
-
-  const [additionalGuests, setAdditionalGuests] = useState<{ firstName: string; lastName: string }[]>([]);
 
   const [accommodationType, setAccommodationType] = useState<'family' | 'friends'>('family');
   const [billingAddress, setBillingAddress] = useState('');
@@ -201,16 +210,6 @@ export function VillaOnRezervasyonForm({ villa, initialCheckIn, initialCheckOut,
 
   const totalGuests = adults + children + babies;
 
-  useEffect(() => {
-    const total = adults + children + babies;
-    const extra = Math.max(0, total - 1);
-    setAdditionalGuests((prev) => {
-      const next = prev.slice(0, extra);
-      while (next.length < extra) next.push({ firstName: '', lastName: '' });
-      return next;
-    });
-  }, [adults, children, babies]);
-
   const nights = nightsBetween(checkIn, checkOut);
   const dates = nightDates(checkIn, nights);
   const { sum: nightlySum, missingDates } = sumNightlyPrices(villa, dates);
@@ -230,7 +229,6 @@ export function VillaOnRezervasyonForm({ villa, initialCheckIn, initialCheckOut,
     missingDates.length === 0 &&
     total > 0 &&
     totalGuests >= 1 &&
-    totalGuests <= maxCap &&
     adults >= 1;
 
   const gallerySorted = useMemo(
@@ -238,34 +236,6 @@ export function VillaOnRezervasyonForm({ villa, initialCheckIn, initialCheckOut,
     [villa.gallery],
   );
   const coverUrl = gallerySorted.find((g) => g.type === 'image')?.url;
-
-  const clampGuests = useCallback(
-    (nextA: number, nextC: number, nextB: number) => {
-      let a = nextA;
-      let c = nextC;
-      let b = nextB;
-      if (a + c + b > maxCap) {
-        const over = a + c + b - maxCap;
-        let cut = over;
-        while (cut > 0 && b > 0) {
-          b--;
-          cut--;
-        }
-        while (cut > 0 && c > 0) {
-          c--;
-          cut--;
-        }
-        while (cut > 0 && a > 1) {
-          a--;
-          cut--;
-        }
-      }
-      setAdults(Math.max(1, a));
-      setChildren(Math.max(0, c));
-      setBabies(Math.max(0, b));
-    },
-    [maxCap],
-  );
 
   const submit = useCallback(async () => {
     setErr(null);
@@ -282,6 +252,13 @@ export function VillaOnRezervasyonForm({ villa, initialCheckIn, initialCheckOut,
       setErr('Geçerli telefon girin.');
       return;
     }
+    if (!notTurkishCitizen) {
+      const identityDigits = identityNumber.replace(/\D/g, '');
+      if (identityDigits.length !== 11) {
+        setErr('Geçerli bir T.C. Kimlik No girin.');
+        return;
+      }
+    }
     if (!billingAddress.trim()) {
       setErr('Fatura adresi zorunludur.');
       return;
@@ -294,18 +271,6 @@ export function VillaOnRezervasyonForm({ villa, initialCheckIn, initialCheckOut,
     if (recaptchaSiteKey && !token) {
       setErr('Lütfen robot olmadığınızı doğrulayın.');
       return;
-    }
-    const extra = Math.max(0, totalGuests - 1);
-    if (additionalGuests.length !== extra) {
-      setErr('Misafir bilgileri eksik.');
-      return;
-    }
-    for (let i = 0; i < additionalGuests.length; i++) {
-      const g = additionalGuests[i];
-      if (!g.firstName.trim() || !g.lastName.trim()) {
-        setErr(`Misafir ${i + 1} için ad ve soyad girin.`);
-        return;
-      }
     }
     if (!canSubmit) {
       setErr('Seçilen tarihler veya misafir sayısı geçersiz.');
@@ -327,12 +292,12 @@ export function VillaOnRezervasyonForm({ villa, initialCheckIn, initialCheckOut,
           lastName: lastName.trim(),
           phoneCountryCode: phoneCountry,
           phone: digits,
+          identityNumber: notTurkishCitizen ? '' : identityNumber.replace(/\D/g, ''),
           foreignPhone,
           notTurkishCitizen,
           adults,
           children,
           babies,
-          additionalGuests,
           accommodationType,
           billingAddress: billingAddress.trim(),
           paymentPreference,
@@ -360,6 +325,7 @@ export function VillaOnRezervasyonForm({ villa, initialCheckIn, initialCheckOut,
     firstName,
     lastName,
     phone,
+    identityNumber,
     phoneCountry,
     billingAddress,
     legalIdentity,
@@ -367,7 +333,6 @@ export function VillaOnRezervasyonForm({ villa, initialCheckIn, initialCheckOut,
     preInfo,
     recaptchaSiteKey,
     recaptchaToken,
-    additionalGuests,
     totalGuests,
     canSubmit,
     villa.slug,
@@ -445,31 +410,31 @@ export function VillaOnRezervasyonForm({ villa, initialCheckIn, initialCheckOut,
 
             <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
               <h2 className="text-lg font-semibold text-zinc-900">Misafir sayısı</h2>
-              <p className="mt-1 text-xs text-zinc-500">Toplam en fazla {maxCap} kişi (villa kapasitesi).</p>
+              <p className="mt-1 text-xs text-zinc-500">Yetişkin sayısı en fazla {maxCap} olabilir.</p>
               <div className="mt-4 space-y-3">
                 <Stepper
                   label="Yetişkin"
                   hint="13 yaş ve üzeri"
                   value={adults}
                   min={1}
-                  max={maxCap - children - babies}
-                  onChange={(n) => clampGuests(n, children, babies)}
+                  max={maxCap}
+                  onChange={(n) => setAdults(Math.max(1, Math.min(maxCap, n)))}
                 />
                 <Stepper
                   label="Çocuk"
                   hint="2 – 12 yaş"
                   value={children}
                   min={0}
-                  max={maxCap - adults - babies}
-                  onChange={(n) => clampGuests(adults, n, babies)}
+                  max={99}
+                  onChange={(n) => setChildren(Math.max(0, n))}
                 />
                 <Stepper
                   label="Bebek"
                   hint="0 – 2 yaş"
                   value={babies}
                   min={0}
-                  max={maxCap - adults - children}
-                  onChange={(n) => clampGuests(adults, children, n)}
+                  max={99}
+                  onChange={(n) => setBabies(Math.max(0, n))}
                 />
               </div>
             </section>
@@ -544,6 +509,22 @@ export function VillaOnRezervasyonForm({ villa, initialCheckIn, initialCheckOut,
                     className={inputClassName}
                   />
                 </label>
+                <label className="block text-sm font-medium text-zinc-700" htmlFor="villa-pre-identity">
+                  T.C. Kimlik No {!notTurkishCitizen ? '*' : '(opsiyonel)'}
+                  <input
+                    id="villa-pre-identity"
+                    type="text"
+                    name="identityNumber"
+                    value={identityNumber}
+                    onChange={(e) => setIdentityNumber(e.target.value.replace(/\D/g, '').slice(0, 11))}
+                    inputMode="numeric"
+                    autoComplete="off"
+                    placeholder="11 haneli T.C. Kimlik No"
+                    disabled={notTurkishCitizen}
+                    required={!notTurkishCitizen}
+                    className={inputClassName + (notTurkishCitizen ? ' cursor-not-allowed bg-zinc-100 text-zinc-500' : '')}
+                  />
+                </label>
               </div>
 
               <label className="mt-4 flex cursor-pointer items-start gap-3 text-sm text-zinc-700">
@@ -559,51 +540,15 @@ export function VillaOnRezervasyonForm({ villa, initialCheckIn, initialCheckOut,
                 <input
                   type="checkbox"
                   checked={notTurkishCitizen}
-                  onChange={(e) => setNotTurkishCitizen(e.target.checked)}
+                  onChange={(e) => {
+                    setNotTurkishCitizen(e.target.checked);
+                    if (e.target.checked) setIdentityNumber('');
+                  }}
                   className="mt-1"
                 />
                 <span>T.C. vatandaşı değilim</span>
               </label>
             </section>
-
-            {additionalGuests.length > 0 && (
-              <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
-                <h2 className="text-lg font-semibold text-zinc-900">Diğer misafirler</h2>
-                <div className="mt-2 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-xs text-sky-900">
-                  Konaklama bildirimi için güvenlik birimlerine iletilmek üzere tüm misafir adları gerekebilir.
-                </div>
-                <div className="mt-4 space-y-4">
-                  {additionalGuests.map((g, i) => (
-                    <div key={i} className="grid gap-3 sm:grid-cols-2">
-                      <label className="block text-sm font-medium text-zinc-700">
-                        Ad (misafir {i + 1})
-                        <input
-                          value={g.firstName}
-                          onChange={(e) => {
-                            const next = [...additionalGuests];
-                            next[i] = { ...next[i], firstName: e.target.value };
-                            setAdditionalGuests(next);
-                          }}
-                          className={inputClassName}
-                        />
-                      </label>
-                      <label className="block text-sm font-medium text-zinc-700">
-                        Soyad
-                        <input
-                          value={g.lastName}
-                          onChange={(e) => {
-                            const next = [...additionalGuests];
-                            next[i] = { ...next[i], lastName: e.target.value };
-                            setAdditionalGuests(next);
-                          }}
-                          className={inputClassName}
-                        />
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
 
             <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
               <h2 className="text-lg font-semibold text-zinc-900">Konaklama türü</h2>

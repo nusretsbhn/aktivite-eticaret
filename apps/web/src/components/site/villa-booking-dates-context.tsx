@@ -16,11 +16,26 @@ type Value = {
 
 const VillaBookingDatesContext = createContext<Value | null>(null);
 
-export function VillaBookingDatesProvider({ villa, children }: { villa: AdminVilla; children: ReactNode }) {
+function isIsoDate(s: string | undefined): s is string {
+  return Boolean(s && /^\d{4}-\d{2}-\d{2}$/.test(s));
+}
+
+export function VillaBookingDatesProvider({
+  villa,
+  children,
+  initialDates,
+}: {
+  villa: AdminVilla;
+  children: ReactNode;
+  initialDates?: { checkIn?: string; checkOut?: string };
+}) {
   const today = todayIsoLocal();
   const defaultOut = addDaysIso(today, Math.max(1, villa.minStayNights));
-  const [checkIn, setCheckIn] = useState(today);
-  const [checkOut, setCheckOut] = useState(defaultOut);
+  const initialCheckIn = isIsoDate(initialDates?.checkIn) ? initialDates.checkIn : today;
+  const initialCheckOut =
+    isIsoDate(initialDates?.checkOut) && initialDates.checkOut > initialCheckIn ? initialDates.checkOut : defaultOut;
+  const [checkIn, setCheckIn] = useState(initialCheckIn);
+  const [checkOut, setCheckOut] = useState(initialCheckOut);
 
   const setDates = useCallback((next: { checkIn: string; checkOut: string }) => {
     setCheckIn(next.checkIn);

@@ -38,10 +38,32 @@ function regionOptionsFromVillas(villas: AdminVilla[]): string[] {
   return Array.from(s).sort((a, b) => a.localeCompare(b, 'tr'));
 }
 
+function featuredOptionsFromVillas(villas: AdminVilla[]): string[] {
+  const byKey = new Map<string, string>();
+  for (const v of villas) {
+    const items = Array.isArray(v.featuredItems) ? v.featuredItems : [];
+    for (const item of items) {
+      const text = typeof item?.description === 'string' ? item.description.trim() : '';
+      if (!text) continue;
+      const key = text.toLocaleLowerCase('tr');
+      if (!byKey.has(key)) byKey.set(key, text);
+    }
+  }
+  return Array.from(byKey.values()).sort((a, b) => a.localeCompare(b, 'tr'));
+}
+
 function matchesRegion(v: AdminVilla, region: string): boolean {
   if (!region.trim()) return true;
   const r = region.trim().toLocaleLowerCase('tr');
   return locationLine(v).toLocaleLowerCase('tr').includes(r);
+}
+
+function matchesFeaturedItem(v: AdminVilla, feature: string): boolean {
+  const target = feature.trim().toLocaleLowerCase('tr');
+  if (!target) return true;
+  return (v.featuredItems ?? []).some(
+    (item) => (item.description ?? '').trim().toLocaleLowerCase('tr') === target,
+  );
 }
 
 function coverImage(v: AdminVilla) {
@@ -83,6 +105,7 @@ export function VillasListingClient({
   const logoUrl = settings.siteManagement?.logoUrl;
   const active = useMemo(() => (villas ?? []).filter((v) => v.isActive), [villas]);
   const regions = useMemo(() => regionOptionsFromVillas(active), [active]);
+  const featuredOptions = useMemo(() => featuredOptionsFromVillas(active), [active]);
   const tagMap = useMemo(() => new Map((settings.tags ?? []).map((t) => [t.id, t.name])), [settings.tags]);
 
   const isoOk = (s: string | undefined) => Boolean(s && /^\d{4}-\d{2}-\d{2}$/.test(s));
@@ -112,6 +135,7 @@ export function VillasListingClient({
   const [selectedRegions, setSelectedRegions] = useState<string[]>(
     initialQuery?.region ? [initialQuery.region] : [],
   );
+  const [selectedFeatured, setSelectedFeatured] = useState<string[]>([]);
   const [bedroomsMin, setBedroomsMin] = useState('');
   const [priceMinInput, setPriceMinInput] = useState('');
   const [priceMaxInput, setPriceMaxInput] = useState('');
@@ -122,9 +146,16 @@ export function VillasListingClient({
     setSelectedRegions((prev) => (prev.includes(r) ? prev.filter((x) => x !== r) : [...prev, r]));
   };
 
+  const toggleFeatured = (feature: string) => {
+    setSelectedFeatured((prev) =>
+      prev.includes(feature) ? prev.filter((x) => x !== feature) : [...prev, feature],
+    );
+  };
+
   const resetFilters = () => {
     setSearchText('');
     setSelectedRegions([]);
+    setSelectedFeatured([]);
     setBedroomsMin('');
     setPriceMinInput('');
     setPriceMaxInput('');
@@ -141,6 +172,7 @@ export function VillasListingClient({
       if (guests > v.guestCount) return false;
       if (bedMin > 0 && v.bedroomCount < bedMin) return false;
       if (selectedRegions.length && !selectedRegions.some((r) => matchesRegion(v, r))) return false;
+      if (selectedFeatured.length && !selectedFeatured.some((feature) => matchesFeaturedItem(v, feature))) return false;
       if (q) {
         const blob = `${v.displayName} ${v.description} ${locationLine(v)}`.toLocaleLowerCase('tr');
         if (!blob.includes(q)) return false;
@@ -167,6 +199,7 @@ export function VillasListingClient({
     priceMinInput,
     searchText,
     selectedRegions,
+    selectedFeatured,
     dateFilterActive,
   ]);
 
@@ -241,6 +274,30 @@ export function VillasListingClient({
               </button>
             ))}
           </div>
+        </div>
+
+        <div>
+          <p className="mb-2 text-sm font-semibold text-zinc-800">Öne çıkan özellikler</p>
+          {featuredOptions.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {featuredOptions.map((feature) => (
+                <button
+                  type="button"
+                  key={feature}
+                  onClick={() => toggleFeatured(feature)}
+                  className={`rounded-full border px-3 py-1.5 text-xs ${
+                    selectedFeatured.includes(feature)
+                      ? 'border-blue-700 bg-blue-50 text-blue-800'
+                      : 'border-zinc-300 text-zinc-800'
+                  }`}
+                >
+                  {feature}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-zinc-500">Öne çıkan özellik tanımı olan villa bulunamadı.</p>
+          )}
         </div>
 
         <label className="block text-sm">
@@ -388,6 +445,14 @@ export function VillasListingClient({
                 {sorted.map((v) => {
                   const img = coverImage(v);
                   const cur = v.paymentCurrency;
+                  const detailParams = new URLSearchParams();
+                  if (dateFilterActive) {
+                    detailParams.set('checkIn', checkIn);
+                    detailParams.set('checkOut', checkOut);
+                  }
+                  const detailHref = detailParams.size
+                    ? `/villalar/${encodeURIComponent(v.slug)}?${detailParams.toString()}`
+                    : `/villalar/${encodeURIComponent(v.slug)}`;
                   const tags = (v.tagIds ?? [])
                     .map((id) => tagMap.get(id))
                     .filter((x): x is string => Boolean(x))
@@ -407,7 +472,11 @@ export function VillasListingClient({
                     const dates = nightDates(checkIn, n);
                     const { sum, missingDates } = sumNightlyPrices(v, dates);
                     if (missingDates.length === 0 && sum > 0) {
-                      dateBasedTotal = sum;
+                      const cleaningFeeBase = n > 0 && v.cleaningFee > 0 ? v.cleaningFee : 0;
+                      const isCleaningFreeByThreshold =
+                        n > 0 && v.freeCleaningThreshold > 0 && n >= v.freeCleaningThreshold;
+                      const cleaningFee = isCleaningFreeByThreshold ? 0 : cleaningFeeBase;
+                      dateBasedTotal = sum + cleaningFee;
                       dateBasedAvgNight = Math.round(sum / Math.max(1, n));
                     }
                   }
@@ -415,7 +484,7 @@ export function VillasListingClient({
                   return (
                     <li key={v.id}>
                       <Link
-                        href={`/villalar/${encodeURIComponent(v.slug)}`}
+                        href={detailHref}
                         className="grid overflow-hidden rounded-2xl border border-zinc-200 bg-white transition hover:border-amber-200 hover:shadow-sm md:grid-cols-[240px_1fr]"
                       >
                         <div className="relative aspect-[16/10] bg-zinc-100 md:aspect-auto md:min-h-[200px]">

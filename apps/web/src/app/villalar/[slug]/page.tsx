@@ -7,7 +7,10 @@ import { readSettings } from '@/lib/admin-settings-server';
 import { readVillas } from '@/lib/admin-villas-server';
 import { SITE_PRODUCT_VILLA_RENTAL, isSiteProductEnabled } from '@/lib/site-product-types';
 
-type Props = { params: Promise<{ slug: string }> };
+type Props = {
+  params: Promise<{ slug: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
@@ -21,8 +24,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function VillaDetailPage({ params }: Props) {
+export default async function VillaDetailPage({ params, searchParams }: Props) {
   const { slug } = await params;
+  const sp = (await searchParams) ?? {};
   const [settings, villas] = await Promise.all([readSettings(), readVillas()]);
 
   if (!isSiteProductEnabled(settings.siteManagement?.enabledSiteProducts, SITE_PRODUCT_VILLA_RENTAL)) {
@@ -42,5 +46,14 @@ export default async function VillaDetailPage({ params }: Props) {
     notFound();
   }
 
-  return <VillaDetailView villa={villa} settings={settings} />;
+  return (
+    <VillaDetailView
+      villa={villa}
+      settings={settings}
+      initialDates={{
+        checkIn: typeof sp.checkIn === 'string' ? sp.checkIn : '',
+        checkOut: typeof sp.checkOut === 'string' ? sp.checkOut : '',
+      }}
+    />
+  );
 }
