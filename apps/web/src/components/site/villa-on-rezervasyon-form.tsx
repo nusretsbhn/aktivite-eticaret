@@ -213,9 +213,11 @@ export function VillaOnRezervasyonForm({
   const nights = nightsBetween(checkIn, checkOut);
   const dates = nightDates(checkIn, nights);
   const { sum: nightlySum, missingDates } = sumNightlyPrices(villa, dates);
-  const shortStayFee =
-    nights > 0 && nights < villa.minStayNights && villa.cleaningFee > 0 ? villa.cleaningFee : 0;
-  const total = nightlySum + shortStayFee;
+  const cleaningFeeBase = nights > 0 && villa.cleaningFee > 0 ? villa.cleaningFee : 0;
+  const isCleaningFreeByThreshold =
+    nights > 0 && villa.freeCleaningThreshold > 0 && nights >= villa.freeCleaningThreshold;
+  const cleaningFee = isCleaningFreeByThreshold ? 0 : cleaningFeeBase;
+  const total = nightlySum + cleaningFee;
   const prepayment = villa.prepaymentPercent > 0 ? Math.round((total * villa.prepaymentPercent) / 100) : 0;
   const remainder = total - prepayment;
   const payNow = paymentPreference === 'full' ? total : prepayment;
@@ -739,10 +741,10 @@ export function VillaOnRezervasyonForm({
                     </span>
                     <span className="font-medium tabular-nums text-zinc-900">{fmt(nightlySum)}</span>
                   </div>
-                  {shortStayFee > 0 && (
+                  {nights > 0 && (
                     <div className="flex justify-between gap-2 text-zinc-600">
-                      <span>Kısa konaklama / temizlik</span>
-                      <span className="font-medium tabular-nums text-zinc-900">{fmt(shortStayFee)}</span>
+                      <span>Temizlik ücreti</span>
+                      <span className="font-medium tabular-nums text-zinc-900">{fmt(cleaningFee)}</span>
                     </div>
                   )}
                   <div className="flex justify-between gap-2 border-t border-zinc-100 pt-2 font-semibold text-zinc-900">

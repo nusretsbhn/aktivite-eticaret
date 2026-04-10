@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CalendarRange, ChevronLeft, ChevronRight, Images, Minus, Plus, UserRound } from 'lucide-react';
+import { Baby, CalendarRange, ChevronLeft, ChevronRight, Images, Minus, Plus, UserRound, Users } from 'lucide-react';
 
 import { averageNightly, nightDates, nightsBetween, sumNightlyPrices } from '@/lib/villa-booking-math';
 import { useVillaBookingDates } from '@/components/site/villa-booking-dates-context';
@@ -246,10 +246,12 @@ export function VillaDetailTopSection({ villa, children }: Props) {
             <label className="block text-xs font-medium text-zinc-500">
               Misafir
               <div className="mt-1.5 flex min-h-11 items-center gap-2 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2">
-                <UserRound className="h-4 w-4 shrink-0 text-teal-600" aria-hidden />
                 <div className="w-full space-y-2">
                   <div className="flex items-center justify-between gap-2 text-sm">
-                    <span className="font-medium text-zinc-900">Yetişkin (13+)</span>
+                    <span className="inline-flex items-center gap-2 font-medium text-zinc-900">
+                      <Users className="h-4 w-4 text-teal-600" aria-hidden />
+                      Yetişkin (13+)
+                    </span>
                     <div className="inline-flex items-center gap-2">
                       <button
                         type="button"
@@ -273,7 +275,10 @@ export function VillaDetailTopSection({ villa, children }: Props) {
                     </div>
                   </div>
                   <div className="flex items-center justify-between gap-2 text-sm">
-                    <span className="font-medium text-zinc-900">Çocuk (3-12)</span>
+                    <span className="inline-flex items-center gap-2 font-medium text-zinc-900">
+                      <UserRound className="h-4 w-4 text-teal-600" aria-hidden />
+                      Çocuk (3-12)
+                    </span>
                     <div className="inline-flex items-center gap-2">
                       <button
                         type="button"
@@ -296,7 +301,10 @@ export function VillaDetailTopSection({ villa, children }: Props) {
                     </div>
                   </div>
                   <div className="flex items-center justify-between gap-2 text-sm">
-                    <span className="font-medium text-zinc-900">Bebek (0-2)</span>
+                    <span className="inline-flex items-center gap-2 font-medium text-zinc-900">
+                      <Baby className="h-4 w-4 text-teal-600" aria-hidden />
+                      Bebek (0-2)
+                    </span>
                     <div className="inline-flex items-center gap-2">
                       <button
                         type="button"
