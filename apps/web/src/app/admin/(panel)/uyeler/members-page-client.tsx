@@ -37,6 +37,16 @@ export function MembersPageClient() {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [createForm, setCreateForm] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+    password: '',
+    kvkkConsent: false,
+    smsConsent: false,
+  });
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<{
@@ -91,6 +101,42 @@ export function MembersPageClient() {
     });
   }
 
+  async function createMember() {
+    setCreateError(null);
+    if (!createForm.fullName.trim() || !createForm.email.trim() || !createForm.phone.trim() || !createForm.password) {
+      setCreateError('Ad soyad, e-posta, telefon ve şifre zorunludur.');
+      return;
+    }
+    setCreating(true);
+    try {
+      const res = await fetch('/api/admin/members', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(createForm),
+      });
+      const data = (await res.json()) as { error?: string };
+      if (!res.ok) {
+        setCreateError(data.error ?? 'Kullanıcı oluşturulamadı');
+        return;
+      }
+      setCreateForm({
+        fullName: '',
+        email: '',
+        phone: '',
+        password: '',
+        kvkkConsent: false,
+        smsConsent: false,
+      });
+      setPage(1);
+      void load();
+    } catch {
+      setCreateError('Ağ hatası.');
+    } finally {
+      setCreating(false);
+    }
+  }
+
   async function saveEdit() {
     if (!editingId || !editForm) return;
     const res = await fetch(`/api/admin/members/${editingId}`, {
@@ -129,7 +175,74 @@ export function MembersPageClient() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Üye Yönetimi</h1>
+        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Kullanıcı Yönetimi</h1>
+      </div>
+
+      <div className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+        <p className="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">Yeni kullanıcı tanımla</p>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <label className="block text-sm">
+            <span className="text-zinc-500 dark:text-zinc-400">Ad Soyad</span>
+            <input
+              value={createForm.fullName}
+              onChange={(e) => setCreateForm((f) => ({ ...f, fullName: e.target.value }))}
+              className="mt-1 min-h-10 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-50"
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="text-zinc-500 dark:text-zinc-400">E-posta</span>
+            <input
+              type="email"
+              value={createForm.email}
+              onChange={(e) => setCreateForm((f) => ({ ...f, email: e.target.value }))}
+              className="mt-1 min-h-10 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-50"
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="text-zinc-500 dark:text-zinc-400">Telefon</span>
+            <input
+              value={createForm.phone}
+              onChange={(e) => setCreateForm((f) => ({ ...f, phone: e.target.value }))}
+              className="mt-1 min-h-10 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-50"
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="text-zinc-500 dark:text-zinc-400">Şifre</span>
+            <input
+              type="password"
+              value={createForm.password}
+              onChange={(e) => setCreateForm((f) => ({ ...f, password: e.target.value }))}
+              className="mt-1 min-h-10 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-50"
+            />
+          </label>
+        </div>
+        <div className="mt-3 flex flex-wrap items-center gap-4">
+          <label className="inline-flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300">
+            <input
+              type="checkbox"
+              checked={createForm.kvkkConsent}
+              onChange={(e) => setCreateForm((f) => ({ ...f, kvkkConsent: e.target.checked }))}
+            />
+            KVKK Onayı
+          </label>
+          <label className="inline-flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300">
+            <input
+              type="checkbox"
+              checked={createForm.smsConsent}
+              onChange={(e) => setCreateForm((f) => ({ ...f, smsConsent: e.target.checked }))}
+            />
+            SMS Onayı
+          </label>
+          <button
+            type="button"
+            disabled={creating}
+            onClick={() => void createMember()}
+            className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900"
+          >
+            {creating ? 'Kaydediliyor...' : 'Kullanıcı Ekle'}
+          </button>
+        </div>
+        {createError && <p className="mt-2 text-sm font-medium text-red-600">{createError}</p>}
       </div>
 
       <div className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
