@@ -4,6 +4,7 @@ import { requireAdminSession } from '@/lib/admin-api-auth';
 import { readSettings, writeSettings } from '@/lib/admin-settings-server';
 import { normalizeHomePageSectionOrder } from '@/lib/home-page-sections';
 import { normalizeEnabledSiteProducts } from '@/lib/site-product-types';
+import { normalizeWhatsAppDigits } from '@/lib/whatsapp-digits';
 import type {
   AdminSettings,
   DictionaryGroup,
@@ -148,9 +149,12 @@ function validateSettings(body: unknown): AdminSettings | null {
             })
             .filter((x): x is NonNullable<typeof x> => Boolean(x));
           const homePageSectionOrder = normalizeHomePageSectionOrder(o.homePageSectionOrder);
+          const whatsappRaw = String(o.whatsappPhoneDigits ?? '').trim();
+          const whatsappPhoneDigits = whatsappRaw ? normalizeWhatsAppDigits(whatsappRaw) ?? '' : '';
           return {
             ...(logoUrl ? { logoUrl } : {}),
             ...(darkLogoUrl ? { darkLogoUrl } : {}),
+            whatsappPhoneDigits,
             enabledSiteProducts,
             slides,
             homePageSectionOrder,
@@ -350,7 +354,10 @@ export async function PATCH(request: Request) {
     ...next,
     // nested merges to avoid wiping other tabs when patching one tab
     blockManagement: next.blockManagement ?? current.blockManagement,
-    siteManagement: next.siteManagement ?? current.siteManagement,
+    siteManagement:
+      next.siteManagement && current.siteManagement
+        ? { ...current.siteManagement, ...next.siteManagement }
+        : (next.siteManagement ?? current.siteManagement),
     bannerManagement: next.bannerManagement ?? current.bannerManagement,
     paymentManagement: next.paymentManagement ?? current.paymentManagement,
     mailManagement: next.mailManagement ?? current.mailManagement,

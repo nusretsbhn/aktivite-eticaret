@@ -2,16 +2,28 @@
 
 import { usePathname } from 'next/navigation';
 
-/** 05536882734 → uluslararası (ülke kodu 90, baştaki 0 atılır) */
-const WHATSAPP_E164 = '905536882734';
-const PREFILL =
-  '12 adalar tekne turu hakkında bilgi almak istiyorum.';
+import { buildWhatsAppChatUrl, normalizeWhatsAppDigits } from '@/lib/whatsapp-digits';
 
-const href = `https://wa.me/${WHATSAPP_E164}?text=${encodeURIComponent(PREFILL)}`;
+const DEFAULT_PHONE = '905536882734';
+const DEFAULT_PREFILL = '12 adalar tekne turu hakkında bilgi almak istiyorum.';
 
-export function SiteWhatsAppFloat() {
+type Props = {
+  /** wa.me için ulusal rakamlar (örn. 905536882734) */
+  phoneDigits?: string;
+  prefillMessage?: string;
+};
+
+export function SiteWhatsAppFloat({
+  phoneDigits = DEFAULT_PHONE,
+  prefillMessage = DEFAULT_PREFILL,
+}: Props) {
   const pathname = usePathname();
   if (pathname?.startsWith('/admin')) return null;
+
+  const raw = phoneDigits.replace(/\D/g, '');
+  const normalized = raw ? normalizeWhatsAppDigits(raw) : null;
+  const digits = normalized ?? DEFAULT_PHONE;
+  const href = buildWhatsAppChatUrl(digits, prefillMessage);
 
   return (
     <a

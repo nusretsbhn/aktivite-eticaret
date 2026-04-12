@@ -1010,7 +1010,7 @@ export function SettingsPageClient() {
         {tab === 'site' && (
           <div className="space-y-8">
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
-              Logo ve ana sayfa slider içeriklerini buradan yönetebilirsiniz.
+              Logo, WhatsApp balonu ve ana sayfa slider içeriklerini buradan yönetebilirsiniz.
             </p>
 
             <section className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
@@ -1166,6 +1166,41 @@ export function SettingsPageClient() {
                   )}
                 </div>
               </div>
+            </section>
+
+            <section className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
+              <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">WhatsApp balonu</h2>
+              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                Sağ alttaki yeşil butonun yönlendireceği numara. Örnek: <span className="font-mono">0553 688 27 34</span>,{' '}
+                <span className="font-mono">905536882734</span> veya <span className="font-mono">+90 553 688 27 34</span>.
+                Boş bırakırsanız varsayılan numara kullanılır.
+              </p>
+              <label className="mt-3 block text-sm">
+                <span className="text-zinc-600 dark:text-zinc-400">WhatsApp telefon numarası</span>
+                <input
+                  type="tel"
+                  autoComplete="tel"
+                  placeholder="905536882734"
+                  className="mt-1 min-h-11 w-full max-w-md rounded-lg border border-zinc-300 bg-white px-3 py-2 font-mono text-sm dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-50"
+                  value={settings.siteManagement?.whatsappPhoneDigits ?? ''}
+                  onChange={(e) => {
+                    if (!settings) return;
+                    const sm = settings.siteManagement ?? { slides: [] };
+                    const next: AdminSettings = {
+                      ...settings,
+                      siteManagement: {
+                        ...sm,
+                        slides: (sm.slides ?? []).slice(),
+                        logoUrl: sm.logoUrl ?? '',
+                        darkLogoUrl: sm.darkLogoUrl ?? '',
+                        whatsappPhoneDigits: e.target.value,
+                      },
+                    };
+                    setSettings(next);
+                  }}
+                  onBlur={() => void save(settings)}
+                />
+              </label>
             </section>
 
             <section className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">

@@ -73,6 +73,7 @@ export function getDefaultSettings(): AdminSettings {
     siteManagement: {
       logoUrl: '',
       darkLogoUrl: '',
+      whatsappPhoneDigits: '905536882734',
       enabledSiteProducts: [...DEFAULT_ENABLED_SITE_PRODUCTS],
       slides: [
         {

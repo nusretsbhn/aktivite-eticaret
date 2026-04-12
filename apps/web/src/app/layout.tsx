@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
+import { SiteWhatsAppFloat } from "@/components/site/site-whatsapp-float";
 import { readSettings } from "@/lib/admin-settings-server";
+import { normalizeWhatsAppDigits } from "@/lib/whatsapp-digits";
 import { SiteAuthProvider } from "@/components/site/site-auth-provider";
 import { SiteCookieConsent } from "@/components/site/site-cookie-consent";
-import { SiteWhatsAppFloat } from "@/components/site/site-whatsapp-float";
 
 import "./globals.css";
 
@@ -54,11 +55,23 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  let whatsappDigits = "905536882734";
+  try {
+    const settings = await readSettings();
+    const raw = settings.siteManagement?.whatsappPhoneDigits?.trim();
+    if (raw) {
+      const n = normalizeWhatsAppDigits(raw);
+      if (n) whatsappDigits = n;
+    }
+  } catch {
+    /* varsayılan */
+  }
+
   return (
     <html
       lang="tr"
@@ -68,7 +81,7 @@ export default function RootLayout({
         <SiteAuthProvider>
           {children}
           <SiteCookieConsent />
-          <SiteWhatsAppFloat />
+          <SiteWhatsAppFloat phoneDigits={whatsappDigits} />
         </SiteAuthProvider>
       </body>
     </html>

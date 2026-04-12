@@ -61,6 +61,11 @@ export type AdminSettings = {
   siteManagement?: {
     logoUrl?: string;
     darkLogoUrl?: string;
+    /**
+     * Sabit WhatsApp balonu için; wa.me ulusal format (ülke kodu dahil, sadece rakam, örn. 905536882734).
+     * Boşsa kod içi varsayılan kullanılır.
+     */
+    whatsappPhoneDigits?: string;
     /** Açık iş hatları: tekne turu, aktivite, villa kiralama */
     enabledSiteProducts?: SiteProductType[];
     slides: {
