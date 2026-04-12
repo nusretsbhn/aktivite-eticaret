@@ -78,6 +78,15 @@ export function VillasIndexClient() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [bulkPriceFile, setBulkPriceFile] = useState<File | null>(null);
+  const [bulkAvailabilityFile, setBulkAvailabilityFile] = useState<File | null>(null);
+  const [bulkPriceMode, setBulkPriceMode] = useState<'merge' | 'replace'>('merge');
+  const [bulkAvailabilityMode, setBulkAvailabilityMode] = useState<'merge' | 'replace'>('merge');
+  const [bulkImportingPrices, setBulkImportingPrices] = useState(false);
+  const [bulkImportingAvailability, setBulkImportingAvailability] = useState(false);
+  const [bulkMessagePrices, setBulkMessagePrices] = useState<string | null>(null);
+  const [bulkMessageAvailability, setBulkMessageAvailability] = useState<string | null>(null);
+
   useEffect(() => {
     setPage(1);
   }, [debouncedQ, isActive]);
@@ -149,6 +158,88 @@ export function VillasIndexClient() {
     }
     void load();
     router.refresh();
+  }
+
+  async function importBulkPrices() {
+    if (!bulkPriceFile) {
+      setBulkMessagePrices('JSON dosyası seçin.');
+      return;
+    }
+    setBulkImportingPrices(true);
+    setBulkMessagePrices(null);
+    try {
+      const fd = new FormData();
+      fd.append('prices', bulkPriceFile);
+      fd.append('priceMode', bulkPriceMode);
+      const res = await fetch('/api/admin/villas/import-calendar-bulk', {
+        method: 'POST',
+        credentials: 'include',
+        body: fd,
+      });
+      const data = (await res.json()) as {
+        error?: string;
+        prices?: { success: number; failed: number; failedKeys: string[] } | null;
+      };
+      if (!res.ok) {
+        setBulkMessagePrices(data.error ?? 'Aktarılamadı');
+        return;
+      }
+      const p = data.prices;
+      if (p) {
+        setBulkMessagePrices(
+          `${p.success} adet başarılı, ${p.failed} adet başarısız güncelleme (fiyat)` +
+            (p.failedKeys.length ? ` · eşleşmeyen: ${p.failedKeys.slice(0, 8).join(', ')}${p.failedKeys.length > 8 ? '…' : ''}` : ''),
+        );
+      } else {
+        setBulkMessagePrices('Tamamlandı.');
+      }
+      setBulkPriceFile(null);
+      void load();
+      router.refresh();
+    } finally {
+      setBulkImportingPrices(false);
+    }
+  }
+
+  async function importBulkAvailability() {
+    if (!bulkAvailabilityFile) {
+      setBulkMessageAvailability('JSON dosyası seçin.');
+      return;
+    }
+    setBulkImportingAvailability(true);
+    setBulkMessageAvailability(null);
+    try {
+      const fd = new FormData();
+      fd.append('availability', bulkAvailabilityFile);
+      fd.append('availabilityMode', bulkAvailabilityMode);
+      const res = await fetch('/api/admin/villas/import-calendar-bulk', {
+        method: 'POST',
+        credentials: 'include',
+        body: fd,
+      });
+      const data = (await res.json()) as {
+        error?: string;
+        availability?: { success: number; failed: number; failedKeys: string[] } | null;
+      };
+      if (!res.ok) {
+        setBulkMessageAvailability(data.error ?? 'Aktarılamadı');
+        return;
+      }
+      const a = data.availability;
+      if (a) {
+        setBulkMessageAvailability(
+          `${a.success} adet başarılı, ${a.failed} adet başarısız güncelleme (müsaitlik)` +
+            (a.failedKeys.length ? ` · eşleşmeyen: ${a.failedKeys.slice(0, 8).join(', ')}${a.failedKeys.length > 8 ? '…' : ''}` : ''),
+        );
+      } else {
+        setBulkMessageAvailability('Tamamlandı.');
+      }
+      setBulkAvailabilityFile(null);
+      void load();
+      router.refresh();
+    } finally {
+      setBulkImportingAvailability(false);
+    }
   }
 
   async function copyVilla(v: AdminVilla) {
@@ -235,6 +326,90 @@ export function VillasIndexClient() {
           </label>
         </div>
         {loading && <p className="mt-3 text-xs text-zinc-500 dark:text-zinc-400">Yükleniyor…</p>}
+      </div>
+
+      <div className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+        <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Toplu fiyat / müsaitlik (JSON)</h2>
+        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+          Kök yapı nesne olmalı; anahtarlar paneldeki <strong className="text-zinc-700 dark:text-zinc-300">villa adı</strong> (görünen ad) ile
+          eşleşir. Büyük/küçük harf farkı yoktur. İçerik, tek villa içe aktarımındakiyle aynı dizilerdir (gün + fiyat / müsaitlik satırları).
+        </p>
+        <div className="mt-4 grid gap-6 lg:grid-cols-2">
+          <div className="rounded-xl border border-zinc-100 p-3 dark:border-zinc-800">
+            <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Toplu fiyat</p>
+            <p className="mt-1 font-mono text-[10px] leading-relaxed text-zinc-500 dark:text-zinc-400">
+              {`{ "Villa Görünen Adı": [ { "day": "2025-06-01", "price": 5000 } ] }`}
+            </p>
+            <label className="mt-2 block text-xs text-zinc-500 dark:text-zinc-400">
+              Mod
+              <select
+                className="mt-1 min-h-10 w-full rounded-lg border border-zinc-300 bg-white px-2 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-50"
+                value={bulkPriceMode}
+                onChange={(e) => setBulkPriceMode(e.target.value as 'merge' | 'replace')}
+              >
+                <option value="merge">Birleştir (mevcut + dosya)</option>
+                <option value="replace">Dosyadaki tarihlerle değiştir</option>
+              </select>
+            </label>
+            <input
+              type="file"
+              accept="application/json,.json"
+              className="mt-2 min-h-10 w-full text-sm"
+              onChange={(e) => {
+                setBulkPriceFile(e.target.files?.[0] ?? null);
+                setBulkMessagePrices(null);
+              }}
+            />
+            <button
+              type="button"
+              disabled={bulkImportingPrices}
+              onClick={() => void importBulkPrices()}
+              className="mt-3 inline-flex min-h-10 w-full items-center justify-center rounded-lg bg-zinc-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900"
+            >
+              {bulkImportingPrices ? 'Aktarılıyor…' : 'Fiyatları içe aktar'}
+            </button>
+            {bulkMessagePrices && (
+              <p className="mt-2 text-xs text-zinc-700 dark:text-zinc-300">{bulkMessagePrices}</p>
+            )}
+          </div>
+          <div className="rounded-xl border border-zinc-100 p-3 dark:border-zinc-800">
+            <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Toplu müsaitlik</p>
+            <p className="mt-1 font-mono text-[10px] leading-relaxed text-zinc-500 dark:text-zinc-400">
+              {`{ "Villa Görünen Adı": [ { "day": "2025-06-01", "in_status": "musait", "out_status": null } ] }`}
+            </p>
+            <label className="mt-2 block text-xs text-zinc-500 dark:text-zinc-400">
+              Mod
+              <select
+                className="mt-1 min-h-10 w-full rounded-lg border border-zinc-300 bg-white px-2 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-50"
+                value={bulkAvailabilityMode}
+                onChange={(e) => setBulkAvailabilityMode(e.target.value as 'merge' | 'replace')}
+              >
+                <option value="merge">Birleştir (mevcut + dosya)</option>
+                <option value="replace">Dosyadaki tarihlerle değiştir</option>
+              </select>
+            </label>
+            <input
+              type="file"
+              accept="application/json,.json"
+              className="mt-2 min-h-10 w-full text-sm"
+              onChange={(e) => {
+                setBulkAvailabilityFile(e.target.files?.[0] ?? null);
+                setBulkMessageAvailability(null);
+              }}
+            />
+            <button
+              type="button"
+              disabled={bulkImportingAvailability}
+              onClick={() => void importBulkAvailability()}
+              className="mt-3 inline-flex min-h-10 w-full items-center justify-center rounded-lg bg-zinc-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900"
+            >
+              {bulkImportingAvailability ? 'Aktarılıyor…' : 'Müsaitliği içe aktar'}
+            </button>
+            {bulkMessageAvailability && (
+              <p className="mt-2 text-xs text-zinc-700 dark:text-zinc-300">{bulkMessageAvailability}</p>
+            )}
+          </div>
+        </div>
       </div>
 
       {error && (
