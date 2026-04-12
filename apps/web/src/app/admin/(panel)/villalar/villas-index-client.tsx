@@ -328,9 +328,15 @@ export function VillasIndexClient() {
         {loading && <p className="mt-3 text-xs text-zinc-500 dark:text-zinc-400">Yükleniyor…</p>}
       </div>
 
-      <div className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
-        <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Toplu fiyat / müsaitlik (JSON)</h2>
-        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+      <details className="rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+        <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-zinc-900 marker:hidden [&::-webkit-details-marker]:hidden dark:text-zinc-50">
+          <span className="inline-flex items-center gap-2">
+            Toplu fiyat / müsaitlik (JSON)
+            <span className="text-xs font-normal text-zinc-500 dark:text-zinc-400">(gelişmiş — tıklayınca açılır)</span>
+          </span>
+        </summary>
+        <div className="border-t border-zinc-100 px-4 pb-4 pt-2 dark:border-zinc-800">
+        <p className="text-xs text-zinc-500 dark:text-zinc-400">
           Kök yapı nesne olmalı; anahtarlar paneldeki <strong className="text-zinc-700 dark:text-zinc-300">villa adı</strong> (görünen ad) ile
           eşleşir. Büyük/küçük harf farkı yoktur. İçerik, tek villa içe aktarımındakiyle aynı dizilerdir (gün + fiyat / müsaitlik satırları).
         </p>
@@ -410,7 +416,8 @@ export function VillasIndexClient() {
             )}
           </div>
         </div>
-      </div>
+        </div>
+      </details>
 
       {error && (
         <div className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-800 dark:bg-red-950/40 dark:text-red-200">
