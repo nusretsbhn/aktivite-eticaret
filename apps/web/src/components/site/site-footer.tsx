@@ -61,6 +61,9 @@ const SOCIAL_ORDER: {
 
 const DEFAULT_BRAND = '12.adalartekneturu.com';
 
+/** TÜRSAB dijital doğrulama — band görseli footer’dan yönetilir; hedef adres sabittir. */
+const TURSAB_DDS_HREF = 'https://www.tursab.org.tr/tr/ddsv';
+
 /** Google Play / App Store footer butonları — linkler hazır olunca `true` yapın. */
 const SHOW_FOOTER_STORE_BADGES = false;
 
@@ -145,9 +148,23 @@ export function SiteFooter({
               </div>
             )}
 
-            <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-600">
-              TÜRSAB / İzin belgeleri alanı (sonradan görsel eklenebilir).
-            </div>
+            {footerManagement?.tursabVerificationImageUrl ? (
+              <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-3">
+                <a
+                  href={TURSAB_DDS_HREF}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block max-w-full"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={footerManagement.tursabVerificationImageUrl}
+                    alt="TÜRSAB dijital doğrulama"
+                    className="h-auto max-h-24 w-auto max-w-full object-contain object-left"
+                  />
+                </a>
+              </div>
+            ) : null}
 
             {footerManagement?.paymentMethodsImageUrl ? (
               <div className="flex justify-start">

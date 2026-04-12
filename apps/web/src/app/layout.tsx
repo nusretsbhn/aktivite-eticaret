@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
+import { readSettings } from "@/lib/admin-settings-server";
 import { SiteAuthProvider } from "@/components/site/site-auth-provider";
 import { SiteCookieConsent } from "@/components/site/site-cookie-consent";
 import { SiteWhatsAppFloat } from "@/components/site/site-whatsapp-float";
@@ -20,19 +21,38 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL('https://banabivillam.com'),
-  title: {
-    default: 'Banabivillam',
-    template: 'Banabivillam | %s',
-  },
-  description: 'Banabivillam villa ve aktivite rezervasyon platformu.',
-  icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon.ico',
-    apple: '/favicon.ico',
-  },
-};
+const METADATA_BASE = new URL("https://banabivillam.com");
+
+export async function generateMetadata(): Promise<Metadata> {
+  let faviconHref = "/favicon.ico";
+  try {
+    const settings = await readSettings();
+    const logo = settings.siteManagement?.logoUrl?.trim();
+    if (logo) {
+      faviconHref = logo;
+    }
+  } catch {
+    /* varsayılan favicon */
+  }
+
+  return {
+    metadataBase: METADATA_BASE,
+    title: {
+      default: "Banabivillam",
+      template: "Banabivillam | %s",
+    },
+    description: "Banabivillam villa ve aktivite rezervasyon platformu.",
+    icons: {
+      icon: faviconHref,
+      shortcut: faviconHref,
+      apple: faviconHref,
+    },
+    /** TÜRSAB DDS / yönlendirme politikası için gerekli */
+    other: {
+      referrer: "origin",
+    },
+  };
+}
 
 export default function RootLayout({
   children,

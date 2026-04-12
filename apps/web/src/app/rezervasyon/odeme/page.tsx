@@ -3,6 +3,8 @@ import { PhoneCall } from 'lucide-react';
 
 import { SiteAccountWithNotifications } from '@/components/site/site-account-with-notifications';
 import { readActivities } from '@/lib/admin-activities-server';
+import { parseActivityGuestParams } from '@/lib/activity-booking-params';
+import { computeActivityBookingTotal, resolveActivityPrices } from '@/lib/activity-pricing';
 import { validateBookingRequest } from '@/lib/availability-helpers';
 import { readSettings } from '@/lib/admin-settings-server';
 import { PaymentFormClient } from './payment-form-client';
@@ -35,7 +37,8 @@ export default async function PaymentPage({
   const sp = (await searchParams) ?? {};
   const activityId = typeof sp.activityId === 'string' ? sp.activityId : '';
   const date = typeof sp.date === 'string' ? sp.date : '';
-  const people = Math.max(1, Number(typeof sp.people === 'string' ? sp.people : '1'));
+  const { adults, children, infants } = parseActivityGuestParams(sp);
+  const people = adults + children + infants;
   const paymentPlan =
     typeof sp.paymentPlan === 'string' && (sp.paymentPlan === 'full' || sp.paymentPlan === 'prepayment')
       ? sp.paymentPlan
@@ -83,10 +86,10 @@ export default async function PaymentPage({
   const askSellEnabled = Boolean(payment?.askSellEnabled);
   const askSellOnly = Boolean(activity?.askSell) && askSellEnabled;
   const cover = activity ? getCoverImageUrl(activity) : '';
-  const selectedPrice =
-    activity && date ? (activity.prices ?? []).find((p) => p.date === date)?.price : undefined;
-  const price = typeof selectedPrice === 'number' ? selectedPrice : 0;
-  const grossTotal = price * people;
+  const priceRow = activity && date ? (activity.prices ?? []).find((p) => p.date === date) : undefined;
+  const { adult: adultUnit } = resolveActivityPrices(priceRow);
+  const hasPrice = typeof priceRow?.price === 'number' && Number.isFinite(priceRow.price);
+  const grossTotal = computeActivityBookingTotal(priceRow, adults, children, infants);
   const prepaymentPercent =
     typeof activity?.prepaymentPercent === 'number'
       ? Math.min(100, Math.max(1, Math.round(activity.prepaymentPercent)))
@@ -133,11 +136,14 @@ export default async function PaymentPage({
           tripInfo={tripInfo}
           date={date}
           people={people}
+          adults={adults}
+          children={children}
+          infants={infants}
           totalAmount={payableAmount}
           grossTotalAmount={grossTotal}
           prepaymentPercent={prepaymentPercent}
           paymentPlan={paymentPlan}
-          unitPrice={price}
+          unitPrice={adultUnit}
           fullName={fullName}
           firstName={firstName}
           lastName={lastName}
@@ -173,11 +179,13 @@ export default async function PaymentPage({
               <p className="text-sm text-zinc-600">Tarih: {formatDate(date)}</p>
             </div>
             <div className="mt-3 border-t border-zinc-200 pt-3">
-              <p className="text-sm text-zinc-600">Tur ücreti</p>
+              <p className="text-sm text-zinc-600">Yetişkin (kişi başı)</p>
               <p className="text-3xl font-extrabold text-zinc-900">
-                {formatTry(price)} <span className="text-lg">TRY</span>
+                {hasPrice ? formatTry(adultUnit) : '-'} <span className="text-lg">TRY</span>
               </p>
-              <p className="text-sm text-zinc-600">Kişi: {people}</p>
+              <p className="text-sm text-zinc-600">
+                {adults} yetişkin · {children} çocuk · {infants} bebek (toplam {people} kişi)
+              </p>
             </div>
             <div className="mt-3 border-t border-zinc-200 pt-3">
               <p className={`text-xs font-semibold uppercase tracking-wide ${paymentPlan === 'prepayment' ? 'text-zinc-500' : 'text-zinc-500'}`}>

@@ -45,15 +45,28 @@ type PassengerDraft = {
   gender: 'female' | 'male';
 };
 
+function passengerSlotLabel(idx: number, adultsCount: number, childrenCount: number, infantsCount: number): string {
+  if (idx < adultsCount) return `${idx + 1}. Yetişkin (+13)`;
+  if (idx < adultsCount + childrenCount) return `${idx - adultsCount + 1}. Çocuk (3-12)`;
+  if (idx < adultsCount + childrenCount + infantsCount) return `${idx - adultsCount - childrenCount + 1}. Bebek (0-2)`;
+  return `${idx + 1}. Kişi`;
+}
+
 export function PassengerFormClient({
   nextUrl,
   peopleCount,
+  adultsCount,
+  childrenCount,
+  infantsCount,
   isFamilyBoat = false,
   bookingBlocked = false,
   bookingMessage,
 }: {
   nextUrl: string;
   peopleCount: number;
+  adultsCount: number;
+  childrenCount: number;
+  infantsCount: number;
   isFamilyBoat?: boolean;
   bookingBlocked?: boolean;
   bookingMessage?: string;
@@ -204,7 +217,9 @@ export function PassengerFormClient({
       {passengers.map((passenger, idx) => (
         <div key={`p-${idx}`} className="rounded-xl border border-zinc-200 bg-white p-4">
           <div className="mb-3 flex items-center justify-between">
-            <p className="text-sm font-semibold text-zinc-900">{idx + 1}. Kişi (Yetişkin)</p>
+            <p className="text-sm font-semibold text-zinc-900">
+              {passengerSlotLabel(idx, adultsCount, childrenCount, infantsCount)}
+            </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
           <label className="block text-xs text-zinc-500">

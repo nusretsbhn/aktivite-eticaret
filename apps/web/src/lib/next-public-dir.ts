@@ -42,11 +42,20 @@ export function getNextPublicDir(): string {
   return join(getNextAppRoot(), 'public');
 }
 
-/** Upload dosyaları için olası public klasörleri (öncelik sırasıyla). */
+/** Kalıcı medya dosyaları (admin upload). `UPLOADS_DIR` yoksa `data/uploads`. */
+export function getUploadsDir(): string {
+  return process.env.UPLOADS_DIR?.trim() || join(getNextAppRoot(), 'data', 'uploads');
+}
+
+/**
+ * `/api/uploads/...` ile sunulan dosyaların aranacağı kök dizinler.
+ * Yazma `getUploadsDir()` altına yapıldığı için okuma da bu dizini kapsamalıdır (aksi halde 404 / kırık resim).
+ */
 export function getPublicSearchDirs(): string[] {
   const uploadsDir = process.env.UPLOADS_DIR?.trim();
   const dirs = [
     ...(uploadsDir ? [uploadsDir] : []),
+    getUploadsDir(),
     getNextPublicDir(),
     join(process.cwd(), 'public'),
     join(process.cwd(), 'apps', 'web', 'public'),
@@ -62,9 +71,4 @@ export function getPublicSearchDirs(): string[] {
 /** JSON fallback ve geçici dosyalar için `data/` alt yolu. */
 export function appDataFile(filename: string): string {
   return join(getNextAppRoot(), 'data', filename);
-}
-
-/** Kalici medya dosyalari icin klasor. EasyPanel volume buraya baglanabilir. */
-export function getUploadsDir(): string {
-  return process.env.UPLOADS_DIR?.trim() || join(getNextAppRoot(), 'data', 'uploads');
 }

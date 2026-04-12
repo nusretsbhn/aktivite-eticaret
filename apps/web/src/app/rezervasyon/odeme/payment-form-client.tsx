@@ -21,6 +21,9 @@ export function PaymentFormClient({
   tripInfo,
   date,
   people,
+  adults,
+  children,
+  infants,
   totalAmount,
   grossTotalAmount,
   prepaymentPercent,
@@ -53,6 +56,9 @@ export function PaymentFormClient({
   tripInfo?: string;
   date: string;
   people: number;
+  adults: number;
+  children: number;
+  infants: number;
   totalAmount: number;
   grossTotalAmount: number;
   prepaymentPercent: number;
@@ -118,6 +124,9 @@ export function PaymentFormClient({
           tripInfo,
           date,
           peopleCount: people,
+          adults,
+          children,
+          infants,
           unitPrice,
           totalAmount,
           grossTotalAmount,

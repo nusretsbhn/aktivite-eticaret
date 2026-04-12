@@ -122,6 +122,7 @@ export function getDefaultSettings(): AdminSettings {
     },
     footerManagement: {
       paymentMethodsImageUrl: '',
+      tursabVerificationImageUrl: '',
       footerBrandText: '12.adalartekneturu.com',
     },
   };

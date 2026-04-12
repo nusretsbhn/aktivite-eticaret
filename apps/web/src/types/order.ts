@@ -17,6 +17,10 @@ export type Order = {
   departurePlace: string;
   date: string;
   peopleCount: number;
+  /** Üçlü fiyatlandırma: ayrı sayılar (yoksa peopleCount = yetişkin varsayılır) */
+  adultCount?: number;
+  childCount?: number;
+  infantCount?: number;
   /** Normal sipariş veya sor-sat talebi */
   orderKind?: OrderKind;
   paymentType: OrderPaymentType;

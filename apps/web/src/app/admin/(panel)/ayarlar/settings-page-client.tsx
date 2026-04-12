@@ -2290,8 +2290,65 @@ export function SettingsPageClient() {
         {tab === 'footer' && (
           <div className="space-y-6">
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
-              Ödeme / kart logoları alanına yüklenecek görsel (iyzico metni kaldırıldı). Alt çubuktaki sağdaki metin.
+              TÜRSAB dijital doğrulama bandı, ödeme görselleri ve alt çubuk metni. TÜRSAB görseli tıklanınca{' '}
+              <span className="font-mono text-xs">https://www.tursab.org.tr/tr/ddsv</span> adresine gider.
             </p>
+            <section className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
+              <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">TÜRSAB dijital doğrulama bandı</p>
+              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                İzin belgeleri alanı — PNG veya SVG. Yükleme sonrası kaydedilir; sitede sabit bağlantıyla gösterilir.
+              </p>
+              <input
+                type="file"
+                accept="image/*"
+                className="mt-2 min-h-11 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-50"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file || !settings) return;
+                  void uploadCoverFile(file, 'footer', 'footer:tursab-dds').then((url) => {
+                    if (!url) return;
+                    const fm = settings.footerManagement ?? {};
+                    const next: AdminSettings = {
+                      ...settings,
+                      footerManagement: { ...fm, tursabVerificationImageUrl: url },
+                    };
+                    setSettings(next);
+                    void save(next);
+                  });
+                  e.currentTarget.value = '';
+                }}
+              />
+              {settings.footerManagement?.tursabVerificationImageUrl ? (
+                <div className="mt-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={settings.footerManagement.tursabVerificationImageUrl}
+                    alt="TÜRSAB önizleme"
+                    className="max-h-24 w-auto max-w-full object-contain object-left"
+                  />
+                  <p className="mt-1 truncate text-xs text-zinc-500">{settings.footerManagement.tursabVerificationImageUrl}</p>
+                  <button
+                    type="button"
+                    className="mt-2 text-sm font-medium text-red-600 hover:underline dark:text-red-400"
+                    onClick={() => {
+                      if (!settings) return;
+                      const fm = settings.footerManagement ?? {};
+                      const next: AdminSettings = {
+                        ...settings,
+                        footerManagement: { ...fm, tursabVerificationImageUrl: '' },
+                      };
+                      setSettings(next);
+                      void save(next);
+                    }}
+                  >
+                    Görseli kaldır
+                  </button>
+                </div>
+              ) : (
+                <p className="mt-2 text-xs text-zinc-500">Henüz görsel yok.</p>
+              )}
+            </section>
+
             <section className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
               <label className="block text-sm">
                 <span className="text-zinc-600 dark:text-zinc-400">Alt çubuk sağ metin</span>

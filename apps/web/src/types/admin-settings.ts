@@ -120,6 +120,8 @@ export type AdminSettings = {
   /** Footer ödeme görseli ve alt marka metni */
   footerManagement?: {
     paymentMethodsImageUrl?: string;
+    /** TÜRSAB dijital doğrulama bandı — sabit link: https://www.tursab.org.tr/tr/ddsv */
+    tursabVerificationImageUrl?: string;
     /** Alt çubuk sağdaki metin (örn. alan adı) */
     footerBrandText?: string;
   };

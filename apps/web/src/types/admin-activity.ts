@@ -8,7 +8,12 @@ export type GalleryItem = {
 
 export type PriceEntry = {
   date: string; // YYYY-MM-DD
+  /** Yetişkin (13+) — tek fiyatlı eski kayıtlar için birincil alan */
   price: number;
+  /** Çocuk (3-12), yoksa `price` kullanılır */
+  priceChild?: number;
+  /** Bebek (0-2), yoksa `price` kullanılır */
+  priceInfant?: number;
 };
 
 /** Sadece dolu/bakım günleri saklanır; kayıt yoksa o gün müsaittir. */

@@ -4,14 +4,18 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import {
+  Baby,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   Clock3,
   Filter,
   MapPin,
+  Minus,
+  Plus,
   Search,
   SlidersHorizontal,
+  UserRound,
   Users,
   X,
 } from 'lucide-react';
@@ -20,6 +24,7 @@ import { DictionaryIcon } from '@/components/icons/dictionary-icon';
 import { SiteDatePickerOverlay } from '@/components/site/site-date-picker-overlay';
 import { SiteAccountWithNotifications } from '@/components/site/site-account-with-notifications';
 import { SiteFooter } from '@/components/site/site-footer';
+import { computeActivityBookingTotal, resolveActivityPrices } from '@/lib/activity-pricing';
 import { getAvailabilityForDate } from '@/lib/availability-helpers';
 import type { AdminActivity } from '@/types/admin-activity';
 import type { AdminSettings } from '@/types/admin-settings';
@@ -120,8 +125,10 @@ export function ActivitiesListingClient({
   const [imageIndexById, setImageIndexById] = useState<Record<string, number>>({});
   const [lightbox, setLightbox] = useState<{ activityId: string; index: number } | null>(null);
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
-  /** Seçilen kart için rezervasyon kişi sayısı (filtredeki kişi sayısından bağımsız). */
-  const [bookingPersonCount, setBookingPersonCount] = useState(1);
+  /** Seçilen kart için yetişkin / çocuk / bebek (kart bazında). */
+  const [bookingGuestsById, setBookingGuestsById] = useState<
+    Record<string, { adults: number; children: number; infants: number }>
+  >({});
 
   const logoUrl = settings.siteManagement?.logoUrl;
   const activeActivities = useMemo(
@@ -491,9 +498,21 @@ export function ActivitiesListingClient({
               const isSelected = selectedActivityId === a.id;
               const activeTab = detailsTabById[a.id] ?? 'general';
               const trips = (a.trips ?? []).slice().sort((x, y) => x.departureTime.localeCompare(y.departureTime));
-              const todayPrice = (a.prices ?? []).find((p) => p.date === selectedDate)?.price;
+              const priceRow = (a.prices ?? []).find((p) => p.date === selectedDate);
+              const hasPrice = typeof priceRow?.price === 'number' && Number.isFinite(priceRow.price);
+              const { adult: adultUnit, child: childUnit, infant: infantUnit } = resolveActivityPrices(priceRow);
               const maxPeople = Math.max(1, a.capacity ?? 1);
-              const peopleForTotals = isSelected ? bookingPersonCount : personCount;
+              const guests = isSelected
+                ? bookingGuestsById[a.id] ?? {
+                    adults: Math.min(Math.max(1, personCount), maxPeople),
+                    children: 0,
+                    infants: 0,
+                  }
+                : { adults: Math.max(1, personCount), children: 0, infants: 0 };
+              const peopleForTotals = guests.adults + guests.children + guests.infants;
+              const bookingTotal = computeActivityBookingTotal(priceRow, guests.adults, guests.children, guests.infants);
+              const previewTotal = computeActivityBookingTotal(priceRow, Math.max(1, personCount), 0, 0);
+              const cardTotal = isSelected ? bookingTotal : previewTotal;
               const included = (a.includedItemIds ?? []).map((id) => dictionaryMap.get(id)).filter(Boolean);
               const excluded = (a.excludedItemIds ?? []).map((id) => dictionaryMap.get(id)).filter(Boolean);
               const tags = (a.tagIds ?? [])
@@ -616,7 +635,7 @@ export function ActivitiesListingClient({
                       </div>
                     </div>
 
-                    <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-3">
+                    <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-3 xl:min-w-[200px]">
                       {blockReason && (
                         <p className="mb-2 rounded-lg bg-red-100 px-2 py-1.5 text-center text-xs font-bold text-red-800 dark:bg-red-950/60 dark:text-red-200">
                           {blockReason}
@@ -627,15 +646,149 @@ export function ActivitiesListingClient({
                       </p>
                       <p className="text-sm font-semibold text-zinc-800">{a.capacity} Kişi</p>
                       <div className="my-3 h-px bg-zinc-200" />
-                      <p className="text-sm text-zinc-600">Kişi başı</p>
-                      <p className="text-4xl font-extrabold tracking-tight text-zinc-900">
-                        {typeof todayPrice === 'number' ? formatTry(todayPrice) : '-'}
-                        <span className="ml-1 text-lg font-bold">TRY</span>
+                      <p className="text-sm text-zinc-600">Yetişkin (kişi başı)</p>
+                      <p className="text-3xl font-extrabold tracking-tight text-zinc-900">
+                        {hasPrice ? formatTry(adultUnit) : '-'}
+                        <span className="ml-1 text-base font-bold">TRY</span>
                       </p>
-                      <p className="mt-1 text-sm text-zinc-500">
-                        Toplam{' '}
-                        {typeof todayPrice === 'number' ? formatTry(todayPrice * peopleForTotals) : '-'} TRY
+                      {(childUnit !== adultUnit || infantUnit !== adultUnit) && hasPrice && (
+                        <p className="mt-1 text-[11px] leading-snug text-zinc-500">
+                          Çocuk {formatTry(childUnit)} · Bebek {formatTry(infantUnit)} TRY
+                        </p>
+                      )}
+                      <p className="mt-2 text-sm text-zinc-500">
+                        Toplam <span className="font-semibold text-zinc-800">{hasPrice ? formatTry(cardTotal) : '-'}</span> TRY
                       </p>
+
+                      {isSelected && !bookingBlocked && (
+                        <div className="mt-3 space-y-2 border-t border-zinc-200 pt-3 text-zinc-900">
+                          <p className="text-xs font-semibold text-zinc-800">Misafir</p>
+                          <div className="flex items-center justify-between gap-1 text-xs text-zinc-900">
+                            <span className="inline-flex items-center gap-1 text-zinc-800">
+                              <Users className="h-3.5 w-3.5 shrink-0 text-blue-600" aria-hidden />
+                              Yetişkin (+13)
+                            </span>
+                            <span className="inline-flex items-center gap-1 text-zinc-900">
+                              <button
+                                type="button"
+                                className="flex h-7 w-7 items-center justify-center rounded border border-zinc-300 bg-white text-zinc-900 disabled:opacity-40 dark:bg-white dark:text-zinc-900"
+                                disabled={guests.adults <= 1}
+                                onClick={() =>
+                                  setBookingGuestsById((prev) => {
+                                    const cur = prev[a.id] ?? guests;
+                                    const next = { ...cur, adults: Math.max(1, cur.adults - 1) };
+                                    if (next.adults + next.children + next.infants > maxPeople) return prev;
+                                    return { ...prev, [a.id]: next };
+                                  })
+                                }
+                                aria-label="Yetişkin azalt"
+                              >
+                                <Minus className="h-3.5 w-3.5 shrink-0 text-zinc-900" strokeWidth={2.25} />
+                              </button>
+                              <span className="min-w-[1.5rem] text-center text-sm font-semibold tabular-nums text-zinc-900">
+                                {guests.adults}
+                              </span>
+                              <button
+                                type="button"
+                                className="flex h-7 w-7 items-center justify-center rounded border border-zinc-300 bg-white text-zinc-900 disabled:opacity-40 dark:bg-white dark:text-zinc-900"
+                                disabled={guests.adults + guests.children + guests.infants >= maxPeople}
+                                onClick={() =>
+                                  setBookingGuestsById((prev) => {
+                                    const cur = prev[a.id] ?? guests;
+                                    if (cur.adults + cur.children + cur.infants >= maxPeople) return prev;
+                                    return { ...prev, [a.id]: { ...cur, adults: cur.adults + 1 } };
+                                  })
+                                }
+                                aria-label="Yetişkin artır"
+                              >
+                                <Plus className="h-3.5 w-3.5 shrink-0 text-zinc-900" strokeWidth={2.25} />
+                              </button>
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between gap-1 text-xs text-zinc-900">
+                            <span className="inline-flex items-center gap-1 text-zinc-800">
+                              <UserRound className="h-3.5 w-3.5 shrink-0 text-blue-600" aria-hidden />
+                              Çocuk (3-12)
+                            </span>
+                            <span className="inline-flex items-center gap-1 text-zinc-900">
+                              <button
+                                type="button"
+                                className="flex h-7 w-7 items-center justify-center rounded border border-zinc-300 bg-white text-zinc-900 disabled:opacity-40 dark:bg-white dark:text-zinc-900"
+                                disabled={guests.children <= 0}
+                                onClick={() =>
+                                  setBookingGuestsById((prev) => {
+                                    const cur = prev[a.id] ?? guests;
+                                    const next = { ...cur, children: Math.max(0, cur.children - 1) };
+                                    return { ...prev, [a.id]: next };
+                                  })
+                                }
+                                aria-label="Çocuk azalt"
+                              >
+                                <Minus className="h-3.5 w-3.5 shrink-0 text-zinc-900" strokeWidth={2.25} />
+                              </button>
+                              <span className="min-w-[1.5rem] text-center text-sm font-semibold tabular-nums text-zinc-900">
+                                {guests.children}
+                              </span>
+                              <button
+                                type="button"
+                                className="flex h-7 w-7 items-center justify-center rounded border border-zinc-300 bg-white text-zinc-900 disabled:opacity-40 dark:bg-white dark:text-zinc-900"
+                                disabled={guests.adults + guests.children + guests.infants >= maxPeople}
+                                onClick={() =>
+                                  setBookingGuestsById((prev) => {
+                                    const cur = prev[a.id] ?? guests;
+                                    if (cur.adults + cur.children + cur.infants >= maxPeople) return prev;
+                                    return { ...prev, [a.id]: { ...cur, children: cur.children + 1 } };
+                                  })
+                                }
+                                aria-label="Çocuk artır"
+                              >
+                                <Plus className="h-3.5 w-3.5 shrink-0 text-zinc-900" strokeWidth={2.25} />
+                              </button>
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between gap-1 text-xs text-zinc-900">
+                            <span className="inline-flex items-center gap-1 text-zinc-800">
+                              <Baby className="h-3.5 w-3.5 shrink-0 text-blue-600" aria-hidden />
+                              Bebek (0-2)
+                            </span>
+                            <span className="inline-flex items-center gap-1 text-zinc-900">
+                              <button
+                                type="button"
+                                className="flex h-7 w-7 items-center justify-center rounded border border-zinc-300 bg-white text-zinc-900 disabled:opacity-40 dark:bg-white dark:text-zinc-900"
+                                disabled={guests.infants <= 0}
+                                onClick={() =>
+                                  setBookingGuestsById((prev) => {
+                                    const cur = prev[a.id] ?? guests;
+                                    return { ...prev, [a.id]: { ...cur, infants: Math.max(0, cur.infants - 1) } };
+                                  })
+                                }
+                                aria-label="Bebek azalt"
+                              >
+                                <Minus className="h-3.5 w-3.5 shrink-0 text-zinc-900" strokeWidth={2.25} />
+                              </button>
+                              <span className="min-w-[1.5rem] text-center text-sm font-semibold tabular-nums text-zinc-900">
+                                {guests.infants}
+                              </span>
+                              <button
+                                type="button"
+                                className="flex h-7 w-7 items-center justify-center rounded border border-zinc-300 bg-white text-zinc-900 disabled:opacity-40 dark:bg-white dark:text-zinc-900"
+                                disabled={guests.adults + guests.children + guests.infants >= maxPeople}
+                                onClick={() =>
+                                  setBookingGuestsById((prev) => {
+                                    const cur = prev[a.id] ?? guests;
+                                    if (cur.adults + cur.children + cur.infants >= maxPeople) return prev;
+                                    return { ...prev, [a.id]: { ...cur, infants: cur.infants + 1 } };
+                                  })
+                                }
+                                aria-label="Bebek artır"
+                              >
+                                <Plus className="h-3.5 w-3.5 shrink-0 text-zinc-900" strokeWidth={2.25} />
+                              </button>
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
                       <button
                         type="button"
                         disabled={bookingBlocked}
@@ -644,7 +797,14 @@ export function ActivitiesListingClient({
                           if (selectedActivityId === a.id) {
                             setSelectedActivityId(null);
                           } else {
-                            setBookingPersonCount(Math.min(Math.max(1, personCount), maxPeople));
+                            setBookingGuestsById((prev) => ({
+                              ...prev,
+                              [a.id]: prev[a.id] ?? {
+                                adults: Math.min(Math.max(1, personCount), maxPeople),
+                                children: 0,
+                                infants: 0,
+                              },
+                            }));
                             setSelectedActivityId(a.id);
                           }
                         }}
@@ -676,12 +836,15 @@ export function ActivitiesListingClient({
                             {included.length === 0 && <li className="text-base text-zinc-500">Hizmet bilgisi bulunamadı.</li>}
                           </ul>
                           <p className="mt-4 text-2xl font-extrabold text-zinc-900">
-                            {typeof todayPrice === 'number' ? `${formatTry(todayPrice)} TRY` : '-'}
+                            {hasPrice ? `${formatTry(adultUnit)} TRY (yetişkin)` : '-'}
                           </p>
                           <div className="mt-4 border-t border-zinc-200 pt-3">
                             <p className="text-sm font-semibold text-zinc-700">Toplam Ödeme</p>
                             <p className="mt-1 text-2xl font-extrabold text-zinc-900">
-                              {typeof todayPrice === 'number' ? formatTry(todayPrice * bookingPersonCount) : '-'} TRY
+                              {hasPrice ? formatTry(bookingTotal) : '-'} TRY
+                            </p>
+                            <p className="mt-1 text-xs text-zinc-500">
+                              {guests.adults} yetişkin · {guests.children} çocuk · {guests.infants} bebek
                             </p>
                           </div>
                           <button
@@ -692,7 +855,10 @@ export function ActivitiesListingClient({
                               const params = new URLSearchParams();
                               params.set('activityId', a.id);
                               params.set('date', selectedDate);
-                              params.set('people', String(bookingPersonCount));
+                              params.set('adults', String(guests.adults));
+                              params.set('children', String(guests.children));
+                              params.set('infants', String(guests.infants));
+                              params.set('people', String(peopleForTotals));
                               params.set('paymentPlan', 'full');
                               router.push(`/rezervasyon/yolcu-bilgileri?${params.toString()}`);
                             }}
@@ -718,28 +884,24 @@ export function ActivitiesListingClient({
                             {included.length === 0 && <li className="text-base text-zinc-500">Hizmet bilgisi bulunamadı.</li>}
                           </ul>
                           <p className="mt-4 text-2xl font-extrabold text-zinc-900">
-                            {typeof todayPrice === 'number' ? `${formatTry(todayPrice)} TRY` : '-'}
+                            {hasPrice ? `${formatTry(adultUnit)} TRY (yetişkin)` : '-'}
                           </p>
                           <div className="mt-4 border-t border-blue-200 pt-3">
                             <p className="text-sm font-semibold text-blue-700">
                               Ön Ödeme (%{Math.min(100, Math.max(1, Math.round(a.prepaymentPercent ?? 100)))})
                             </p>
                             <p className="mt-1 text-2xl font-extrabold text-blue-900">
-                              {typeof todayPrice === 'number'
+                              {hasPrice
                                 ? formatTry(
                                     Math.round(
-                                      (todayPrice *
-                                        bookingPersonCount *
-                                        Math.min(100, Math.max(1, Math.round(a.prepaymentPercent ?? 100)))) /
-                                        100,
+                                      (bookingTotal * Math.min(100, Math.max(1, Math.round(a.prepaymentPercent ?? 100)))) / 100,
                                     ),
                                   )
                                 : '-'}{' '}
                               TRY
                             </p>
                             <p className="mt-1 text-xs text-blue-800">
-                              Toplam Tutar:{' '}
-                              {typeof todayPrice === 'number' ? formatTry(todayPrice * bookingPersonCount) : '-'} TRY
+                              Toplam Tutar: {hasPrice ? formatTry(bookingTotal) : '-'} TRY
                             </p>
                           </div>
                           <button
@@ -750,7 +912,10 @@ export function ActivitiesListingClient({
                               const params = new URLSearchParams();
                               params.set('activityId', a.id);
                               params.set('date', selectedDate);
-                              params.set('people', String(bookingPersonCount));
+                              params.set('adults', String(guests.adults));
+                              params.set('children', String(guests.children));
+                              params.set('infants', String(guests.infants));
+                              params.set('people', String(peopleForTotals));
                               params.set('paymentPlan', 'prepayment');
                               router.push(`/rezervasyon/yolcu-bilgileri?${params.toString()}`);
                             }}

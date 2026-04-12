@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
+import { computeActivityBookingTotal } from '@/lib/activity-pricing';
 import { validateBookingRequest } from '@/lib/availability-helpers';
 import { readActivities } from '@/lib/admin-activities-server';
 import { appendAdminNotification, appendUserNotification } from '@/lib/notifications-server';
@@ -33,7 +34,22 @@ export async function POST(request: Request) {
   const tourName = String(b.tourName ?? '').trim();
   const departurePlace = String(b.departurePlace ?? '').trim();
   const date = String(b.date ?? '').trim();
-  const peopleCount = Math.max(1, Number(b.peopleCount ?? 1) || 1);
+  const peopleCountRaw = Math.max(1, Number(b.peopleCount ?? 1) || 1);
+  const hasGuestSplit =
+    b.adults !== undefined || b.children !== undefined || b.infants !== undefined;
+  let adults: number;
+  let children: number;
+  let infants: number;
+  if (hasGuestSplit) {
+    adults = Math.max(1, Math.floor(Number(b.adults ?? 1) || 1));
+    children = Math.max(0, Math.floor(Number(b.children ?? 0) || 0));
+    infants = Math.max(0, Math.floor(Number(b.infants ?? 0) || 0));
+  } else {
+    adults = peopleCountRaw;
+    children = 0;
+    infants = 0;
+  }
+  const peopleCount = adults + children + infants;
   const unitPriceRaw = Math.max(0, Number(b.unitPrice ?? 0) || 0);
   const totalAmount = Math.max(0, Number(b.totalAmount ?? 0) || 0);
   const grossTotalAmount = Math.max(0, Number(b.grossTotalAmount ?? totalAmount) || totalAmount);
@@ -96,6 +112,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: bookingCheck.message }, { status: bookingCheck.httpStatus });
   }
 
+  const priceRow = activity ? (activity.prices ?? []).find((p) => p.date === date) : undefined;
+  const expectedGross = computeActivityBookingTotal(priceRow, adults, children, infants);
+  if (expectedGross > 0 && grossTotalAmount > 0 && Math.abs(expectedGross - grossTotalAmount) > 2) {
+    return NextResponse.json({ error: 'Tutar doğrulanamadı. Lütfen sayfayı yenileyip tekrar deneyin.' }, { status: 400 });
+  }
+
   const now = new Date().toISOString();
   const order: Order = {
     id: randomUUID(),
@@ -109,6 +131,9 @@ export async function POST(request: Request) {
     departurePlace,
     date,
     peopleCount,
+    adultCount: adults,
+    childCount: children,
+    infantCount: infants,
     orderKind,
     paymentType,
     paymentPlan,

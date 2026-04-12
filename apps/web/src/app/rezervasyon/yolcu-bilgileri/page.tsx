@@ -3,6 +3,8 @@ import { PhoneCall } from 'lucide-react';
 
 import { SiteAccountWithNotifications } from '@/components/site/site-account-with-notifications';
 import { readActivities } from '@/lib/admin-activities-server';
+import { parseActivityGuestParams } from '@/lib/activity-booking-params';
+import { computeActivityBookingTotal, resolveActivityPrices } from '@/lib/activity-pricing';
 import { validateBookingRequest } from '@/lib/availability-helpers';
 import { readSettings } from '@/lib/admin-settings-server';
 import { PassengerFormClient } from './passenger-form-client';
@@ -35,7 +37,8 @@ export default async function PassengerInfoPage({
   const sp = (await searchParams) ?? {};
   const activityId = typeof sp.activityId === 'string' ? sp.activityId : '';
   const date = typeof sp.date === 'string' ? sp.date : '';
-  const people = Math.max(1, Number(typeof sp.people === 'string' ? sp.people : '1'));
+  const { adults, children, infants } = parseActivityGuestParams(sp);
+  const people = adults + children + infants;
   const paymentPlan =
     typeof sp.paymentPlan === 'string' && (sp.paymentPlan === 'full' || sp.paymentPlan === 'prepayment')
       ? sp.paymentPlan
@@ -59,10 +62,10 @@ export default async function PassengerInfoPage({
 
   const logoUrl = settings.siteManagement?.logoUrl;
   const cover = activity ? getCoverImageUrl(activity) : '';
-  const selectedPrice =
-    activity && date ? (activity.prices ?? []).find((p) => p.date === date)?.price : undefined;
-  const price = typeof selectedPrice === 'number' ? selectedPrice : 0;
-  const totalAmount = price * people;
+  const priceRow = activity && date ? (activity.prices ?? []).find((p) => p.date === date) : undefined;
+  const { adult: adultUnit, child: childUnit, infant: infantUnit } = resolveActivityPrices(priceRow);
+  const hasPrice = typeof priceRow?.price === 'number' && Number.isFinite(priceRow.price);
+  const totalAmount = computeActivityBookingTotal(priceRow, adults, children, infants);
   const prepaymentPercent =
     typeof activity?.prepaymentPercent === 'number'
       ? Math.min(100, Math.max(1, Math.round(activity.prepaymentPercent)))
@@ -72,7 +75,7 @@ export default async function PassengerInfoPage({
   const remainingAmount = Math.max(0, totalAmount - payableAmount);
   const nextUrl = `/rezervasyon/odeme?activityId=${encodeURIComponent(activity?.id ?? '')}&date=${encodeURIComponent(
     date,
-  )}&people=${encodeURIComponent(String(people))}&paymentPlan=${encodeURIComponent(paymentPlan)}`;
+  )}&adults=${encodeURIComponent(String(adults))}&children=${encodeURIComponent(String(children))}&infants=${encodeURIComponent(String(infants))}&people=${encodeURIComponent(String(people))}&paymentPlan=${encodeURIComponent(paymentPlan)}`;
 
   return (
     <div className="min-h-screen bg-zinc-50">
@@ -99,6 +102,9 @@ export default async function PassengerInfoPage({
         <PassengerFormClient
           nextUrl={nextUrl}
           peopleCount={people}
+          adultsCount={adults}
+          childrenCount={children}
+          infantsCount={infants}
           isFamilyBoat={activity?.boatType === 'family'}
           bookingBlocked={!bookingValidation.ok}
           bookingMessage={bookingValidation.ok ? undefined : bookingValidation.message}
@@ -129,9 +135,17 @@ export default async function PassengerInfoPage({
               </button>
             </div>
             <div className="mt-3 border-t border-zinc-200 pt-3">
-              <p className="text-sm text-zinc-600">Kişi başı</p>
+              <p className="text-sm text-zinc-600">Yetişkin (kişi başı)</p>
               <p className="text-3xl font-extrabold text-zinc-900">
-                {formatTry(price)} <span className="text-lg">TRY</span>
+                {hasPrice ? formatTry(adultUnit) : '-'} <span className="text-lg">TRY</span>
+              </p>
+              {(childUnit !== adultUnit || infantUnit !== adultUnit) && hasPrice && (
+                <p className="mt-1 text-xs text-zinc-500">
+                  Çocuk {formatTry(childUnit)} · Bebek {formatTry(infantUnit)} TRY
+                </p>
+              )}
+              <p className="mt-2 text-xs text-zinc-600">
+                {adults} yetişkin · {children} çocuk · {infants} bebek
               </p>
               <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
                 {paymentPlan === 'full' ? 'Toplam ödeme' : `Ön ödeme (%${prepaymentPercent})`}

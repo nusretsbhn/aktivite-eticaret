@@ -279,6 +279,7 @@ function validateSettings(body: unknown): AdminSettings | null {
           const o = fm as Record<string, unknown>;
           return {
             paymentMethodsImageUrl: String(o.paymentMethodsImageUrl ?? '').trim().slice(0, 500),
+            tursabVerificationImageUrl: String(o.tursabVerificationImageUrl ?? '').trim().slice(0, 500),
             footerBrandText: String(o.footerBrandText ?? '').trim().slice(0, 120),
           } satisfies NonNullable<AdminSettings['footerManagement']>;
         })()
