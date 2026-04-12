@@ -14,7 +14,9 @@ export function normalizeWhatsAppDigits(input: string): string | null {
   return d;
 }
 
-export function buildWhatsAppChatUrl(phoneDigits: string, text: string): string {
-  const enc = encodeURIComponent(text);
-  return `https://wa.me/${phoneDigits}?text=${enc}`;
+/** `text` boşsa yalnızca sohbet açılır, hazır mesaj eklenmez. */
+export function buildWhatsAppChatUrl(phoneDigits: string, text?: string): string {
+  const t = (text ?? '').trim();
+  if (!t) return `https://wa.me/${phoneDigits}`;
+  return `https://wa.me/${phoneDigits}?text=${encodeURIComponent(t)}`;
 }

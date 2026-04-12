@@ -5,25 +5,20 @@ import { usePathname } from 'next/navigation';
 import { buildWhatsAppChatUrl, normalizeWhatsAppDigits } from '@/lib/whatsapp-digits';
 
 const DEFAULT_PHONE = '905536882734';
-const DEFAULT_PREFILL = '12 adalar tekne turu hakkında bilgi almak istiyorum.';
 
 type Props = {
   /** wa.me için ulusal rakamlar (örn. 905536882734) */
   phoneDigits?: string;
-  prefillMessage?: string;
 };
 
-export function SiteWhatsAppFloat({
-  phoneDigits = DEFAULT_PHONE,
-  prefillMessage = DEFAULT_PREFILL,
-}: Props) {
+export function SiteWhatsAppFloat({ phoneDigits = DEFAULT_PHONE }: Props) {
   const pathname = usePathname();
   if (pathname?.startsWith('/admin')) return null;
 
   const raw = phoneDigits.replace(/\D/g, '');
   const normalized = raw ? normalizeWhatsAppDigits(raw) : null;
   const digits = normalized ?? DEFAULT_PHONE;
-  const href = buildWhatsAppChatUrl(digits, prefillMessage);
+  const href = buildWhatsAppChatUrl(digits);
 
   return (
     <a
