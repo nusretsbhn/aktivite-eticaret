@@ -105,6 +105,14 @@ export function getDefaultSettings(): AdminSettings {
       transferBranch: '',
       transferDescription: '',
     },
+    emailManagement: {
+      smtpHost: '',
+      smtpPort: 465,
+      smtpSecure: true,
+      smtpUser: '',
+      smtpPass: '',
+      smtpFrom: '',
+    },
     mailManagement: {
       ticketEmailEnabled: true,
       ticketEmailSubject: 'Rezervasyonunuz — Biletiniz ektedir ({{siparisNo}})',
@@ -120,6 +128,13 @@ export function getDefaultSettings(): AdminSettings {
       facebookUrl: '',
       googleUrl: '',
       youtubeUrl: '',
+    },
+    contactManagement: {
+      address: '',
+      phonePrimary: '',
+      phoneSecondary: '',
+      email: '',
+      googleMapsUrl: '',
     },
     footerManagement: {
       paymentMethodsImageUrl: '',
@@ -189,6 +204,12 @@ export async function readSettings(): Promise<AdminSettings> {
               ...(s.paymentManagement as Partial<NonNullable<AdminSettings['paymentManagement']>>),
             }
           : getDefaultSettings().paymentManagement,
+      emailManagement: {
+        ...getDefaultSettings().emailManagement!,
+        ...(s.emailManagement && typeof s.emailManagement === 'object'
+          ? (s.emailManagement as Partial<NonNullable<AdminSettings['emailManagement']>>)
+          : {}),
+      },
       mailManagement: {
         ...getDefaultSettings().mailManagement!,
         ...(s.mailManagement && typeof s.mailManagement === 'object'
@@ -199,6 +220,12 @@ export async function readSettings(): Promise<AdminSettings> {
         ...getDefaultSettings().socialMedia!,
         ...(s.socialMedia && typeof s.socialMedia === 'object'
           ? (s.socialMedia as Partial<NonNullable<AdminSettings['socialMedia']>>)
+          : {}),
+      },
+      contactManagement: {
+        ...getDefaultSettings().contactManagement!,
+        ...(s.contactManagement && typeof s.contactManagement === 'object'
+          ? (s.contactManagement as Partial<NonNullable<AdminSettings['contactManagement']>>)
           : {}),
       },
       footerManagement: {

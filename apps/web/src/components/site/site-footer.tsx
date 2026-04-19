@@ -4,6 +4,11 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { Chrome, Facebook, Instagram, Youtube } from 'lucide-react';
 
+import {
+  SITE_PRODUCT_ACTIVITY,
+  SITE_PRODUCT_VILLA_RENTAL,
+  type SiteProductType,
+} from '@/lib/site-product-types';
 import type { AdminSettings } from '@/types/admin-settings';
 
 type FooterGroup = {
@@ -11,7 +16,7 @@ type FooterGroup = {
   links: { label: string; href: string }[];
 };
 
-const GROUPS: FooterGroup[] = [
+const BASE_GROUPS: FooterGroup[] = [
   {
     title: 'Gizlilik ve Güvenlik',
     links: [
@@ -36,16 +41,14 @@ const GROUPS: FooterGroup[] = [
       { label: 'Açık Rıza Metni', href: '/sozlesmeler/acik-riza-metni' },
     ],
   },
-  {
-    title: 'Bölgeler',
-    links: [
-      { label: 'Ovacık Bölgesi Villaları', href: `/villalar?region=${encodeURIComponent('Ovacık')}` },
-      { label: 'Faralya Bölgesi Villaları', href: `/villalar?region=${encodeURIComponent('Faralya')}` },
-      { label: 'Yalıkavak Bölgesi Villaları', href: `/villalar?region=${encodeURIComponent('Yalıkavak')}` },
-      { label: 'Göcek Bölgesi Villaları', href: `/villalar?region=${encodeURIComponent('Göcek')}` },
-      { label: 'Ölüdeniz Bölgesi Villaları', href: `/villalar?region=${encodeURIComponent('Ölüdeniz')}` },
-    ],
-  },
+];
+
+const DEFAULT_VILLA_REGION_LINKS: FooterGroup['links'] = [
+  { label: 'Ovacık Bölgesi Villaları', href: `/villalar?region=${encodeURIComponent('Ovacık')}` },
+  { label: 'Faralya Bölgesi Villaları', href: `/villalar?region=${encodeURIComponent('Faralya')}` },
+  { label: 'Yalıkavak Bölgesi Villaları', href: `/villalar?region=${encodeURIComponent('Yalıkavak')}` },
+  { label: 'Göcek Bölgesi Villaları', href: `/villalar?region=${encodeURIComponent('Göcek')}` },
+  { label: 'Ölüdeniz Bölgesi Villaları', href: `/villalar?region=${encodeURIComponent('Ölüdeniz')}` },
 ];
 
 const SOCIAL_ORDER: {
@@ -70,13 +73,18 @@ const SHOW_FOOTER_STORE_BADGES = false;
 export function SiteFooter({
   socialMedia,
   footerManagement,
+  enabledSiteProducts,
 }: {
   socialMedia?: AdminSettings['socialMedia'];
   footerManagement?: AdminSettings['footerManagement'];
+  enabledSiteProducts?: SiteProductType[];
 }) {
   const [showTop, setShowTop] = useState(false);
+  const [activityLocations, setActivityLocations] = useState<string[]>([]);
 
   const brandText = (footerManagement?.footerBrandText ?? '').trim() || DEFAULT_BRAND;
+  const hasActivity = Boolean(enabledSiteProducts?.includes(SITE_PRODUCT_ACTIVITY));
+  const hasVilla = Boolean(enabledSiteProducts?.includes(SITE_PRODUCT_VILLA_RENTAL));
 
   const socialLinks = useMemo(() => {
     const sm = socialMedia ?? {};
@@ -94,11 +102,45 @@ export function SiteFooter({
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  useEffect(() => {
+    if (!hasActivity) {
+      setActivityLocations([]);
+      return;
+    }
+    let cancelled = false;
+    void fetch('/api/public/locations', { cache: 'no-store' })
+      .then(async (res) => {
+        if (!res.ok) return;
+        const data = (await res.json()) as { locations?: string[] };
+        const locations = Array.isArray(data.locations) ? data.locations : [];
+        if (!cancelled) setActivityLocations(locations.slice(0, 5));
+      })
+      .catch(() => {
+        if (!cancelled) setActivityLocations([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [hasActivity]);
+
+  const groups = useMemo(() => {
+    const regionLinks: FooterGroup['links'] =
+      hasActivity && activityLocations.length > 0
+        ? activityLocations.map((loc) => ({
+            label: `${loc} Aktiviteleri`,
+            href: `/aktiviteler?location=${encodeURIComponent(loc)}`,
+          }))
+        : hasVilla
+          ? DEFAULT_VILLA_REGION_LINKS
+          : [];
+    return [...BASE_GROUPS, ...(regionLinks.length ? [{ title: 'Bölgeler', links: regionLinks }] : [])];
+  }, [activityLocations, hasActivity, hasVilla]);
+
   return (
     <footer className="bg-white">
       <div className="border-t border-zinc-200">
         <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 lg:grid-cols-[1fr_1fr_1fr_0.9fr]">
-          {GROUPS.map((g) => (
+          {groups.map((g) => (
             <div key={g.title}>
               <p className="text-sm font-semibold text-zinc-900">{g.title}</p>
               <ul className="mt-4 space-y-2">

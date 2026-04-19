@@ -529,6 +529,9 @@ export function HomeHero({
             <Link href="/blog" className={headerScrolled ? 'hover:text-zinc-900' : 'hover:text-white'}>
               Blog
             </Link>
+            <Link href="/iletisim" className={headerScrolled ? 'hover:text-zinc-900' : 'hover:text-white'}>
+              İletişim
+            </Link>
           </nav>
 
           <div className="flex items-center gap-3">

@@ -41,7 +41,7 @@ export function HomeCategoriesSection({
         const catCover = (c.coverImageUrl ?? '').trim();
         return {
           id: s.id,
-          name: s.name,
+          name: c.name,
           coverImageUrl: subCover || catCover,
           description: (s.description ?? '').trim(),
           toursCount: actsInSub.length,

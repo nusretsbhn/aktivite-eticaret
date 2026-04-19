@@ -113,7 +113,16 @@ export type AdminSettings = {
     transferBranch?: string;
     transferDescription?: string;
   };
-  /** Bilet / fatura e-posta şablonları (SMTP bilgisi .env ile) */
+  /** SMTP e-posta sunucu bilgileri (adminden yönetilir; boşsa .env fallback). */
+  emailManagement?: {
+    smtpHost?: string;
+    smtpPort?: number;
+    smtpSecure?: boolean;
+    smtpUser?: string;
+    smtpPass?: string;
+    smtpFrom?: string;
+  };
+  /** Bilet / fatura e-posta şablonları */
   mailManagement?: {
     ticketEmailEnabled: boolean;
     ticketEmailSubject: string;
@@ -128,6 +137,14 @@ export type AdminSettings = {
     facebookUrl?: string;
     googleUrl?: string;
     youtubeUrl?: string;
+  };
+  /** İletişim sayfası için yönetilebilir bilgiler */
+  contactManagement?: {
+    address?: string;
+    phonePrimary?: string;
+    phoneSecondary?: string;
+    email?: string;
+    googleMapsUrl?: string;
   };
   /** Footer ödeme görseli ve alt marka metni */
   footerManagement?: {

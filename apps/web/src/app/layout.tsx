@@ -24,23 +24,31 @@ const geistMono = Geist_Mono({
 
 const METADATA_BASE = new URL("https://banabivillam.com");
 
+const DEFAULT_SITE_TITLE = "Banabivillam";
+
 export async function generateMetadata(): Promise<Metadata> {
+  // Favicon: Site Yönetimi “normal logo” (açık zemin). darkLogoUrl burada kullanılmaz.
   let faviconHref = "/favicon.ico";
+  let siteTitle = DEFAULT_SITE_TITLE;
   try {
     const settings = await readSettings();
-    const logo = settings.siteManagement?.logoUrl?.trim();
-    if (logo) {
-      faviconHref = logo;
+    const lightLogo = settings.siteManagement?.logoUrl?.trim();
+    if (lightLogo) {
+      faviconHref = lightLogo;
+    }
+    const brand = (settings.footerManagement?.footerBrandText ?? "").trim();
+    if (brand) {
+      siteTitle = brand;
     }
   } catch {
-    /* varsayılan favicon */
+    /* varsayılan favicon / başlık */
   }
 
   return {
     metadataBase: METADATA_BASE,
     title: {
-      default: "Banabivillam",
-      template: "Banabivillam | %s",
+      default: siteTitle,
+      template: `${siteTitle} | %s`,
     },
     description: "Banabivillam villa ve aktivite rezervasyon platformu.",
     icons: {

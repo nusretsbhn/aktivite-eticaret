@@ -7,16 +7,19 @@ import { useEffect, useState } from 'react';
 import { useSiteAuth } from '@/components/site/site-auth-provider';
 import { SiteNotificationBell } from '@/components/site/site-notification-bell';
 import { SiteFooter } from '@/components/site/site-footer';
+import type { SiteProductType } from '@/lib/site-product-types';
 import type { AdminSettings } from '@/types/admin-settings';
 
 export function HesapProfileClient({
   logoUrl,
   socialMedia,
   footerManagement,
+  enabledSiteProducts,
 }: {
   logoUrl?: string;
   socialMedia?: AdminSettings['socialMedia'];
   footerManagement?: AdminSettings['footerManagement'];
+  enabledSiteProducts?: SiteProductType[];
 }) {
   const router = useRouter();
   const { user, authReady, refreshUser } = useSiteAuth();
@@ -226,7 +229,11 @@ export function HesapProfileClient({
         </section>
       </main>
 
-      <SiteFooter socialMedia={socialMedia} footerManagement={footerManagement} />
+      <SiteFooter
+        socialMedia={socialMedia}
+        footerManagement={footerManagement}
+        enabledSiteProducts={enabledSiteProducts}
+      />
     </div>
   );
 }

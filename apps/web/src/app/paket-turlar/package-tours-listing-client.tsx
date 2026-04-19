@@ -172,6 +172,7 @@ export function PackageToursListingClient({ packageTours, activities, settings, 
             {showVillaNavLink && <Link href="/villalar" className="text-zinc-600 hover:text-zinc-900">Villalar</Link>}
             <Link href="#" className="text-zinc-600 hover:text-zinc-900">Kampanyalar</Link>
             <Link href="/blog" className="text-zinc-600 hover:text-zinc-900">Blog</Link>
+            <Link href="/iletisim" className="text-zinc-600 hover:text-zinc-900">İletişim</Link>
           </nav>
           <SiteAccountWithNotifications
             menuClassName="rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-900 hover:bg-zinc-50"
@@ -316,7 +317,11 @@ export function PackageToursListingClient({ packageTours, activities, settings, 
           setCheckOut(next.checkOut);
         }}
       />
-      <SiteFooter socialMedia={settings.socialMedia} footerManagement={settings.footerManagement} />
+      <SiteFooter
+        socialMedia={settings.socialMedia}
+        footerManagement={settings.footerManagement}
+        enabledSiteProducts={settings.siteManagement?.enabledSiteProducts}
+      />
     </div>
   );
 }

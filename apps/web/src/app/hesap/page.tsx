@@ -10,6 +10,7 @@ export default async function HesapPage() {
       logoUrl={logoUrl}
       socialMedia={settings.socialMedia}
       footerManagement={settings.footerManagement}
+      enabledSiteProducts={settings.siteManagement?.enabledSiteProducts}
     />
   );
 }

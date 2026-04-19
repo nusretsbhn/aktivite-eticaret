@@ -9,6 +9,7 @@ import { isOrderTicketEligible } from '@/lib/order-ticket-eligibility';
 import { useSiteAuth } from '@/components/site/site-auth-provider';
 import { SiteNotificationBell } from '@/components/site/site-notification-bell';
 import { SiteFooter } from '@/components/site/site-footer';
+import type { SiteProductType } from '@/lib/site-product-types';
 import type { AdminSettings } from '@/types/admin-settings';
 import type { Order } from '@/types/order';
 
@@ -32,10 +33,12 @@ export function HesapSiparislerClient({
   logoUrl,
   socialMedia,
   footerManagement,
+  enabledSiteProducts,
 }: {
   logoUrl?: string;
   socialMedia?: AdminSettings['socialMedia'];
   footerManagement?: AdminSettings['footerManagement'];
+  enabledSiteProducts?: SiteProductType[];
 }) {
   const router = useRouter();
   const { user, authReady } = useSiteAuth();
@@ -281,7 +284,11 @@ export function HesapSiparislerClient({
         </div>
       )}
 
-      <SiteFooter socialMedia={socialMedia} footerManagement={footerManagement} />
+      <SiteFooter
+        socialMedia={socialMedia}
+        footerManagement={footerManagement}
+        enabledSiteProducts={enabledSiteProducts}
+      />
     </div>
   );
 }

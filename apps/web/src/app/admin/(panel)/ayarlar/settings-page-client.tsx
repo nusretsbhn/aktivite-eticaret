@@ -21,8 +21,10 @@ type TabId =
   | 'banner'
   | 'packageTour'
   | 'payment'
+  | 'email'
   | 'mail'
   | 'social'
+  | 'contact'
   | 'footer'
   | 'blok';
 
@@ -40,8 +42,10 @@ const TABS: { id: TabId; label: string }[] = [
   { id: 'banner', label: 'Banner Yönetimi' },
   { id: 'packageTour', label: 'Paket Tur' },
   { id: 'payment', label: 'Ödeme Yönetimi' },
+  { id: 'email', label: 'Email Bilgileri' },
   { id: 'mail', label: 'Mail Şablon Yönetimi' },
   { id: 'social', label: 'Sosyal Medya' },
+  { id: 'contact', label: 'İletişim Bilgileri' },
   { id: 'footer', label: 'Footer Yönetimi' },
   { id: 'blok', label: 'Blok yönetimi' },
 ];
@@ -2085,12 +2089,111 @@ export function SettingsPageClient() {
           </div>
         )}
 
+        {tab === 'email' && (
+          <div className="space-y-6">
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              SMTP sunucu bilgileri. Bu ayarlar üyelik doğrulama kodu, bilet ve fatura e-postalarında kullanılır.
+            </p>
+
+            <section className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label className="block text-sm sm:col-span-2">
+                  <span className="text-zinc-600 dark:text-zinc-400">SMTP Host</span>
+                  <input
+                    className="mt-1 min-h-11 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 font-mono text-sm dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-50"
+                    value={settings.emailManagement?.smtpHost ?? ''}
+                    onChange={(e) => {
+                      const em = settings.emailManagement ?? {};
+                      const next: AdminSettings = { ...settings, emailManagement: { ...em, smtpHost: e.target.value } };
+                      setSettings(next);
+                    }}
+                    onBlur={() => void save(settings)}
+                    placeholder="mail.example.com"
+                  />
+                </label>
+                <label className="block text-sm">
+                  <span className="text-zinc-600 dark:text-zinc-400">SMTP Port</span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={65535}
+                    className="mt-1 min-h-11 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 font-mono text-sm dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-50"
+                    value={settings.emailManagement?.smtpPort ?? 465}
+                    onChange={(e) => {
+                      const em = settings.emailManagement ?? {};
+                      const port = Math.max(1, Math.min(65535, Number(e.target.value) || 465));
+                      const next: AdminSettings = { ...settings, emailManagement: { ...em, smtpPort: port } };
+                      setSettings(next);
+                    }}
+                    onBlur={() => void save(settings)}
+                  />
+                </label>
+                <label className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-800 dark:border-zinc-600 dark:text-zinc-200">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(settings.emailManagement?.smtpSecure)}
+                    onChange={(e) => {
+                      const em = settings.emailManagement ?? {};
+                      const next: AdminSettings = { ...settings, emailManagement: { ...em, smtpSecure: e.target.checked } };
+                      setSettings(next);
+                      void save(next);
+                    }}
+                  />
+                  Secure (SSL/TLS)
+                </label>
+                <label className="block text-sm">
+                  <span className="text-zinc-600 dark:text-zinc-400">SMTP User</span>
+                  <input
+                    className="mt-1 min-h-11 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 font-mono text-sm dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-50"
+                    value={settings.emailManagement?.smtpUser ?? ''}
+                    onChange={(e) => {
+                      const em = settings.emailManagement ?? {};
+                      const next: AdminSettings = { ...settings, emailManagement: { ...em, smtpUser: e.target.value } };
+                      setSettings(next);
+                    }}
+                    onBlur={() => void save(settings)}
+                    placeholder="rezervasyon@..."
+                  />
+                </label>
+                <label className="block text-sm">
+                  <span className="text-zinc-600 dark:text-zinc-400">SMTP Password</span>
+                  <input
+                    type="password"
+                    className="mt-1 min-h-11 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 font-mono text-sm dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-50"
+                    value={settings.emailManagement?.smtpPass ?? ''}
+                    onChange={(e) => {
+                      const em = settings.emailManagement ?? {};
+                      const next: AdminSettings = { ...settings, emailManagement: { ...em, smtpPass: e.target.value } };
+                      setSettings(next);
+                    }}
+                    onBlur={() => void save(settings)}
+                    placeholder="********"
+                  />
+                </label>
+                <label className="block text-sm">
+                  <span className="text-zinc-600 dark:text-zinc-400">Gönderen adres (From)</span>
+                  <input
+                    className="mt-1 min-h-11 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 font-mono text-sm dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-50"
+                    value={settings.emailManagement?.smtpFrom ?? ''}
+                    onChange={(e) => {
+                      const em = settings.emailManagement ?? {};
+                      const next: AdminSettings = { ...settings, emailManagement: { ...em, smtpFrom: e.target.value } };
+                      setSettings(next);
+                    }}
+                    onBlur={() => void save(settings)}
+                    placeholder="rezervasyon@..."
+                  />
+                </label>
+              </div>
+            </section>
+          </div>
+        )}
+
         {tab === 'mail' && (
           <div className="space-y-6">
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
-              Bilet ve fatura e-postaları aynı SMTP ayarlarını kullanır (
-              <code className="rounded bg-zinc-100 px-1 text-xs dark:bg-zinc-800">SMTP_*</code> ortam
-              değişkenleri). Şifre buraya yazılmaz.
+              Bu sekme bilet ve fatura e-posta şablonlarını yönetir. SMTP bağlantı bilgileri için{' '}
+              <span className="font-semibold">Email Bilgileri</span> sekmesini kullanın.
             </p>
 
             <section className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
@@ -2310,6 +2413,108 @@ export function SettingsPageClient() {
                   />
                 </label>
               ))}
+            </section>
+          </div>
+        )}
+
+        {tab === 'contact' && (
+          <div className="space-y-6">
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              Üst menüdeki <span className="font-semibold">İletişim</span> sayfasında gösterilecek bilgiler.
+            </p>
+            <section className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
+              <label className="mb-4 block text-sm">
+                <span className="text-zinc-600 dark:text-zinc-400">Adres</span>
+                <textarea
+                  className="mt-1 min-h-[96px] w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-50"
+                  value={settings.contactManagement?.address ?? ''}
+                  onChange={(e) => {
+                    if (!settings) return;
+                    const cm = settings.contactManagement ?? {};
+                    const next: AdminSettings = {
+                      ...settings,
+                      contactManagement: { ...cm, address: e.target.value },
+                    };
+                    setSettings(next);
+                  }}
+                  onBlur={() => void save(settings)}
+                  placeholder="Açık adres"
+                />
+              </label>
+              <label className="mb-4 block text-sm">
+                <span className="text-zinc-600 dark:text-zinc-400">Telefon 1</span>
+                <input
+                  className="mt-1 min-h-11 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-50"
+                  value={settings.contactManagement?.phonePrimary ?? ''}
+                  onChange={(e) => {
+                    if (!settings) return;
+                    const cm = settings.contactManagement ?? {};
+                    const next: AdminSettings = {
+                      ...settings,
+                      contactManagement: { ...cm, phonePrimary: e.target.value },
+                    };
+                    setSettings(next);
+                  }}
+                  onBlur={() => void save(settings)}
+                  placeholder="+90 ..."
+                />
+              </label>
+              <label className="mb-4 block text-sm">
+                <span className="text-zinc-600 dark:text-zinc-400">Telefon 2 (opsiyonel)</span>
+                <input
+                  className="mt-1 min-h-11 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-50"
+                  value={settings.contactManagement?.phoneSecondary ?? ''}
+                  onChange={(e) => {
+                    if (!settings) return;
+                    const cm = settings.contactManagement ?? {};
+                    const next: AdminSettings = {
+                      ...settings,
+                      contactManagement: { ...cm, phoneSecondary: e.target.value },
+                    };
+                    setSettings(next);
+                  }}
+                  onBlur={() => void save(settings)}
+                  placeholder="+90 ..."
+                />
+              </label>
+              <label className="mb-4 block text-sm">
+                <span className="text-zinc-600 dark:text-zinc-400">E-posta</span>
+                <input
+                  type="email"
+                  className="mt-1 min-h-11 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-50"
+                  value={settings.contactManagement?.email ?? ''}
+                  onChange={(e) => {
+                    if (!settings) return;
+                    const cm = settings.contactManagement ?? {};
+                    const next: AdminSettings = {
+                      ...settings,
+                      contactManagement: { ...cm, email: e.target.value },
+                    };
+                    setSettings(next);
+                  }}
+                  onBlur={() => void save(settings)}
+                  placeholder="ornek@site.com"
+                />
+              </label>
+              <label className="block text-sm">
+                <span className="text-zinc-600 dark:text-zinc-400">Google Maps bağlantı linki</span>
+                <input
+                  type="url"
+                  className="mt-1 min-h-11 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-50"
+                  value={settings.contactManagement?.googleMapsUrl ?? ''}
+                  onChange={(e) => {
+                    if (!settings) return;
+                    const cm = settings.contactManagement ?? {};
+                    const next: AdminSettings = {
+                      ...settings,
+                      contactManagement: { ...cm, googleMapsUrl: e.target.value },
+                    };
+                    setSettings(next);
+                  }}
+                  onBlur={() => void save(settings)}
+                  placeholder="https://maps.google.com/..."
+                />
+              </label>
             </section>
           </div>
         )}

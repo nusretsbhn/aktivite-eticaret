@@ -76,6 +76,9 @@ export function VillaDetailView({ villa, settings, initialDates }: Props) {
             <Link href="/blog" className="text-sm font-medium text-zinc-600 hover:text-zinc-900">
               Blog
             </Link>
+            <Link href="/iletisim" className="text-sm font-medium text-zinc-600 hover:text-zinc-900">
+              İletişim
+            </Link>
           </nav>
 
           <div className="flex items-center gap-3">
@@ -293,7 +296,11 @@ export function VillaDetailView({ villa, settings, initialDates }: Props) {
         </VillaBookingDatesProvider>
       </main>
 
-      <SiteFooter socialMedia={settings.socialMedia} footerManagement={settings.footerManagement} />
+      <SiteFooter
+        socialMedia={settings.socialMedia}
+        footerManagement={settings.footerManagement}
+        enabledSiteProducts={settings.siteManagement?.enabledSiteProducts}
+      />
     </div>
   );
 }

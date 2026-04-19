@@ -246,6 +246,23 @@ function validateSettings(body: unknown): AdminSettings | null {
         })()
       : undefined;
 
+  const em = b.emailManagement;
+  const emailManagement =
+    em && typeof em === 'object'
+      ? (() => {
+          const o = em as Record<string, unknown>;
+          const smtpPort = Math.max(1, Math.min(65535, Number(o.smtpPort) || 465));
+          return {
+            smtpHost: String(o.smtpHost ?? '').trim().slice(0, 200),
+            smtpPort,
+            smtpSecure: Boolean(o.smtpSecure),
+            smtpUser: String(o.smtpUser ?? '').trim().slice(0, 200),
+            smtpPass: String(o.smtpPass ?? '').trim().slice(0, 400),
+            smtpFrom: String(o.smtpFrom ?? '').trim().slice(0, 200),
+          } satisfies NonNullable<AdminSettings['emailManagement']>;
+        })()
+      : undefined;
+
   const mailRaw = b.mailManagement;
   const mailManagement =
     mailRaw && typeof mailRaw === 'object'
@@ -273,6 +290,21 @@ function validateSettings(body: unknown): AdminSettings | null {
             googleUrl: String(o.googleUrl ?? '').trim().slice(0, 500),
             youtubeUrl: String(o.youtubeUrl ?? '').trim().slice(0, 500),
           } satisfies NonNullable<AdminSettings['socialMedia']>;
+        })()
+      : undefined;
+
+  const cm = b.contactManagement;
+  const contactManagement =
+    cm && typeof cm === 'object'
+      ? (() => {
+          const o = cm as Record<string, unknown>;
+          return {
+            address: String(o.address ?? '').trim().slice(0, 500),
+            phonePrimary: String(o.phonePrimary ?? '').trim().slice(0, 40),
+            phoneSecondary: String(o.phoneSecondary ?? '').trim().slice(0, 40),
+            email: String(o.email ?? '').trim().slice(0, 120),
+            googleMapsUrl: String(o.googleMapsUrl ?? '').trim().slice(0, 500),
+          } satisfies NonNullable<AdminSettings['contactManagement']>;
         })()
       : undefined;
 
@@ -345,8 +377,10 @@ function validateSettings(body: unknown): AdminSettings | null {
     ...(siteManagement ? { siteManagement } : {}),
     ...(bannerManagement ? { bannerManagement } : {}),
     ...(paymentManagement ? { paymentManagement } : {}),
+    ...(emailManagement ? { emailManagement } : {}),
     ...(mailManagement ? { mailManagement } : {}),
     ...(socialMedia ? { socialMedia } : {}),
+    ...(contactManagement ? { contactManagement } : {}),
     ...(footerManagement ? { footerManagement } : {}),
     ...(packageTourManagement ? { packageTourManagement } : {}),
   };
@@ -387,8 +421,10 @@ export async function PATCH(request: Request) {
         : (next.siteManagement ?? current.siteManagement),
     bannerManagement: next.bannerManagement ?? current.bannerManagement,
     paymentManagement: next.paymentManagement ?? current.paymentManagement,
+    emailManagement: next.emailManagement ?? current.emailManagement,
     mailManagement: next.mailManagement ?? current.mailManagement,
     socialMedia: next.socialMedia ?? current.socialMedia,
+    contactManagement: next.contactManagement ?? current.contactManagement,
     footerManagement: next.footerManagement ?? current.footerManagement,
     packageTourManagement: next.packageTourManagement ?? current.packageTourManagement,
   };

@@ -377,6 +377,9 @@ export function VillasListingClient({
             <Link href="/blog" className="font-medium hover:text-zinc-900">
               Blog
             </Link>
+            <Link href="/iletisim" className="font-medium hover:text-zinc-900">
+              İletişim
+            </Link>
           </nav>
           <div className="flex items-center gap-2">
             <div className="hidden md:contents">
@@ -589,7 +592,11 @@ export function VillasListingClient({
         }}
       />
 
-      <SiteFooter socialMedia={settings.socialMedia} footerManagement={settings.footerManagement} />
+      <SiteFooter
+        socialMedia={settings.socialMedia}
+        footerManagement={settings.footerManagement}
+        enabledSiteProducts={settings.siteManagement?.enabledSiteProducts}
+      />
     </div>
   );
 }

@@ -93,6 +93,7 @@ async function HomePage({
       <SiteFooter
         socialMedia={settings.socialMedia}
         footerManagement={settings.footerManagement}
+        enabledSiteProducts={settings.siteManagement?.enabledSiteProducts}
       />
     </div>
   );

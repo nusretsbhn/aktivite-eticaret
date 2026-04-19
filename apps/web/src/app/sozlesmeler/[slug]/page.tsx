@@ -89,6 +89,9 @@ export default async function PublicContractPage({
             <Link href="/blog" className="font-medium hover:text-zinc-900">
               Blog
             </Link>
+            <Link href="/iletisim" className="font-medium hover:text-zinc-900">
+              İletişim
+            </Link>
           </nav>
           <SiteAccountWithNotifications menuClassName="inline-flex min-h-10 items-center rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-semibold text-zinc-900 hover:bg-zinc-50" />
         </div>
@@ -117,7 +120,11 @@ export default async function PublicContractPage({
         </div>
       </main>
 
-      <SiteFooter socialMedia={settings.socialMedia} footerManagement={settings.footerManagement} />
+      <SiteFooter
+        socialMedia={settings.socialMedia}
+        footerManagement={settings.footerManagement}
+        enabledSiteProducts={settings.siteManagement?.enabledSiteProducts}
+      />
     </div>
   );
 }
