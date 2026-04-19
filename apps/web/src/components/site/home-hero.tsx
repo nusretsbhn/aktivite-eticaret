@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Home, Ship, Ticket } from 'lucide-react';
+import { Briefcase, Home, Ship, Ticket } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { SiteDatePickerOverlay } from '@/components/site/site-date-picker-overlay';
@@ -12,6 +12,7 @@ import { addDaysIso } from '@/lib/villa-booking-math';
 import {
   SITE_PRODUCT_ACTIVITY,
   SITE_PRODUCT_BOAT_TOUR,
+  SITE_PRODUCT_PACKAGE_TOUR,
   SITE_PRODUCT_OPTIONS,
   SITE_PRODUCT_VILLA_RENTAL,
   type SiteProductType,
@@ -61,6 +62,7 @@ const TAB_ICONS: Record<SiteProductType, typeof Ship> = {
   boat_tour: Ship,
   activity: Ticket,
   villa_rental: Home,
+  package_tour: Briefcase,
 };
 
 export function HomeHero({
@@ -90,22 +92,27 @@ export function HomeHero({
   const showSearchWidget = enabledTabs.length > 0;
   const showToursInNav =
     enabledSiteProducts.includes(SITE_PRODUCT_BOAT_TOUR) ||
-    enabledSiteProducts.includes(SITE_PRODUCT_ACTIVITY);
+    enabledSiteProducts.includes(SITE_PRODUCT_ACTIVITY) ||
+    enabledSiteProducts.includes(SITE_PRODUCT_PACKAGE_TOUR);
   const showVillaNavLink = enabledSiteProducts.includes(SITE_PRODUCT_VILLA_RENTAL);
 
   const isActivityTab =
-    activeTab === SITE_PRODUCT_BOAT_TOUR || activeTab === SITE_PRODUCT_ACTIVITY;
+    activeTab === SITE_PRODUCT_BOAT_TOUR ||
+    activeTab === SITE_PRODUCT_ACTIVITY ||
+    activeTab === SITE_PRODUCT_PACKAGE_TOUR;
   const isVillaTab = activeTab === SITE_PRODUCT_VILLA_RENTAL;
 
   const [dateIso, setDateIso] = useState<string | null>(null);
   const [dateOpen, setDateOpen] = useState(false);
 
   const [peopleOpen, setPeopleOpen] = useState(false);
-  const [peopleTarget, setPeopleTarget] = useState<'activity' | 'villa'>('activity');
+  const [peopleTarget, setPeopleTarget] = useState<'activity' | 'villa' | 'package'>('activity');
   const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
+  const [infants, setInfants] = useState(0);
   const [tempAdults, setTempAdults] = useState(1);
   const [tempChildren, setTempChildren] = useState(0);
+  const [tempInfants, setTempInfants] = useState(0);
 
   const [vRegion, setVRegion] = useState('');
   const [vCheckIn, setVCheckIn] = useState(() => todayIsoLocal());
@@ -115,6 +122,12 @@ export function HomeHero({
   const [vAdults, setVAdults] = useState(1);
   const [vChildren, setVChildren] = useState(0);
   const [villaRangeOpen, setVillaRangeOpen] = useState(false);
+  const [ptCheckIn, setPtCheckIn] = useState(() => todayIsoLocal());
+  const [ptCheckOut, setPtCheckOut] = useState(() => addDaysIso(todayIsoLocal(), 3));
+  const [ptAdults, setPtAdults] = useState(1);
+  const [ptChildren, setPtChildren] = useState(0);
+  const [ptInfants, setPtInfants] = useState(0);
+  const [packageRangeOpen, setPackageRangeOpen] = useState(false);
   const [mobileSearchExpanded, setMobileSearchExpanded] = useState(true);
 
   const [locations, setLocations] = useState<string[]>([]);
@@ -126,6 +139,7 @@ export function HomeHero({
 
   const peopleBtnRef = useRef<HTMLButtonElement | null>(null);
   const villaPeopleBtnRef = useRef<HTMLButtonElement | null>(null);
+  const packagePeopleBtnRef = useRef<HTMLButtonElement | null>(null);
   const [peoplePopoverPos, setPeoplePopoverPos] = useState<{ top: number; left: number; width: number } | null>(null);
 
   useEffect(() => {
@@ -142,6 +156,10 @@ export function HomeHero({
     children > 0 ? `${adults} Yetişkin, ${children} Çocuk` : `${adults} Yetişkin`;
   const villaPeopleLabel =
     vChildren > 0 ? `${vAdults} Yetişkin, ${vChildren} Çocuk` : `${vAdults} Yetişkin`;
+  const packagePeopleLabel =
+    ptChildren > 0 || ptInfants > 0
+      ? `${ptAdults} Yetişkin, ${ptChildren} Çocuk, ${ptInfants} Bebek`
+      : `${ptAdults} Yetişkin`;
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -178,7 +196,12 @@ export function HomeHero({
 
   useEffect(() => {
     if (!peopleOpen) return;
-    const btn = (peopleTarget === 'villa' ? villaPeopleBtnRef : peopleBtnRef).current;
+    const btn =
+      (peopleTarget === 'villa'
+        ? villaPeopleBtnRef
+        : peopleTarget === 'package'
+          ? packagePeopleBtnRef
+          : peopleBtnRef).current;
     if (!btn) return;
 
     const calc = () => {
@@ -240,6 +263,16 @@ export function HomeHero({
     router.push(`/villalar?${params.toString()}`);
   }
 
+  function goPackageTourListing() {
+    const params = new URLSearchParams();
+    params.set('checkIn', ptCheckIn);
+    params.set('checkOut', ptCheckOut);
+    params.set('adults', String(ptAdults));
+    params.set('children', String(ptChildren));
+    params.set('infants', String(ptInfants));
+    router.push(`/paket-turlar?${params.toString()}`);
+  }
+
   const inputShellClass =
     'flex h-12 w-full flex-col items-start justify-center rounded-xl border border-zinc-200 bg-zinc-50 px-4 text-left outline-none transition hover:border-zinc-300';
 
@@ -279,6 +312,7 @@ export function HomeHero({
               setPeopleTarget('villa');
               setTempAdults(vAdults);
               setTempChildren(vChildren);
+              setTempInfants(0);
               setPeopleOpen(true);
             }}
             className="min-w-0 flex-1"
@@ -296,6 +330,47 @@ export function HomeHero({
             className="h-12 shrink-0 rounded-xl bg-[#1D61FF] px-5 text-sm font-semibold text-white shadow-sm hover:bg-blue-600 md:px-7"
           >
             Villa Ara →
+          </button>
+        </div>
+      );
+    }
+
+    if (activeTab === SITE_PRODUCT_PACKAGE_TOUR) {
+      return (
+        <div className="flex flex-col gap-2 md:flex-row md:items-stretch">
+          <button type="button" onClick={() => setPackageRangeOpen(true)} className="min-w-0 flex-1">
+            <span className="sr-only">Tarih aralığı</span>
+            <div className={inputShellClass}>
+              <span className="text-[11px] text-zinc-500">Giriş – çıkış</span>
+              <span className="text-sm font-semibold text-zinc-900">
+                {formatTrDateRangeShort(ptCheckIn, ptCheckOut)}
+              </span>
+            </div>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setPeopleTarget('package');
+              setTempAdults(ptAdults);
+              setTempChildren(ptChildren);
+              setTempInfants(ptInfants);
+              setPeopleOpen(true);
+            }}
+            className="min-w-0 flex-1"
+            ref={packagePeopleBtnRef}
+          >
+            <span className="sr-only">Kişi sayısı</span>
+            <div className={inputShellClass}>
+              <span className="text-[11px] text-zinc-500">Kişi sayısı</span>
+              <span className="text-sm font-semibold text-zinc-900">{packagePeopleLabel}</span>
+            </div>
+          </button>
+          <button
+            type="button"
+            onClick={goPackageTourListing}
+            className="h-12 shrink-0 rounded-xl bg-[#1D61FF] px-5 text-sm font-semibold text-white shadow-sm hover:bg-blue-600 md:px-7"
+          >
+            Paket Tur Ara →
           </button>
         </div>
       );
@@ -334,6 +409,7 @@ export function HomeHero({
             setPeopleTarget('activity');
             setTempAdults(adults);
             setTempChildren(children);
+            setTempInfants(infants);
             setPeopleOpen(true);
           }}
           className="min-w-0 flex-1"
@@ -576,6 +652,16 @@ export function HomeHero({
           setVCheckOut(next.checkOut);
         }}
       />
+      <VillaSearchDateRangeModal
+        checkIn={ptCheckIn}
+        checkOut={ptCheckOut}
+        open={packageRangeOpen}
+        onClose={() => setPackageRangeOpen(false)}
+        onChange={(next) => {
+          setPtCheckIn(next.checkIn);
+          setPtCheckOut(next.checkOut);
+        }}
+      />
 
       {peopleOpen && peoplePopoverPos && (
         <div className="fixed inset-0 z-50 hidden md:block">
@@ -646,6 +732,35 @@ export function HomeHero({
                     </button>
                   </div>
                 </div>
+                {peopleTarget === 'package' && (
+                  <>
+                    <div className="h-px bg-zinc-200" />
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-base font-semibold">Bebek</p>
+                        <p className="text-sm text-zinc-500">0–2 yaş arası</p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          className="h-11 w-11 rounded-full border border-zinc-200 text-xl text-zinc-600 disabled:opacity-40"
+                          onClick={() => setTempInfants((v) => clamp(v - 1, 0, 20))}
+                          disabled={tempInfants <= 0}
+                        >
+                          −
+                        </button>
+                        <span className="w-8 text-center text-xl font-semibold tabular-nums">{tempInfants}</span>
+                        <button
+                          type="button"
+                          className="h-11 w-11 rounded-full border border-zinc-200 text-xl text-zinc-900"
+                          onClick={() => setTempInfants((v) => clamp(v + 1, 0, 20))}
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
 
               <div className="mt-5 flex items-center justify-between">
@@ -655,6 +770,7 @@ export function HomeHero({
                   onClick={() => {
                     setTempAdults(1);
                     setTempChildren(0);
+                    setTempInfants(0);
                   }}
                 >
                   Temizle
@@ -666,9 +782,14 @@ export function HomeHero({
                     if (peopleTarget === 'villa') {
                       setVAdults(tempAdults);
                       setVChildren(tempChildren);
+                    } else if (peopleTarget === 'package') {
+                      setPtAdults(tempAdults);
+                      setPtChildren(tempChildren);
+                      setPtInfants(tempInfants);
                     } else {
                       setAdults(tempAdults);
                       setChildren(tempChildren);
+                      setInfants(tempInfants);
                     }
                     setPeopleOpen(false);
                   }}
@@ -743,6 +864,35 @@ export function HomeHero({
                     </button>
                   </div>
                 </div>
+                {peopleTarget === 'package' && (
+                  <>
+                    <div className="h-px bg-zinc-200" />
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-lg font-semibold">Bebek</p>
+                        <p className="text-sm text-zinc-500">0–2 yaş arası</p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          className="h-12 w-12 rounded-full border border-zinc-200 text-2xl text-zinc-600 disabled:opacity-40"
+                          onClick={() => setTempInfants((v) => clamp(v - 1, 0, 20))}
+                          disabled={tempInfants <= 0}
+                        >
+                          −
+                        </button>
+                        <span className="w-8 text-center text-xl font-semibold tabular-nums">{tempInfants}</span>
+                        <button
+                          type="button"
+                          className="h-12 w-12 rounded-full border border-zinc-200 text-2xl text-zinc-900"
+                          onClick={() => setTempInfants((v) => clamp(v + 1, 0, 20))}
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
 
               <div className="mt-6 flex items-center justify-between">
@@ -752,6 +902,7 @@ export function HomeHero({
                   onClick={() => {
                     setTempAdults(1);
                     setTempChildren(0);
+                    setTempInfants(0);
                   }}
                 >
                   Temizle
@@ -763,9 +914,14 @@ export function HomeHero({
                     if (peopleTarget === 'villa') {
                       setVAdults(tempAdults);
                       setVChildren(tempChildren);
+                    } else if (peopleTarget === 'package') {
+                      setPtAdults(tempAdults);
+                      setPtChildren(tempChildren);
+                      setPtInfants(tempInfants);
                     } else {
                       setAdults(tempAdults);
                       setChildren(tempChildren);
+                      setInfants(tempInfants);
                     }
                     setPeopleOpen(false);
                   }}

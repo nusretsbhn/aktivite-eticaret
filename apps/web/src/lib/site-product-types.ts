@@ -11,22 +11,27 @@ export const SITE_PRODUCT_ACTIVITY = 'activity' as const;
 
 /** Villa kiralama admin + ana sayfa villa widget’ları */
 export const SITE_PRODUCT_VILLA_RENTAL = 'villa_rental' as const;
+/** Paket tur (otel + oda + kural) iş hattı */
+export const SITE_PRODUCT_PACKAGE_TOUR = 'package_tour' as const;
 
 export type SiteProductType =
   | typeof SITE_PRODUCT_BOAT_TOUR
   | typeof SITE_PRODUCT_ACTIVITY
-  | typeof SITE_PRODUCT_VILLA_RENTAL;
+  | typeof SITE_PRODUCT_VILLA_RENTAL
+  | typeof SITE_PRODUCT_PACKAGE_TOUR;
 
 export const SITE_PRODUCT_OPTIONS: { id: SiteProductType; label: string }[] = [
   { id: SITE_PRODUCT_BOAT_TOUR, label: 'Tekne Turu' },
   { id: SITE_PRODUCT_ACTIVITY, label: 'Aktivite' },
   { id: SITE_PRODUCT_VILLA_RENTAL, label: 'Villa Kiralama' },
+  { id: SITE_PRODUCT_PACKAGE_TOUR, label: 'Paket Tur' },
 ];
 
 const ALLOWED = new Set<SiteProductType>([
   SITE_PRODUCT_BOAT_TOUR,
   SITE_PRODUCT_ACTIVITY,
   SITE_PRODUCT_VILLA_RENTAL,
+  SITE_PRODUCT_PACKAGE_TOUR,
 ]);
 
 /** İlk kurulum: Aktivite + Villa açık */

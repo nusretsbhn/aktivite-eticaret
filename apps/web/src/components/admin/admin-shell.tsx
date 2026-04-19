@@ -8,6 +8,7 @@ import { AdminNotificationBell } from '@/components/admin/admin-notification-bel
 import { AdminLogoutButton } from '@/components/admin/logout-button';
 import {
   SITE_PRODUCT_ACTIVITY,
+  SITE_PRODUCT_PACKAGE_TOUR,
   SITE_PRODUCT_VILLA_RENTAL,
   type SiteProductType,
 } from '@/lib/site-product-types';
@@ -29,6 +30,13 @@ const nav: NavItem[] = [
   { href: '/admin/siparisler/iptal-iade', label: 'İptal / İade Yönetimi' },
   { href: '/admin/aktiviteler', label: 'Aktiviteler', requiresProduct: SITE_PRODUCT_ACTIVITY },
   { href: '/admin/villalar', label: 'Villalar', requiresProduct: SITE_PRODUCT_VILLA_RENTAL },
+  { href: '/admin/paket-turlar', label: 'Paket Turlar', requiresProduct: SITE_PRODUCT_PACKAGE_TOUR },
+  { href: '/admin/paket-tur-talepleri', label: 'Paket Tur Talepleri', requiresProduct: SITE_PRODUCT_PACKAGE_TOUR },
+  {
+    href: '/admin/paket-tur-aktiviteleri',
+    label: 'Paket Tur Aktiviteleri',
+    requiresProduct: SITE_PRODUCT_PACKAGE_TOUR,
+  },
   { href: '/admin/paketler', label: 'Paketler', requiresProduct: SITE_PRODUCT_ACTIVITY },
   { href: '/admin/blog', label: 'Blog Yönetimi' },
   { href: '/admin/uyeler', label: 'Üye Yönetimi' },

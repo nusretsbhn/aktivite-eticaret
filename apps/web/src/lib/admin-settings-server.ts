@@ -126,6 +126,9 @@ export function getDefaultSettings(): AdminSettings {
       tursabVerificationImageUrl: '',
       footerBrandText: '12.adalartekneturu.com',
     },
+    packageTourManagement: {
+      ancillaryServices: [],
+    },
   };
 }
 
@@ -204,6 +207,30 @@ export async function readSettings(): Promise<AdminSettings> {
           ? (s.footerManagement as Partial<NonNullable<AdminSettings['footerManagement']>>)
           : {}),
       },
+      packageTourManagement: (() => {
+        const def = getDefaultSettings().packageTourManagement!;
+        const ptm = s.packageTourManagement;
+        if (!ptm || typeof ptm !== 'object') return def;
+        const o = ptm as Record<string, unknown>;
+        const rows = Array.isArray(o.ancillaryServices) ? o.ancillaryServices : [];
+        const ancillaryServices = rows
+          .map((row) => {
+            if (!row || typeof row !== 'object') return null;
+            const r = row as Record<string, unknown>;
+            const id = String(r.id ?? '').trim();
+            const label = String(r.label ?? '').trim();
+            const icon = String(r.icon ?? '').trim();
+            const iconKeyRaw = String(r.iconKey ?? '').trim();
+            const iconKey =
+              iconKeyRaw && /^[A-Za-z][A-Za-z0-9]*$/.test(iconKeyRaw) && iconKeyRaw.length <= 48
+                ? iconKeyRaw
+                : undefined;
+            if (!id || !label) return null;
+            return { id, label, icon, ...(iconKey ? { iconKey } : {}) };
+          })
+          .filter((x): x is NonNullable<typeof x> => Boolean(x));
+        return { ancillaryServices };
+      })(),
     };
   } catch {
     return getDefaultSettings();

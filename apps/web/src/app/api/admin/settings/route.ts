@@ -289,6 +289,32 @@ function validateSettings(body: unknown): AdminSettings | null {
         })()
       : undefined;
 
+  const ptm = b.packageTourManagement;
+  const packageTourManagement =
+    ptm && typeof ptm === 'object'
+      ? (() => {
+          const o = ptm as Record<string, unknown>;
+          const raw = Array.isArray(o.ancillaryServices) ? o.ancillaryServices : [];
+          const ancillaryServices = raw
+            .map((row) => {
+              if (!row || typeof row !== 'object') return null;
+              const r = row as Record<string, unknown>;
+              const id = String(r.id ?? '').trim();
+              const label = String(r.label ?? '').trim();
+              const icon = String(r.icon ?? '').trim();
+              const iconKeyRaw = String(r.iconKey ?? '').trim();
+              const iconKey =
+                iconKeyRaw && /^[A-Za-z][A-Za-z0-9]*$/.test(iconKeyRaw) && iconKeyRaw.length <= 48
+                  ? iconKeyRaw
+                  : undefined;
+              if (!id || !label) return null;
+              return { id, label, icon, ...(iconKey ? { iconKey } : {}) };
+            })
+            .filter((x): x is NonNullable<typeof x> => Boolean(x));
+          return { ancillaryServices } satisfies NonNullable<AdminSettings['packageTourManagement']>;
+        })()
+      : undefined;
+
   const blk = b.blockManagement;
   const blockManagement =
     blk && typeof blk === 'object'
@@ -322,6 +348,7 @@ function validateSettings(body: unknown): AdminSettings | null {
     ...(mailManagement ? { mailManagement } : {}),
     ...(socialMedia ? { socialMedia } : {}),
     ...(footerManagement ? { footerManagement } : {}),
+    ...(packageTourManagement ? { packageTourManagement } : {}),
   };
 }
 
@@ -363,6 +390,7 @@ export async function PATCH(request: Request) {
     mailManagement: next.mailManagement ?? current.mailManagement,
     socialMedia: next.socialMedia ?? current.socialMedia,
     footerManagement: next.footerManagement ?? current.footerManagement,
+    packageTourManagement: next.packageTourManagement ?? current.packageTourManagement,
   };
 
   await writeSettings(merged);

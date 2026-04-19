@@ -16,6 +16,13 @@ export type SettingsTagEntry = {
   name: string;
 };
 
+export type PackageTourAncillaryService = {
+  id: string;
+  label: string;
+  icon: string;
+  iconKey?: string;
+};
+
 export type SettingsSubCategory = {
   id: string;
   name: string;
@@ -129,5 +136,8 @@ export type AdminSettings = {
     tursabVerificationImageUrl?: string;
     /** Alt çubuk sağdaki metin (örn. alan adı) */
     footerBrandText?: string;
+  };
+  packageTourManagement?: {
+    ancillaryServices: PackageTourAncillaryService[];
   };
 };

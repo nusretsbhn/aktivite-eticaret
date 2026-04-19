@@ -48,7 +48,6 @@ export async function generateMetadata(): Promise<Metadata> {
       shortcut: faviconHref,
       apple: faviconHref,
     },
-    /** TÜRSAB DDS / yönlendirme politikası için gerekli */
     other: {
       referrer: "origin",
     },

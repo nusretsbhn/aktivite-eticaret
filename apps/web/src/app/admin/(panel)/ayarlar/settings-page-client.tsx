@@ -19,6 +19,7 @@ type TabId =
   | 'kategori'
   | 'site'
   | 'banner'
+  | 'packageTour'
   | 'payment'
   | 'mail'
   | 'social'
@@ -37,6 +38,7 @@ const TABS: { id: TabId; label: string }[] = [
   { id: 'kategori', label: 'Kategoriler' },
   { id: 'site', label: 'Site Yönetimi' },
   { id: 'banner', label: 'Banner Yönetimi' },
+  { id: 'packageTour', label: 'Paket Tur' },
   { id: 'payment', label: 'Ödeme Yönetimi' },
   { id: 'mail', label: 'Mail Şablon Yönetimi' },
   { id: 'social', label: 'Sosyal Medya' },
@@ -61,6 +63,8 @@ export function SettingsPageClient() {
   const [dictIconKey, setDictIconKey] = useState<DictionaryIconKey>('Utensils');
   const [dictLabel, setDictLabel] = useState('');
   const [dictGroup, setDictGroup] = useState<DictionaryGroup>('include');
+  const [ptServiceIconKey, setPtServiceIconKey] = useState<DictionaryIconKey>('Utensils');
+  const [ptServiceLabel, setPtServiceLabel] = useState('');
 
   const [tagName, setTagName] = useState('');
 
@@ -587,6 +591,45 @@ export function SettingsPageClient() {
             }
           : c,
       ),
+    };
+    setSettings(next);
+    void save(next);
+  }
+
+  function addPackageTourAncillaryService() {
+    if (!settings) return;
+    const label = ptServiceLabel.trim();
+    if (!label) {
+      setError('Yan hizmet adı girin');
+      return;
+    }
+    const id = uniqueSlug(
+      slugifyId(label),
+      new Set((settings.packageTourManagement?.ancillaryServices ?? []).map((x) => x.id)),
+    );
+    const next: AdminSettings = {
+      ...settings,
+      packageTourManagement: {
+        ancillaryServices: [
+          ...(settings.packageTourManagement?.ancillaryServices ?? []),
+          { id, label, icon: '', iconKey: ptServiceIconKey },
+        ],
+      },
+    };
+    setSettings(next);
+    setPtServiceLabel('');
+    void save(next);
+  }
+
+  function removePackageTourAncillaryService(id: string) {
+    if (!settings) return;
+    const next: AdminSettings = {
+      ...settings,
+      packageTourManagement: {
+        ancillaryServices: (settings.packageTourManagement?.ancillaryServices ?? []).filter(
+          (x) => x.id !== id,
+        ),
+      },
     };
     setSettings(next);
     void save(next);
@@ -1759,6 +1802,73 @@ export function SettingsPageClient() {
                   </label>
                 </div>
               </div>
+            </section>
+          </div>
+        )}
+
+        {tab === 'packageTour' && (
+          <div className="space-y-8">
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              Paket tur detaylarında kullanılacak yan hizmetleri ikonlarıyla birlikte ekleyin.
+            </p>
+
+            <section className="space-y-4 rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
+              <div className="grid gap-4 sm:grid-cols-3">
+                <div className="sm:col-span-2">
+                  <label className="block text-sm">
+                    <span className="text-zinc-600 dark:text-zinc-400">Yan hizmet adı</span>
+                    <input
+                      className="mt-1 min-h-11 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-50"
+                      value={ptServiceLabel}
+                      onChange={(e) => setPtServiceLabel(e.target.value)}
+                      placeholder="Örn. Özel transfer"
+                    />
+                  </label>
+                </div>
+                <div>
+                  <IconPicker value={ptServiceIconKey} onChange={setPtServiceIconKey} />
+                </div>
+              </div>
+              <button
+                type="button"
+                disabled={saving}
+                onClick={() => addPackageTourAncillaryService()}
+                className="min-h-11 rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
+              >
+                Yan hizmet ekle
+              </button>
+            </section>
+
+            <section className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
+              <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Kayıtlı yan hizmetler</h2>
+              <ul className="mt-3 space-y-2">
+                {(settings.packageTourManagement?.ancillaryServices ?? []).length === 0 && (
+                  <li className="text-sm text-zinc-500 dark:text-zinc-400">Henüz kayıt yok.</li>
+                )}
+                {(settings.packageTourManagement?.ancillaryServices ?? []).map((svc) => (
+                  <li
+                    key={svc.id}
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-zinc-200 px-3 py-2 dark:border-zinc-700"
+                  >
+                    <span className="flex min-w-0 items-center gap-3 text-sm">
+                      <DictionaryIcon
+                        iconKey={svc.iconKey}
+                        fallbackEmoji={svc.icon || undefined}
+                        className="h-5 w-5 shrink-0 text-zinc-700 dark:text-zinc-300"
+                      />
+                      <span className="truncate text-zinc-800 dark:text-zinc-200">{svc.label}</span>
+                      <span className="font-mono text-xs text-zinc-400">{svc.id}</span>
+                    </span>
+                    <button
+                      type="button"
+                      className="min-h-10 shrink-0 rounded border border-red-300 px-3 py-1.5 text-xs text-red-700 dark:border-red-800 dark:text-red-300"
+                      onClick={() => removePackageTourAncillaryService(svc.id)}
+                    >
+                      Sil
+                    </button>
+                  </li>
+                ))}
+              </ul>
             </section>
           </div>
         )}
