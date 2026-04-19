@@ -5,6 +5,7 @@ import { useState } from 'react';
 
 import { SiteAccountWithNotifications } from '@/components/site/site-account-with-notifications';
 import { SiteFooter } from '@/components/site/site-footer';
+import { SITE_PRODUCT_VILLA_RENTAL } from '@/lib/site-product-types';
 import type { AdminSettings } from '@/types/admin-settings';
 
 type Props = {
@@ -14,6 +15,8 @@ type Props = {
 export function ContactPageClient({ settings }: Props) {
   const logoUrl = settings.siteManagement?.logoUrl;
   const contact = settings.contactManagement;
+  const enabledProducts = settings.siteManagement?.enabledSiteProducts ?? [];
+  const showVillaNavLink = enabledProducts.includes(SITE_PRODUCT_VILLA_RENTAL);
 
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
@@ -63,9 +66,11 @@ export function ContactPageClient({ settings }: Props) {
             <Link href="/aktiviteler" className="font-medium hover:text-zinc-900">
               Turlar
             </Link>
-            <Link href="/villalar" className="font-medium hover:text-zinc-900">
-              Villalar
-            </Link>
+            {showVillaNavLink ? (
+              <Link href="/villalar" className="font-medium hover:text-zinc-900">
+                Villalar
+              </Link>
+            ) : null}
             <Link href="/blog" className="font-medium hover:text-zinc-900">
               Blog
             </Link>
