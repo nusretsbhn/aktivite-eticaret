@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { requireAdminSession } from '@/lib/admin-api-auth';
-import { readPackageTours, writePackageTours } from '@/lib/admin-package-tours-server';
+import { normalizePriceRules, readPackageTours, writePackageTours } from '@/lib/admin-package-tours-server';
 import type { AdminPackageTour } from '@/types/admin-package-tour';
 import type { GalleryItem } from '@/types/admin-activity';
 
@@ -148,7 +148,9 @@ export async function PATCH(request: Request, context: RouteContext) {
         (input.gallery ?? current.gallery)[0]?.url ||
         ''),
     isActive: input.isActive ?? current.isActive,
-    priceRules: input.priceRules ?? current.priceRules,
+    priceRules: normalizePriceRules(
+      input.priceRules !== undefined ? input.priceRules : current.priceRules,
+    ),
     updatedAt: new Date().toISOString(),
   };
   if (!merged.packageName || !merged.conceptName) {

@@ -1,11 +1,11 @@
 import { readJsonStore, writeJsonStore } from '@/lib/db-json-store';
 import { appDataFile } from '@/lib/next-public-dir';
-import type { AdminPackageTour } from '@/types/admin-package-tour';
+import type { AdminPackageTour, PackageTourPriceRule } from '@/types/admin-package-tour';
 import type { GalleryItem } from '@/types/admin-activity';
 
 const DATA_PATH = appDataFile('admin-package-tours.json');
 
-function normalizePriceRules(raw: unknown): AdminPackageTour['priceRules'] {
+export function normalizePriceRules(raw: unknown): PackageTourPriceRule[] {
   if (!Array.isArray(raw)) return [];
   return raw
     .map((row) => {
@@ -15,6 +15,8 @@ function normalizePriceRules(raw: unknown): AdminPackageTour['priceRules'] {
       const fromDate = String(r.fromDate ?? '').trim();
       const toDate = String(r.toDate ?? '').trim();
       if (!id || !fromDate || !toDate) return null;
+      const roundingMode: PackageTourPriceRule['roundingMode'] =
+        r.roundingMode === 'down' ? 'down' : 'up';
       return {
         id,
         fromDate,
@@ -22,7 +24,7 @@ function normalizePriceRules(raw: unknown): AdminPackageTour['priceRules'] {
         costPrice: Math.max(0, Number(r.costPrice) || 0),
         profitPercent: Math.max(0, Number(r.profitPercent) || 0),
         singleRoomMultiplier: Math.max(1, Number(r.singleRoomMultiplier) || 1),
-        roundingMode: r.roundingMode === 'down' ? 'down' : 'up',
+        roundingMode,
         childAgeRules: Array.isArray(r.childAgeRules)
           ? r.childAgeRules
               .map((x) => {
@@ -78,7 +80,7 @@ function normalizeGallery(raw: unknown): GalleryItem[] {
         isCover: Boolean(row.isCover),
       } satisfies GalleryItem;
     })
-    .filter((x): x is NonNullable<typeof x> => Boolean(x) && Boolean(x.url) && Boolean(x.id))
+    .filter((x): x is GalleryItem => x != null && Boolean(x.url) && Boolean(x.id))
     .sort((a, b) => a.sortOrder - b.sortOrder)
     .map((g, i) => ({ ...g, sortOrder: i }));
 }

@@ -15,7 +15,7 @@ type Props = {
 export default async function PackageTourDetailPage({ params, searchParams }: Props) {
   const [{ id }, sp, settings, items, activities] = await Promise.all([
     params,
-    searchParams ?? Promise.resolve({}),
+    searchParams ?? Promise.resolve({} as Record<string, string | string[] | undefined>),
     readSettings(),
     readPackageTours(),
     readPackageTourActivities(),
