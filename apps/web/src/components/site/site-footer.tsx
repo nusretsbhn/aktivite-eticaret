@@ -153,7 +153,7 @@ export function SiteFooter({
                 <a
                   href={TURSAB_DDS_HREF}
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel="noopener"
                   className="inline-block max-w-full"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
