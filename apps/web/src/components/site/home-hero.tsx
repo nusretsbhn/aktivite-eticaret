@@ -54,6 +54,11 @@ type Props = {
   villaRegionOptions?: string[];
 };
 
+type ActivitySearchOptionsResponse = {
+  locations?: string[];
+  categoriesByLocation?: Record<string, { id: string; name: string }[]>;
+};
+
 function clampSlides(slides: Slide[]): Slide[] {
   return slides.filter((s) => s.title.trim().length > 0);
 }
@@ -132,6 +137,8 @@ export function HomeHero({
 
   const [locations, setLocations] = useState<string[]>([]);
   const [location, setLocation] = useState<string>('');
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
+  const [categoriesByLocation, setCategoriesByLocation] = useState<Record<string, { id: string; name: string }[]>>({});
   const [headerScrolled, setHeaderScrolled] = useState(false);
 
   const dateBtnRef = useRef<HTMLButtonElement | null>(null);
@@ -229,26 +236,43 @@ export function HomeHero({
   useEffect(() => {
     if (!needsActivityLocations) {
       setLocations([]);
+      setCategoriesByLocation({});
       return;
     }
     let cancelled = false;
-    void fetch('/api/public/locations', { cache: 'no-store' })
-      .then((r) => r.json() as Promise<{ locations: string[] }>)
+    void fetch('/api/public/activity-search-options', { cache: 'no-store' })
+      .then((r) => r.json() as Promise<ActivitySearchOptionsResponse>)
       .then((data) => {
         if (cancelled) return;
         setLocations(Array.isArray(data.locations) ? data.locations : []);
+        setCategoriesByLocation(data.categoriesByLocation && typeof data.categoriesByLocation === 'object' ? data.categoriesByLocation : {});
       })
       .catch(() => {
-        if (!cancelled) setLocations([]);
+        if (!cancelled) {
+          setLocations([]);
+          setCategoriesByLocation({});
+        }
       });
     return () => {
       cancelled = true;
     };
   }, [needsActivityLocations]);
 
+  const locationCategoryOptions = useMemo(() => {
+    if (!location.trim()) return [];
+    return categoriesByLocation[location] ?? [];
+  }, [categoriesByLocation, location]);
+
+  useEffect(() => {
+    if (!locationCategoryOptions.some((c) => c.id === selectedCategoryId)) {
+      setSelectedCategoryId('');
+    }
+  }, [locationCategoryOptions, selectedCategoryId]);
+
   function goListingPage() {
     const params = new URLSearchParams();
     if (location.trim()) params.set('location', location.trim());
+    if (selectedCategoryId) params.set('mainCategory', selectedCategoryId);
     if (dateIso) params.set('date', dateIso);
     params.set('people', String(adults + children));
     router.push(`/aktiviteler?${params.toString()}`);
@@ -382,7 +406,10 @@ export function HomeHero({
           <span className="sr-only">Lokasyon</span>
           <select
             value={location}
-            onChange={(e) => setLocation(e.target.value)}
+            onChange={(e) => {
+              setLocation(e.target.value);
+              setSelectedCategoryId('');
+            }}
             className="h-12 w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 text-zinc-900 outline-none focus:border-zinc-300"
           >
             <option value="" className="text-zinc-900">
@@ -395,6 +422,25 @@ export function HomeHero({
             ))}
           </select>
         </label>
+        {location.trim() && (
+          <label className="min-w-0 flex-1">
+            <span className="sr-only">Kategori</span>
+            <select
+              value={selectedCategoryId}
+              onChange={(e) => setSelectedCategoryId(e.target.value)}
+              className="h-12 w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 text-zinc-900 outline-none focus:border-zinc-300"
+            >
+              <option value="" className="text-zinc-900">
+                Tümü
+              </option>
+              {locationCategoryOptions.map((cat) => (
+                <option key={cat.id} value={cat.id} className="text-zinc-900">
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
         <button type="button" onClick={() => setDateOpen(true)} className="min-w-0 flex-1" ref={dateBtnRef}>
           <span className="sr-only">Tarih</span>
           <div className={inputShellClass}>
