@@ -41,7 +41,10 @@ export function HomeCategoriesSection({
         const catCover = (c.coverImageUrl ?? '').trim();
         return {
           id: s.id,
-          name: c.name,
+          mainCategoryId: c.id,
+          /** Kart alt kategoriyi temsil eder; başlık alt kategori adı olmalı */
+          name: s.name,
+          parentName: c.name,
           coverImageUrl: subCover || catCover,
           description: (s.description ?? '').trim(),
           toursCount: actsInSub.length,
@@ -72,7 +75,7 @@ export function HomeCategoriesSection({
             return (
               <Link
                 key={it.id}
-                href={`/aktiviteler?subCategoryId=${encodeURIComponent(it.id)}`}
+                href={`/aktiviteler?mainCategory=${encodeURIComponent(it.mainCategoryId)}&subCategoryId=${encodeURIComponent(it.id)}`}
                 className="group relative overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-100 shadow-sm"
               >
                 {it.coverImageUrl ? (
@@ -96,6 +99,9 @@ export function HomeCategoriesSection({
                   <p className="text-lg font-extrabold leading-tight text-white drop-shadow">
                     {it.name}
                   </p>
+                  {it.parentName && it.parentName !== it.name && (
+                    <p className="mt-0.5 text-xs font-medium text-white/80 drop-shadow">{it.parentName}</p>
+                  )}
                   {!!it.description && (
                     <p className="mt-1 line-clamp-1 text-xs text-white/85">{it.description}</p>
                   )}
