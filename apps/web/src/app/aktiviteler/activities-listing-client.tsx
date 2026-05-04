@@ -184,12 +184,8 @@ export function ActivitiesListingClient({
         return false;
       }
       if (selectedLocations.length && !selectedLocations.includes(a.location || '')) return false;
-      if (selectedMainCategories.length && !selectedMainCategories.includes(String(a.mainCategory ?? ''))) return false;
-      if (
-        selectedSubCategoryIds.length &&
-        !(a.subCategoryIds ?? []).some((id) => selectedSubCategoryIds.includes(String(id)))
-      )
-        return false;
+      if (selectedMainCategories.length && !selectedMainCategories.includes(a.mainCategory)) return false;
+      if (selectedSubCategoryIds.length && !(a.subCategoryIds ?? []).some((id) => selectedSubCategoryIds.includes(id))) return false;
       if (selectedTagIds.length && !(a.tagIds ?? []).some((id) => selectedTagIds.includes(id))) return false;
       if ((a.capacity ?? 0) < personCount) return false;
       if (Number.isFinite(minPrice) && minPrice > 0 && (typeof todayPrice !== 'number' || todayPrice < minPrice)) return false;

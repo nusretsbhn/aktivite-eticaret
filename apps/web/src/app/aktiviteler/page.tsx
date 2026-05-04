@@ -6,16 +6,6 @@ import { readActivities } from '@/lib/admin-activities-server';
 import { readSettings } from '@/lib/admin-settings-server';
 import { SITE_PRODUCT_ACTIVITY, isSiteProductEnabled } from '@/lib/site-product-types';
 
-function firstSearchParam(v: string | string[] | undefined): string {
-  if (typeof v === 'string') return v;
-  if (Array.isArray(v)) {
-    for (const item of v) {
-      if (typeof item === 'string' && item) return item;
-    }
-  }
-  return '';
-}
-
 export default async function ActivitiesPage({
   searchParams,
 }: {
@@ -41,13 +31,13 @@ export default async function ActivitiesPage({
       activities={activities}
       settings={settings}
       initialQuery={{
-        q: firstSearchParam(sp.q),
-        date: firstSearchParam(sp.date),
-        location: firstSearchParam(sp.location),
-        mainCategory: firstSearchParam(sp.mainCategory),
-        subCategoryId: firstSearchParam(sp.subCategoryId),
-        tagId: firstSearchParam(sp.tagId),
-        people: firstSearchParam(sp.people),
+        q: typeof sp.q === 'string' ? sp.q : '',
+        date: typeof sp.date === 'string' ? sp.date : '',
+        location: typeof sp.location === 'string' ? sp.location : '',
+        mainCategory: typeof sp.mainCategory === 'string' ? sp.mainCategory : '',
+        subCategoryId: typeof sp.subCategoryId === 'string' ? sp.subCategoryId : '',
+        tagId: typeof sp.tagId === 'string' ? sp.tagId : '',
+        people: typeof sp.people === 'string' ? sp.people : '',
       }}
     />
   );
