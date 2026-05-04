@@ -49,15 +49,6 @@ function newId() {
   return `id-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
-function escapeHtml(input: string) {
-  return String(input)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
-}
-
 function emptyInput(): AdminVillaInput {
   return {
     displayName: '',
@@ -247,95 +238,6 @@ export function VillaForm({ mode, villa }: Props) {
         r.id === roomId ? { ...r, items: r.items.filter((it) => it.id !== itemId) } : r,
       ),
     }));
-  }
-
-  function printInventoryReceipt() {
-    const villaTitle = form.displayName?.trim() || form.legalName?.trim() || 'Villa';
-    const lines: string[] = [];
-    lines.push(`<div class="title">${escapeHtml(villaTitle)} - Genel Envanter</div>`);
-    lines.push(`<div class="meta">${new Date().toLocaleString('tr-TR')}</div>`);
-    lines.push('<hr />');
-
-    if (!form.rooms.length) {
-      lines.push('<div class="empty">Henüz oda/ürün eklenmedi.</div>');
-    } else {
-      for (const room of form.rooms) {
-        const roomName = room.name?.trim() || 'İsimsiz oda';
-        lines.push(`<div class="room">${escapeHtml(roomName)}</div>`);
-
-        const counts = new Map<string, number>();
-        for (const item of room.items ?? []) {
-          const key = item.name?.trim();
-          if (!key) continue;
-          counts.set(key, (counts.get(key) ?? 0) + 1);
-        }
-
-        if (!counts.size) {
-          lines.push('<div class="item muted">- Envanter öğesi yok</div>');
-        } else {
-          const sorted = [...counts.entries()].sort((a, b) => a[0].localeCompare(b[0], 'tr'));
-          for (const [name, qty] of sorted) {
-            lines.push(
-              `<div class="item"><span>${escapeHtml(name)}</span><span class="qty">x${qty}</span></div>`,
-            );
-          }
-        }
-        lines.push('<div class="sep"></div>');
-      }
-    }
-
-    const printWindow = window.open('', '_blank', 'noopener,noreferrer,width=420,height=760');
-    if (!printWindow) {
-      alert('Yazdırma penceresi açılamadı. Lütfen pop-up engelleyiciyi kontrol edin.');
-      return;
-    }
-
-    printWindow.document.write(`<!doctype html>
-<html lang="tr">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Envanter Fişi</title>
-    <style>
-      * { box-sizing: border-box; }
-      body {
-        margin: 0;
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-        color: #111827;
-        background: #ffffff;
-      }
-      .receipt {
-        width: 80mm;
-        margin: 0 auto;
-        padding: 8px 8px 40mm; /* yırtma payı */
-      }
-      .title { font-size: 14px; font-weight: 700; text-align: center; }
-      .meta { font-size: 11px; text-align: center; margin-top: 4px; color: #4b5563; }
-      hr { border: 0; border-top: 1px dashed #9ca3af; margin: 8px 0; }
-      .room { font-size: 12px; font-weight: 700; margin: 8px 0 4px; }
-      .item { font-size: 12px; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
-      .item + .item { margin-top: 2px; }
-      .qty { font-weight: 700; white-space: nowrap; }
-      .muted { color: #6b7280; }
-      .sep { border-top: 1px dotted #d1d5db; margin: 8px 0; }
-      @media print {
-        @page { size: 80mm auto; margin: 0; }
-        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="receipt">
-      ${lines.join('')}
-    </div>
-    <script>
-      window.addEventListener('load', function () {
-        window.print();
-      });
-    </script>
-  </body>
-</html>`);
-    printWindow.document.close();
   }
 
   async function onSubmit(e: React.FormEvent) {
@@ -787,18 +689,9 @@ export function VillaForm({ mode, villa }: Props) {
 
       {tab === 'rooms' && (
         <div className="space-y-4">
-          <div className="flex flex-wrap gap-2">
-            <button type="button" onClick={addRoom} className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white dark:bg-zinc-100 dark:text-zinc-900">
-              Oda ekle
-            </button>
-            <button
-              type="button"
-              onClick={printInventoryReceipt}
-              className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-100 dark:hover:bg-zinc-800"
-            >
-              FİŞ YAZDIR
-            </button>
-          </div>
+          <button type="button" onClick={addRoom} className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white dark:bg-zinc-100 dark:text-zinc-900">
+            Oda ekle
+          </button>
           {form.rooms.length === 0 && <p className="text-sm text-zinc-500">Henüz oda eklenmedi.</p>}
           {form.rooms.map((room) => (
             <div key={room.id} className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
