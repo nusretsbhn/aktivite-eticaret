@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { SiteCallFloat } from "@/components/site/site-call-float";
 import { SiteWhatsAppFloat } from "@/components/site/site-whatsapp-float";
 import { readSettings } from "@/lib/admin-settings-server";
+import { getSiteUrl } from "@/lib/site-url";
 import { normalizeWhatsAppDigits } from "@/lib/whatsapp-digits";
 import { SiteAuthProvider } from "@/components/site/site-auth-provider";
 import { SiteCookieConsent } from "@/components/site/site-cookie-consent";
@@ -23,40 +24,27 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const METADATA_BASE = new URL("https://banabivillam.com");
-
 const DEFAULT_SITE_TITLE = "Banabivillam";
 
 export async function generateMetadata(): Promise<Metadata> {
-  // Favicon: Site Yönetimi “normal logo” (açık zemin). darkLogoUrl burada kullanılmaz.
-  let faviconHref = "/favicon.ico";
   let siteTitle = DEFAULT_SITE_TITLE;
   try {
     const settings = await readSettings();
-    const lightLogo = settings.siteManagement?.logoUrl?.trim();
-    if (lightLogo) {
-      faviconHref = lightLogo;
-    }
     const brand = (settings.footerManagement?.footerBrandText ?? "").trim();
     if (brand) {
       siteTitle = brand;
     }
   } catch {
-    /* varsayılan favicon / başlık */
+    /* varsayılan başlık */
   }
 
   return {
-    metadataBase: METADATA_BASE,
+    metadataBase: getSiteUrl(),
     title: {
       default: siteTitle,
       template: `${siteTitle} | %s`,
     },
     description: "Banabivillam villa ve aktivite rezervasyon platformu.",
-    icons: {
-      icon: faviconHref,
-      shortcut: faviconHref,
-      apple: faviconHref,
-    },
     other: {
       referrer: "origin",
     },
