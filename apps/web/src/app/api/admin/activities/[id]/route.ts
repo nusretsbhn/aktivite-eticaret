@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { requireAdminSession } from '@/lib/admin-api-auth';
 import { readActivities, writeActivities } from '@/lib/admin-activities-server';
+import { normalizeFlexibleSchedule, normalizeScheduleMode } from '@/lib/activity-schedule';
 import { normalizeAvailabilityPayload } from '@/lib/availability-helpers';
 import type { AdminActivity, AdminActivityInput } from '@/types/admin-activity';
 
@@ -132,6 +133,12 @@ export async function PATCH(request: Request, context: RouteContext) {
         ? normalizeAvailabilityPayload(body.availability)
         : current.availability,
     trips: body.trips !== undefined ? (Array.isArray(body.trips) ? body.trips : current.trips) : current.trips,
+    scheduleMode:
+      body.scheduleMode !== undefined ? normalizeScheduleMode(body.scheduleMode) : (current.scheduleMode ?? 'trips'),
+    flexibleSchedule:
+      body.flexibleSchedule !== undefined
+        ? normalizeFlexibleSchedule(body.flexibleSchedule)
+        : current.flexibleSchedule,
     updatedAt: new Date().toISOString(),
   };
 

@@ -34,31 +34,38 @@ async function readLocalUpload(relPath: string): Promise<SiteFaviconAsset | null
   return null;
 }
 
-/** Site Yönetimi’ndeki normal logo (logoUrl) — tarayıcı sekmesi favicon’u. */
-export async function loadSiteFavicon(): Promise<SiteFaviconAsset | null> {
-  let logoUrl = '';
+async function loadImageAsset(imageUrl: string): Promise<SiteFaviconAsset | null> {
+  const url = imageUrl.trim();
+  if (!url) return null;
   try {
-    const settings = await readSettings();
-    logoUrl = settings.siteManagement?.logoUrl?.trim() ?? '';
-  } catch {
-    return null;
-  }
-  if (!logoUrl) return null;
-
-  try {
-    if (logoUrl.startsWith('http://') || logoUrl.startsWith('https://')) {
-      const res = await fetch(logoUrl, { cache: 'no-store' });
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      const res = await fetch(url, { cache: 'no-store' });
       if (!res.ok) return null;
       const buffer = Buffer.from(await res.arrayBuffer());
       const ct = res.headers.get('content-type')?.split(';')[0]?.trim();
-      const contentType = ct && ct.startsWith('image/') ? ct : mimeFromPath(logoUrl);
+      const contentType = ct && ct.startsWith('image/') ? ct : mimeFromPath(url);
       return { buffer, contentType };
     }
-    if (logoUrl.startsWith('/')) {
-      return readLocalUpload(logoUrl);
+    if (url.startsWith('/')) {
+      return readLocalUpload(url);
     }
   } catch {
     return null;
   }
   return null;
+}
+
+/** Site Yönetimi faviconUrl; yoksa logoUrl — tarayıcı sekmesi ikonu. */
+export async function loadSiteFavicon(): Promise<SiteFaviconAsset | null> {
+  try {
+    const settings = await readSettings();
+    const sm = settings.siteManagement;
+    const faviconUrl = sm?.faviconUrl?.trim() ?? '';
+    const logoUrl = sm?.logoUrl?.trim() ?? '';
+    const source = faviconUrl || logoUrl;
+    if (!source) return null;
+    return loadImageAsset(source);
+  } catch {
+    return null;
+  }
 }

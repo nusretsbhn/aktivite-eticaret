@@ -20,6 +20,7 @@ import {
   X,
 } from 'lucide-react';
 
+import { ActivityScheduleTimes } from '@/components/site/activity-schedule-times';
 import { DictionaryIcon } from '@/components/icons/dictionary-icon';
 import { SiteDatePickerOverlay } from '@/components/site/site-date-picker-overlay';
 import { SiteAccountWithNotifications } from '@/components/site/site-account-with-notifications';
@@ -520,7 +521,6 @@ export function ActivitiesListingClient({
               const isExpanded = Boolean(expandedIds[a.id]);
               const isSelected = selectedActivityId === a.id;
               const activeTab = detailsTabById[a.id] ?? 'general';
-              const trips = (a.trips ?? []).slice().sort((x, y) => x.departureTime.localeCompare(y.departureTime));
               const priceRow = (a.prices ?? []).find((p) => p.date === selectedDate);
               const hasPrice = typeof priceRow?.price === 'number' && Number.isFinite(priceRow.price);
               const { adult: adultUnit, child: childUnit, infant: infantUnit } = resolveActivityPrices(priceRow);
@@ -628,21 +628,8 @@ export function ActivitiesListingClient({
                       </div>
                       <p className="mt-2 text-sm text-zinc-600">{shortText(a.description)}</p>
 
-                      <div className="mt-3 space-y-1.5">
-                        {trips.length ? (
-                          trips.map((t) => (
-                            <div key={t.id} className="flex flex-wrap items-center gap-2 text-sm text-zinc-700">
-                              <span className="font-bold text-zinc-900">{t.departureTime}</span>
-                              <span className="text-zinc-400">→</span>
-                              <span className="font-bold text-zinc-900">{t.arrivalTime}</span>
-                              <span className="mx-1 text-zinc-300">|</span>
-                              <Clock3 className="h-4 w-4 text-zinc-500" />
-                              <span>{t.durationHours} Saat</span>
-                            </div>
-                          ))
-                        ) : (
-                          <p className="text-sm text-zinc-500">Sefer bilgisi yok</p>
-                        )}
+                      <div className="mt-3">
+                        <ActivityScheduleTimes activity={a} emptyClassName="text-sm text-zinc-500" />
                       </div>
 
                       <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-zinc-200 pt-3">

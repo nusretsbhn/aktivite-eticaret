@@ -1,6 +1,7 @@
 import { MapPin } from 'lucide-react';
 import Link from 'next/link';
 
+import { ActivityScheduleTimes } from '@/components/site/activity-schedule-times';
 import type { AdminActivity } from '@/types/admin-activity';
 import type { AdminSettings } from '@/types/admin-settings';
 
@@ -72,10 +73,6 @@ export function HomeActivitiesSection({
               .filter((x): x is string => Boolean(x))
               .slice(0, 3);
 
-            const trips = (a.trips ?? [])
-              .slice()
-              .sort((x, y) => x.departureTime.localeCompare(y.departureTime));
-
             const todayPrice = (a.prices ?? []).find((p) => String(p.date) === today)?.price;
 
             return (
@@ -125,21 +122,8 @@ export function HomeActivitiesSection({
                     {shortText(a.description, 140) || ' '}
                   </p>
 
-                  <div className="mt-3 space-y-2 text-[11px] text-zinc-700">
-                    {trips.length ? (
-                      trips.map((t) => (
-                        <div key={t.id} className="flex items-center justify-between gap-3">
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-zinc-900">{t.departureTime}</span>
-                            <span className="text-zinc-400">→</span>
-                            <span className="font-semibold text-zinc-900">{t.arrivalTime}</span>
-                          </div>
-                          <span className="text-zinc-500">{t.durationHours} Saat</span>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-zinc-500">Sefer bilgisi yok</p>
-                    )}
+                  <div className="mt-3 text-[11px]">
+                    <ActivityScheduleTimes activity={a} emptyClassName="text-zinc-500" />
                   </div>
 
                   <div className="my-4 h-px w-full bg-zinc-200" />

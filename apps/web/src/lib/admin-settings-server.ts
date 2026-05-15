@@ -71,6 +71,8 @@ export function getDefaultSettings(): AdminSettings {
       deliveryAndReturnTerms: '',
     },
     siteManagement: {
+      siteTitle: '',
+      faviconUrl: '',
       logoUrl: '',
       darkLogoUrl: '',
       whatsappPhoneDigits: '905536882734',

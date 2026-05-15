@@ -31,6 +31,20 @@ export type TripEntry = {
   durationHours: number;
 };
 
+/** Sefer listesi veya esnek saat penceresi */
+export type ActivityScheduleMode = 'trips' | 'flexible';
+
+export type FlexibleSchedule = {
+  /** Müşteriye gösterilen kısa metin (örn. "Gün boyu esnek", "Randevuya göre") */
+  label?: string;
+  /** Opsiyonel başlangıç HH:mm */
+  windowStart?: string;
+  /** Opsiyonel bitiş HH:mm */
+  windowEnd?: string;
+  /** Tahmini tur süresi (saat); boşsa pencereden hesaplanabilir */
+  durationHours?: number;
+};
+
 export type ActivityBoatType = 'family' | 'standard';
 
 export type AdminActivity = {
@@ -67,6 +81,9 @@ export type AdminActivity = {
   prices: PriceEntry[];
   /** Tarih bazlı dolu/bakım; boş günler müsait kabul edilir */
   availability: AvailabilityEntry[];
+  /** trips: sabit seferler; flexible: esnek aktivite saati */
+  scheduleMode?: ActivityScheduleMode;
+  flexibleSchedule?: FlexibleSchedule;
   trips: TripEntry[];
   createdAt: string;
   updatedAt: string;
@@ -80,4 +97,6 @@ export type AdminActivityInput = Omit<
   prices?: PriceEntry[];
   availability?: AvailabilityEntry[];
   trips?: TripEntry[];
+  scheduleMode?: ActivityScheduleMode;
+  flexibleSchedule?: FlexibleSchedule;
 };

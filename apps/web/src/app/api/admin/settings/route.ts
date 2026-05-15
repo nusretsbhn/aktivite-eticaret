@@ -125,6 +125,8 @@ function validateSettings(body: unknown): AdminSettings | null {
     sm && typeof sm === 'object'
       ? (() => {
           const o = sm as Record<string, unknown>;
+          const siteTitle = String(o.siteTitle ?? '').trim();
+          const faviconUrl = String(o.faviconUrl ?? '').trim();
           const logoUrl = String(o.logoUrl ?? '').trim();
           const darkLogoUrl = String(o.darkLogoUrl ?? '').trim();
           const enabledSiteProducts = normalizeEnabledSiteProducts(o.enabledSiteProducts);
@@ -154,6 +156,8 @@ function validateSettings(body: unknown): AdminSettings | null {
           const callRaw = String(o.callPhoneDigits ?? '').trim();
           const callPhoneDigits = callRaw ? normalizeWhatsAppDigits(callRaw) ?? '' : '';
           return {
+            siteTitle,
+            faviconUrl,
             ...(logoUrl ? { logoUrl } : {}),
             ...(darkLogoUrl ? { darkLogoUrl } : {}),
             whatsappPhoneDigits,

@@ -1057,7 +1057,7 @@ export function SettingsPageClient() {
         {tab === 'site' && (
           <div className="space-y-8">
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
-              Logo, WhatsApp balonu ve ana sayfa slider içeriklerini buradan yönetebilirsiniz.
+              Site başlığı, favicon, logo, WhatsApp balonu ve ana sayfa slider içeriklerini buradan yönetebilirsiniz.
             </p>
 
             <section className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
@@ -1210,6 +1210,124 @@ export function SettingsPageClient() {
                     />
                   ) : (
                     <p className="text-sm text-zinc-400">Koyu zemin logosu seçilmedi.</p>
+                  )}
+                </div>
+              </div>
+            </section>
+
+            <section className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
+              <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Tarayıcı sekmesi</h2>
+              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                Sekme başlığı ve ikon. Favicon boş bırakılırsa normal site logosu kullanılır. Kare veya kareye yakın
+                PNG/ICO önerilir (ör. 32×32 veya 192×192).
+              </p>
+              <label className="mt-4 block text-sm">
+                <span className="text-zinc-600 dark:text-zinc-400">Site genel başlığı</span>
+                <input
+                  type="text"
+                  placeholder="Günübirlik Aktivite"
+                  className="mt-1 min-h-11 w-full max-w-md rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-50"
+                  value={settings.siteManagement?.siteTitle ?? ''}
+                  onChange={(e) => {
+                    if (!settings) return;
+                    const sm = settings.siteManagement ?? { slides: [] };
+                    const next: AdminSettings = {
+                      ...settings,
+                      siteManagement: {
+                        ...sm,
+                        slides: (sm.slides ?? []).slice(),
+                        siteTitle: e.target.value,
+                      },
+                    };
+                    setSettings(next);
+                  }}
+                  onBlur={() => void save(settings)}
+                />
+              </label>
+              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                Tarayıcı sekmesinde ve varsayılan sayfa başlığında görünür. Alt sayfalarda &quot;Site adı | Sayfa&quot;
+                formatı kullanılır.
+              </p>
+              <div className="mt-4 grid gap-3 lg:grid-cols-2">
+                <div>
+                  <p className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">Favicon</p>
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml,image/x-icon,.ico"
+                    className="min-h-11 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-50"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file || !settings) return;
+                      void uploadCoverFile(file, 'site', 'site:favicon').then((url) => {
+                        if (!url) return;
+                        const sm = settings.siteManagement ?? { slides: [] };
+                        const next: AdminSettings = {
+                          ...settings,
+                          siteManagement: {
+                            ...sm,
+                            slides: (sm.slides ?? []).slice(),
+                            faviconUrl: url,
+                          },
+                        };
+                        setSettings(next);
+                        void save(next);
+                      });
+                      e.currentTarget.value = '';
+                    }}
+                  />
+                  {settings.siteManagement?.faviconUrl ? (
+                    <p className="mt-2 truncate text-xs text-zinc-500 dark:text-zinc-400">
+                      {settings.siteManagement.faviconUrl}
+                    </p>
+                  ) : (
+                    <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+                      Yüklenmedi — normal logo favicon olarak kullanılır.
+                    </p>
+                  )}
+                  {settings.siteManagement?.faviconUrl && (
+                    <button
+                      type="button"
+                      className="mt-2 text-xs font-medium text-red-600 hover:text-red-500 dark:text-red-400"
+                      disabled={saving}
+                      onClick={() => {
+                        if (!settings) return;
+                        const sm = settings.siteManagement ?? { slides: [] };
+                        const next: AdminSettings = {
+                          ...settings,
+                          siteManagement: {
+                            ...sm,
+                            slides: (sm.slides ?? []).slice(),
+                            faviconUrl: '',
+                          },
+                        };
+                        setSettings(next);
+                        void save(next);
+                      }}
+                    >
+                      Favicon&apos;u kaldır (logoya dön)
+                    </button>
+                  )}
+                </div>
+                <div className="rounded-lg border border-dashed border-zinc-300 p-3 dark:border-zinc-700">
+                  {settings.siteManagement?.faviconUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={settings.siteManagement.faviconUrl}
+                      alt="Favicon önizleme"
+                      className="h-12 w-12 object-contain"
+                    />
+                  ) : settings.siteManagement?.logoUrl ? (
+                    <div className="flex items-center gap-3">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={settings.siteManagement.logoUrl}
+                        alt="Logo favicon yedek"
+                        className="h-12 w-12 object-contain"
+                      />
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400">Şu an normal logo kullanılıyor.</p>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400">Favicon veya logo yok.</p>
                   )}
                 </div>
               </div>

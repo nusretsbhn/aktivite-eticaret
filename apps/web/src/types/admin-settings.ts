@@ -66,6 +66,10 @@ export type AdminSettings = {
     deliveryAndReturnTerms: string;
   };
   siteManagement?: {
+    /** Tarayıcı sekmesi ve varsayılan sayfa başlığı */
+    siteTitle?: string;
+    /** Sekme ikonu; boşsa normal logo (logoUrl) kullanılır */
+    faviconUrl?: string;
     logoUrl?: string;
     darkLogoUrl?: string;
     /**

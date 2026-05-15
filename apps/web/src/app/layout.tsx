@@ -30,9 +30,12 @@ export async function generateMetadata(): Promise<Metadata> {
   let siteTitle = DEFAULT_SITE_TITLE;
   try {
     const settings = await readSettings();
-    const brand = (settings.footerManagement?.footerBrandText ?? "").trim();
-    if (brand) {
-      siteTitle = brand;
+    const fromSite = (settings.siteManagement?.siteTitle ?? "").trim();
+    const fromFooter = (settings.footerManagement?.footerBrandText ?? "").trim();
+    if (fromSite) {
+      siteTitle = fromSite;
+    } else if (fromFooter) {
+      siteTitle = fromFooter;
     }
   } catch {
     /* varsayılan başlık */

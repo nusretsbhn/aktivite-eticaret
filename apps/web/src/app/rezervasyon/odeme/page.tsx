@@ -5,6 +5,7 @@ import { SiteAccountWithNotifications } from '@/components/site/site-account-wit
 import { readActivities } from '@/lib/admin-activities-server';
 import { parseActivityGuestParams } from '@/lib/activity-booking-params';
 import { computeActivityBookingTotal, resolveActivityPrices } from '@/lib/activity-pricing';
+import { formatActivityTripInfo } from '@/lib/activity-schedule';
 import { validateBookingRequest } from '@/lib/availability-helpers';
 import { readSettings } from '@/lib/admin-settings-server';
 import { PaymentFormClient } from './payment-form-client';
@@ -96,9 +97,7 @@ export default async function PaymentPage({
       : 100;
   const prepaymentTotal = Math.round((grossTotal * prepaymentPercent) / 100);
   const payableAmount = paymentPlan === 'full' ? grossTotal : prepaymentTotal;
-  const tripInfo = (activity?.trips ?? [])
-    .map((t) => `${t.departureTime}→${t.arrivalTime}${typeof t.durationHours === 'number' ? ` (${t.durationHours} Saat)` : ''}`)
-    .join(' | ');
+  const tripInfo = activity ? formatActivityTripInfo(activity) : '';
 
   return (
     <div className="min-h-screen bg-zinc-50">
