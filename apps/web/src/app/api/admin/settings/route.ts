@@ -151,10 +151,13 @@ function validateSettings(body: unknown): AdminSettings | null {
           const homePageSectionOrder = normalizeHomePageSectionOrder(o.homePageSectionOrder);
           const whatsappRaw = String(o.whatsappPhoneDigits ?? '').trim();
           const whatsappPhoneDigits = whatsappRaw ? normalizeWhatsAppDigits(whatsappRaw) ?? '' : '';
+          const callRaw = String(o.callPhoneDigits ?? '').trim();
+          const callPhoneDigits = callRaw ? normalizeWhatsAppDigits(callRaw) ?? '' : '';
           return {
             ...(logoUrl ? { logoUrl } : {}),
             ...(darkLogoUrl ? { darkLogoUrl } : {}),
             whatsappPhoneDigits,
+            callPhoneDigits,
             enabledSiteProducts,
             slides,
             homePageSectionOrder,

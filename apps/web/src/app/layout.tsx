@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
+import { SiteCallFloat } from "@/components/site/site-call-float";
 import { SiteWhatsAppFloat } from "@/components/site/site-whatsapp-float";
 import { readSettings } from "@/lib/admin-settings-server";
 import { normalizeWhatsAppDigits } from "@/lib/whatsapp-digits";
@@ -68,12 +69,18 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   let whatsappDigits = "905536882734";
+  let callPhoneDigits: string | undefined;
   try {
     const settings = await readSettings();
     const raw = settings.siteManagement?.whatsappPhoneDigits?.trim();
     if (raw) {
       const n = normalizeWhatsAppDigits(raw);
       if (n) whatsappDigits = n;
+    }
+    const callRaw = settings.siteManagement?.callPhoneDigits?.trim();
+    if (callRaw) {
+      const n = normalizeWhatsAppDigits(callRaw);
+      if (n) callPhoneDigits = n;
     }
   } catch {
     /* varsayılan */
@@ -88,6 +95,7 @@ export default async function RootLayout({
         <SiteAuthProvider>
           {children}
           <SiteCookieConsent />
+          <SiteCallFloat phoneDigits={callPhoneDigits} />
           <SiteWhatsAppFloat phoneDigits={whatsappDigits} />
         </SiteAuthProvider>
       </body>

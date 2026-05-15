@@ -20,3 +20,10 @@ export function buildWhatsAppChatUrl(phoneDigits: string, text?: string): string
   if (!t) return `https://wa.me/${phoneDigits}`;
   return `https://wa.me/${phoneDigits}?text=${encodeURIComponent(t)}`;
 }
+
+/** `tel:` bağlantısı (mobilde doğrudan arama başlatır). */
+export function buildTelUrl(phoneDigits: string): string {
+  const d = String(phoneDigits ?? '').replace(/\D/g, '');
+  if (!d) return 'tel:';
+  return `tel:+${d}`;
+}

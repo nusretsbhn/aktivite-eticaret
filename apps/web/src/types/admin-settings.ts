@@ -73,6 +73,11 @@ export type AdminSettings = {
      * Boşsa kod içi varsayılan kullanılır.
      */
     whatsappPhoneDigits?: string;
+    /**
+     * Sol alttaki arama balonu; tel: ile açılır (ülke kodu dahil, sadece rakam).
+     * Boşsa arama butonu gösterilmez.
+     */
+    callPhoneDigits?: string;
     /** Açık iş hatları: tekne turu, aktivite, villa kiralama */
     enabledSiteProducts?: SiteProductType[];
     slides: {
