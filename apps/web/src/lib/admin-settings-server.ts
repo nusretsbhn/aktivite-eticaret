@@ -1,5 +1,6 @@
 import { appDataFile } from '@/lib/next-public-dir';
 import { readJsonStore, writeJsonStore } from '@/lib/db-json-store';
+import { parseActivityImageMap } from '@/lib/activity-home-widgets';
 import { normalizeHomeActivityOrderIds } from '@/lib/home-activity-order';
 import { DEFAULT_HOME_PAGE_SECTION_ORDER, normalizeHomePageSectionOrder } from '@/lib/home-page-sections';
 import { DEFAULT_ENABLED_SITE_PRODUCTS, normalizeEnabledSiteProducts } from '@/lib/site-product-types';
@@ -57,6 +58,8 @@ export function getDefaultSettings(): AdminSettings {
     ],
     blockManagement: {
       villaRegionBanners: {},
+      activityLocationImages: {},
+      activityMainCategoryImages: {},
     },
     contracts: {
       kvkkPolicy: '',
@@ -168,16 +171,12 @@ export async function readSettings(): Promise<AdminSettings> {
         const bm = s.blockManagement;
         if (!bm || typeof bm !== 'object') return def;
         const o = bm as Record<string, unknown>;
-        const vrb = o.villaRegionBanners;
-        const villaRegionBanners: Record<string, string> = {};
-        if (vrb && typeof vrb === 'object') {
-          for (const [k, v] of Object.entries(vrb as Record<string, unknown>)) {
-            const key = String(k ?? '').trim().slice(0, 120);
-            const val = String(v ?? '').trim().slice(0, 500);
-            if (key && val) villaRegionBanners[key] = val;
-          }
-        }
-        return { ...def, villaRegionBanners };
+        return {
+          ...def,
+          villaRegionBanners: parseActivityImageMap(o.villaRegionBanners),
+          activityLocationImages: parseActivityImageMap(o.activityLocationImages),
+          activityMainCategoryImages: parseActivityImageMap(o.activityMainCategoryImages),
+        };
       })(),
       contracts:
         s.contracts && typeof s.contracts === 'object'

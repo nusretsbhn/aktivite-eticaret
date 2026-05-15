@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { GripVertical } from 'lucide-react';
 import { useState } from 'react';
 
 import { buildHomeActivityOrderFromActivities } from '@/lib/home-activity-order';
@@ -32,6 +33,7 @@ export function HomeActivitiesOrderClient({ initialSettings, initialActivities }
     ),
   );
   const [saving, setSaving] = useState(false);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [ok, setOk] = useState<string | null>(null);
 
@@ -80,6 +82,14 @@ export function HomeActivitiesOrderClient({ initialSettings, initialActivities }
     const to = index + dir;
     if (to < 0 || to >= ordered.length) return;
     void save(move(ordered, index, to));
+  }
+
+  function reorderByDrag(fromId: string, toId: string) {
+    if (fromId === toId) return;
+    const fromIdx = ordered.findIndex((a) => a.id === fromId);
+    const toIdx = ordered.findIndex((a) => a.id === toId);
+    if (fromIdx === -1 || toIdx === -1) return;
+    void save(move(ordered, fromIdx, toIdx));
   }
 
   function resetByCreatedAt() {
@@ -149,8 +159,40 @@ export function HomeActivitiesOrderClient({ initialSettings, initialActivities }
               return (
                 <li
                   key={a.id}
-                  className="flex flex-wrap items-center justify-between gap-3 py-3 first:pt-0 last:pb-0"
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const fromId = e.dataTransfer.getData('text/plain');
+                    if (fromId && fromId !== a.id) reorderByDrag(fromId, a.id);
+                  }}
+                  className={`flex flex-wrap items-center gap-3 py-3 first:pt-0 last:pb-0 ${
+                    draggingId === a.id ? 'rounded-lg bg-blue-50/80 ring-2 ring-blue-400/50 dark:bg-blue-950/30' : ''
+                  }`}
                 >
+                  <div
+                    draggable={!saving}
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Sürükleyerek sırayı değiştir"
+                    onDragStart={(e) => {
+                      if (saving) {
+                        e.preventDefault();
+                        return;
+                      }
+                      e.dataTransfer.setData('text/plain', a.id);
+                      e.dataTransfer.effectAllowed = 'move';
+                      setDraggingId(a.id);
+                    }}
+                    onDragEnd={() => setDraggingId(null)}
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-zinc-50 text-zinc-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 ${
+                      saving ? 'cursor-not-allowed opacity-50' : 'cursor-grab active:cursor-grabbing'
+                    }`}
+                  >
+                    <GripVertical className="h-5 w-5 shrink-0" aria-hidden />
+                  </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="text-xs font-mono text-zinc-400">#{index + 1}</span>
@@ -171,7 +213,7 @@ export function HomeActivitiesOrderClient({ initialSettings, initialActivities }
                       {a.location || a.departurePlace || '—'} · {a.activityId}
                     </p>
                   </div>
-                  <div className="flex shrink-0 gap-1">
+                  <div className="ml-auto flex shrink-0 gap-1">
                     <button
                       type="button"
                       disabled={saving || index === 0}
@@ -205,8 +247,8 @@ export function HomeActivitiesOrderClient({ initialSettings, initialActivities }
       </div>
 
       <p className="text-xs text-zinc-500 dark:text-zinc-400">
-        Yukarı / aşağı oklarıyla sırayı değiştirdiğinizde kayıt otomatik yapılır. Yeni eklenen aktif
-        aktiviteler, listede yoksa listenin sonuna eklenir.
+        Sol tutamaktan sürükleyip bırakarak veya yukarı / aşağı oklarıyla sırayı değiştirebilirsiniz; kayıt
+        otomatik yapılır. Yeni eklenen aktif aktiviteler, listede yoksa listenin sonuna eklenir.
       </p>
     </div>
   );

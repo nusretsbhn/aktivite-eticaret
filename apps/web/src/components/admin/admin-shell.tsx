@@ -34,6 +34,11 @@ const nav: NavItem[] = [
     label: 'Ana Sayfa Aktiviteleri',
     requiresProduct: SITE_PRODUCT_ACTIVITY,
   },
+  {
+    href: '/admin/ana-sayfa-aktivite-widgetlari',
+    label: 'Ana Sayfa Widget Görselleri',
+    requiresProduct: SITE_PRODUCT_ACTIVITY,
+  },
   { href: '/admin/villalar', label: 'Villalar', requiresProduct: SITE_PRODUCT_VILLA_RENTAL },
   { href: '/admin/paket-turlar', label: 'Paket Turlar', requiresProduct: SITE_PRODUCT_PACKAGE_TOUR },
   { href: '/admin/paket-tur-talepleri', label: 'Paket Tur Talepleri', requiresProduct: SITE_PRODUCT_PACKAGE_TOUR },
@@ -144,6 +149,8 @@ export function AdminShell({
               if (item.href === '/admin/sayfa-duzeni') return pathname.startsWith('/admin/sayfa-duzeni');
               if (item.href === '/admin/ana-sayfa-aktiviteler')
                 return pathname.startsWith('/admin/ana-sayfa-aktiviteler');
+              if (item.href === '/admin/ana-sayfa-aktivite-widgetlari')
+                return pathname.startsWith('/admin/ana-sayfa-aktivite-widgetlari');
               return pathname === item.href || pathname.startsWith(`${item.href}/`);
             })();
 

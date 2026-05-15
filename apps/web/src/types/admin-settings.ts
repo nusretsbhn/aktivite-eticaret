@@ -51,6 +51,10 @@ export type AdminSettings = {
      * Key: region (örn. "Yalıkavak"), Value: image URL (örn. /uploads/...)
      */
     villaRegionBanners?: Record<string, string>;
+    /** Ana sayfa lokasyon widget kartları — key: aktivite lokasyon adı */
+    activityLocationImages?: Record<string, string>;
+    /** Ana sayfa birincil kategori widget kartları — key: ana kategori id */
+    activityMainCategoryImages?: Record<string, string>;
   };
   contracts?: {
     kvkkPolicy: string;

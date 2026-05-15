@@ -8,6 +8,7 @@ import { HomeBoatTourSection } from '@/components/site/home-boat-tour-section';
 import { HomeCategoriesSection } from '@/components/site/home-categories-section';
 import { HomeFaqSection } from '@/components/site/home-faq-section';
 import { HomeHoneymoonVillasSection } from '@/components/site/home-honeymoon-villas-section';
+import { HomeActivityMainCategoriesSection } from '@/components/site/home-activity-main-categories-section';
 import { HomeLocationWidget } from '@/components/site/home-location-widget';
 import { HomePackagesSection } from '@/components/site/home-packages-section';
 import { HomeVillaRegionBannersSection } from '@/components/site/home-villa-region-banners-section';
@@ -78,6 +79,9 @@ function Section({
     case 'categories':
       if (!showActivity) return null;
       return <HomeCategoriesSection settings={settings} activities={activities} />;
+    case 'activityMainCategories':
+      if (!showActivity) return null;
+      return <HomeActivityMainCategoriesSection activities={activities} settings={settings} />;
     case 'packages':
       if (!showActivity) return null;
       return <HomePackagesSection packages={packages} activities={activities} />;

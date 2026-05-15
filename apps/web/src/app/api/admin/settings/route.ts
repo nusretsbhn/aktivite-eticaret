@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { requireAdminSession } from '@/lib/admin-api-auth';
 import { readSettings, writeSettings } from '@/lib/admin-settings-server';
+import { parseActivityImageMap } from '@/lib/activity-home-widgets';
 import { normalizeHomeActivityOrderIds } from '@/lib/home-activity-order';
 import { normalizeHomePageSectionOrder } from '@/lib/home-page-sections';
 import { normalizeEnabledSiteProducts } from '@/lib/site-product-types';
@@ -362,18 +363,10 @@ function validateSettings(body: unknown): AdminSettings | null {
     blk && typeof blk === 'object'
       ? (() => {
           const o = blk as Record<string, unknown>;
-          const vrb = o.villaRegionBanners;
-          const villaRegionBanners: Record<string, string> = {};
-          if (vrb && typeof vrb === 'object') {
-            for (const [k, v] of Object.entries(vrb as Record<string, unknown>)) {
-              const key = String(k ?? '').trim().slice(0, 120);
-              const val = String(v ?? '').trim().slice(0, 500);
-              if (!key || !val) continue;
-              villaRegionBanners[key] = val;
-            }
-          }
           return {
-            ...(Object.keys(villaRegionBanners).length ? { villaRegionBanners } : { villaRegionBanners: {} }),
+            villaRegionBanners: parseActivityImageMap(o.villaRegionBanners),
+            activityLocationImages: parseActivityImageMap(o.activityLocationImages),
+            activityMainCategoryImages: parseActivityImageMap(o.activityMainCategoryImages),
           } satisfies NonNullable<AdminSettings['blockManagement']>;
         })()
       : undefined;
