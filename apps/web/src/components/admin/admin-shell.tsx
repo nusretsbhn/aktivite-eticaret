@@ -29,6 +29,11 @@ const nav: NavItem[] = [
   { href: '/admin/villa-talepleri', label: 'Villa Talepleri', requiresProduct: SITE_PRODUCT_VILLA_RENTAL },
   { href: '/admin/siparisler/iptal-iade', label: 'İptal / İade Yönetimi' },
   { href: '/admin/aktiviteler', label: 'Aktiviteler', requiresProduct: SITE_PRODUCT_ACTIVITY },
+  {
+    href: '/admin/ana-sayfa-aktiviteler',
+    label: 'Ana Sayfa Aktiviteleri',
+    requiresProduct: SITE_PRODUCT_ACTIVITY,
+  },
   { href: '/admin/villalar', label: 'Villalar', requiresProduct: SITE_PRODUCT_VILLA_RENTAL },
   { href: '/admin/paket-turlar', label: 'Paket Turlar', requiresProduct: SITE_PRODUCT_PACKAGE_TOUR },
   { href: '/admin/paket-tur-talepleri', label: 'Paket Tur Talepleri', requiresProduct: SITE_PRODUCT_PACKAGE_TOUR },
@@ -137,6 +142,8 @@ export function AdminShell({
                 return pathname.startsWith('/admin/siparisler/iptal-iade');
               if (item.href === '/admin/villalar') return pathname.startsWith('/admin/villalar');
               if (item.href === '/admin/sayfa-duzeni') return pathname.startsWith('/admin/sayfa-duzeni');
+              if (item.href === '/admin/ana-sayfa-aktiviteler')
+                return pathname.startsWith('/admin/ana-sayfa-aktiviteler');
               return pathname === item.href || pathname.startsWith(`${item.href}/`);
             })();
 

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { requireAdminSession } from '@/lib/admin-api-auth';
 import { readSettings, writeSettings } from '@/lib/admin-settings-server';
+import { normalizeHomeActivityOrderIds } from '@/lib/home-activity-order';
 import { normalizeHomePageSectionOrder } from '@/lib/home-page-sections';
 import { normalizeEnabledSiteProducts } from '@/lib/site-product-types';
 import { normalizeWhatsAppDigits } from '@/lib/whatsapp-digits';
@@ -151,6 +152,7 @@ function validateSettings(body: unknown): AdminSettings | null {
             })
             .filter((x): x is NonNullable<typeof x> => Boolean(x));
           const homePageSectionOrder = normalizeHomePageSectionOrder(o.homePageSectionOrder);
+          const homeActivityOrder = normalizeHomeActivityOrderIds(o.homeActivityOrder);
           const whatsappRaw = String(o.whatsappPhoneDigits ?? '').trim();
           const whatsappPhoneDigits = whatsappRaw ? normalizeWhatsAppDigits(whatsappRaw) ?? '' : '';
           const callRaw = String(o.callPhoneDigits ?? '').trim();
@@ -165,6 +167,7 @@ function validateSettings(body: unknown): AdminSettings | null {
             enabledSiteProducts,
             slides,
             homePageSectionOrder,
+            homeActivityOrder,
           } satisfies NonNullable<AdminSettings['siteManagement']>;
         })()
       : undefined;

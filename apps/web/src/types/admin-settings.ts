@@ -93,6 +93,8 @@ export type AdminSettings = {
     }[];
     /** Ana sayfa: hero ve footer sabit; aradaki blokların sırası (id listesi). */
     homePageSectionOrder?: string[];
+    /** Ana sayfa aktiviteler widget’ında gösterim sırası (aktivite id listesi). */
+    homeActivityOrder?: string[];
   };
   bannerManagement?: {
     sliderBanners: {

@@ -2,6 +2,7 @@ import { MapPin } from 'lucide-react';
 import Link from 'next/link';
 
 import { ActivityScheduleTimes } from '@/components/site/activity-schedule-times';
+import { sortActiveActivitiesForHome } from '@/lib/home-activity-order';
 import type { AdminActivity } from '@/types/admin-activity';
 import type { AdminSettings } from '@/types/admin-settings';
 
@@ -39,11 +40,11 @@ export function HomeActivitiesSection({
 }) {
   const tagMap = new Map((settings.tags ?? []).map((t) => [t.id, t.name]));
   const today = toIsoDate(new Date());
-  const list = (activities ?? [])
-    .filter((a) => a && a.isActive)
-    .slice()
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-    .slice(0, 12);
+  const list = sortActiveActivitiesForHome(
+    activities ?? [],
+    settings.siteManagement?.homeActivityOrder,
+    12,
+  );
 
   return (
     <section className="bg-white">

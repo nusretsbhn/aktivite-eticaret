@@ -1,5 +1,6 @@
 import { appDataFile } from '@/lib/next-public-dir';
 import { readJsonStore, writeJsonStore } from '@/lib/db-json-store';
+import { normalizeHomeActivityOrderIds } from '@/lib/home-activity-order';
 import { DEFAULT_HOME_PAGE_SECTION_ORDER, normalizeHomePageSectionOrder } from '@/lib/home-page-sections';
 import { DEFAULT_ENABLED_SITE_PRODUCTS, normalizeEnabledSiteProducts } from '@/lib/site-product-types';
 import type { AdminSettings } from '@/types/admin-settings';
@@ -87,6 +88,7 @@ export function getDefaultSettings(): AdminSettings {
         },
       ],
       homePageSectionOrder: [...DEFAULT_HOME_PAGE_SECTION_ORDER],
+      homeActivityOrder: [],
     },
     bannerManagement: {
       sliderBanners: [],
@@ -193,6 +195,7 @@ export async function readSettings(): Promise<AdminSettings> {
           enabledSiteProducts: normalizeEnabledSiteProducts(sm.enabledSiteProducts),
           slides: Array.isArray(sm.slides) ? sm.slides : def.slides,
           homePageSectionOrder: normalizeHomePageSectionOrder(sm.homePageSectionOrder),
+          homeActivityOrder: normalizeHomeActivityOrderIds(sm.homeActivityOrder),
         };
       })(),
       bannerManagement:
