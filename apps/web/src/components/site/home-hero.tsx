@@ -119,6 +119,9 @@ export function HomeHero({
   const [tempChildren, setTempChildren] = useState(0);
   const [tempInfants, setTempInfants] = useState(0);
 
+  type VillaSearchMode = 'date' | 'name';
+  const [villaSearchMode, setVillaSearchMode] = useState<VillaSearchMode>('date');
+  const [vNameQuery, setVNameQuery] = useState('');
   const [vRegion, setVRegion] = useState('');
   const [vCheckIn, setVCheckIn] = useState(() => todayIsoLocal());
   // Villa arama widgetı varsayılan olarak 4 gece seçili gelsin.
@@ -287,6 +290,13 @@ export function HomeHero({
     router.push(`/villalar?${params.toString()}`);
   }
 
+  function goVillaListingByName() {
+    const params = new URLSearchParams();
+    const q = vNameQuery.trim();
+    if (q) params.set('q', q);
+    router.push(`/villalar?${params.toString()}`);
+  }
+
   function goPackageTourListing() {
     const params = new URLSearchParams();
     params.set('checkIn', ptCheckIn);
@@ -304,57 +314,109 @@ export function HomeHero({
     if (!activeTab) return null;
 
     if (isVillaTab) {
+      const villaModeTabClass = (on: boolean) =>
+        [
+          'rounded-t-lg px-4 py-2 text-sm font-semibold transition',
+          on
+            ? 'text-[#1D61FF] shadow-[inset_0_-2px_0_0_#1D61FF]'
+            : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900',
+        ].join(' ');
+
       return (
-        <div className="flex flex-col gap-2 md:flex-row md:items-stretch">
-          <label className="min-w-0 flex-1">
-            <span className="sr-only">Bölge</span>
-            <select
-              value={vRegion}
-              onChange={(e) => setVRegion(e.target.value)}
-              className="h-12 w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 text-zinc-900 outline-none focus:border-zinc-300"
+        <div className="space-y-3">
+          <div className="flex flex-wrap gap-1 border-b border-zinc-100">
+            <button
+              type="button"
+              onClick={() => setVillaSearchMode('date')}
+              className={villaModeTabClass(villaSearchMode === 'date')}
             >
-              <option value="">Bölge seçin</option>
-              {villaRegionOptions.map((r) => (
-                <option key={r} value={r} className="text-zinc-900">
-                  {r}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button type="button" onClick={() => setVillaRangeOpen(true)} className="min-w-0 flex-1">
-            <span className="sr-only">Tarih aralığı</span>
-            <div className={inputShellClass}>
-              <span className="text-[11px] text-zinc-500">Giriş – çıkış</span>
-              <span className="text-sm font-semibold text-zinc-900">
-                {formatTrDateRangeShort(vCheckIn, vCheckOut)}
-              </span>
+              Tarihe göre arama
+            </button>
+            <button
+              type="button"
+              onClick={() => setVillaSearchMode('name')}
+              className={villaModeTabClass(villaSearchMode === 'name')}
+            >
+              İsme göre arama
+            </button>
+          </div>
+
+          {villaSearchMode === 'date' ? (
+            <div className="flex flex-col gap-2 md:flex-row md:items-stretch">
+              <label className="min-w-0 flex-1">
+                <span className="sr-only">Bölge</span>
+                <select
+                  value={vRegion}
+                  onChange={(e) => setVRegion(e.target.value)}
+                  className="h-12 w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 text-zinc-900 outline-none focus:border-zinc-300"
+                >
+                  <option value="">Bölge seçin</option>
+                  {villaRegionOptions.map((r) => (
+                    <option key={r} value={r} className="text-zinc-900">
+                      {r}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <button type="button" onClick={() => setVillaRangeOpen(true)} className="min-w-0 flex-1">
+                <span className="sr-only">Tarih aralığı</span>
+                <div className={inputShellClass}>
+                  <span className="text-[11px] text-zinc-500">Giriş – çıkış</span>
+                  <span className="text-sm font-semibold text-zinc-900">
+                    {formatTrDateRangeShort(vCheckIn, vCheckOut)}
+                  </span>
+                </div>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setPeopleTarget('villa');
+                  setTempAdults(vAdults);
+                  setTempChildren(vChildren);
+                  setTempInfants(0);
+                  setPeopleOpen(true);
+                }}
+                className="min-w-0 flex-1"
+                ref={villaPeopleBtnRef}
+              >
+                <span className="sr-only">Kişi sayısı</span>
+                <div className={inputShellClass}>
+                  <span className="text-[11px] text-zinc-500">Kişi sayısı</span>
+                  <span className="text-sm font-semibold text-zinc-900">{villaPeopleLabel}</span>
+                </div>
+              </button>
+              <button
+                type="button"
+                onClick={goVillaListing}
+                className="h-12 shrink-0 rounded-xl bg-[#1D61FF] px-5 text-sm font-semibold text-white shadow-sm hover:bg-blue-600 md:px-7"
+              >
+                Villa Ara →
+              </button>
             </div>
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setPeopleTarget('villa');
-              setTempAdults(vAdults);
-              setTempChildren(vChildren);
-              setTempInfants(0);
-              setPeopleOpen(true);
-            }}
-            className="min-w-0 flex-1"
-            ref={villaPeopleBtnRef}
-          >
-            <span className="sr-only">Kişi sayısı</span>
-            <div className={inputShellClass}>
-              <span className="text-[11px] text-zinc-500">Kişi sayısı</span>
-              <span className="text-sm font-semibold text-zinc-900">{villaPeopleLabel}</span>
+          ) : (
+            <div className="flex flex-col gap-2 md:flex-row md:items-stretch">
+              <label className="min-w-0 flex-1">
+                <span className="sr-only">Villa adı</span>
+                <input
+                  type="search"
+                  value={vNameQuery}
+                  onChange={(e) => setVNameQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') goVillaListingByName();
+                  }}
+                  placeholder="Villa adı yazın"
+                  className="h-12 w-full rounded-xl border border-zinc-200 bg-zinc-50 px-4 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-zinc-300"
+                />
+              </label>
+              <button
+                type="button"
+                onClick={goVillaListingByName}
+                className="h-12 shrink-0 rounded-xl bg-[#1D61FF] px-5 text-sm font-semibold text-white shadow-sm hover:bg-blue-600 md:px-7"
+              >
+                Villa Ara →
+              </button>
             </div>
-          </button>
-          <button
-            type="button"
-            onClick={goVillaListing}
-            className="h-12 shrink-0 rounded-xl bg-[#1D61FF] px-5 text-sm font-semibold text-white shadow-sm hover:bg-blue-600 md:px-7"
-          >
-            Villa Ara →
-          </button>
+          )}
         </div>
       );
     }

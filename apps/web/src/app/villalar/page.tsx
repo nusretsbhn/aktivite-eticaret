@@ -33,6 +33,7 @@ export default async function VillalarPage({
         checkIn: typeof sp.checkIn === 'string' ? sp.checkIn : '',
         checkOut: typeof sp.checkOut === 'string' ? sp.checkOut : '',
         guests: typeof sp.guests === 'string' ? sp.guests : '',
+        q: typeof sp.q === 'string' ? sp.q : '',
       }}
     />
   );

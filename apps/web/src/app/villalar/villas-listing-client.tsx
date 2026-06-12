@@ -100,6 +100,7 @@ export function VillasListingClient({
     checkIn?: string;
     checkOut?: string;
     guests?: string;
+    q?: string;
   };
 }) {
   const logoUrl = settings.siteManagement?.logoUrl;
@@ -131,7 +132,7 @@ export function VillasListingClient({
   const dateFilterActive = fromHomeSearch || datesChosen;
 
   const [guests, setGuests] = useState(Math.max(1, Number(initialQuery?.guests || 1)));
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState(initialQuery?.q?.trim() ?? '');
   const [selectedRegions, setSelectedRegions] = useState<string[]>(
     initialQuery?.region ? [initialQuery.region] : [],
   );
