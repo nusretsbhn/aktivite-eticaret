@@ -116,16 +116,15 @@ export function VillaDetailView({ villa, settings, initialDates }: Props) {
             <div className="mb-8">
               <div className="min-w-0">
                 <h1 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl">{villa.displayName}</h1>
-                {(villa.documentNo ?? '').trim() ? (
-                  <p className="mt-2 text-sm font-medium text-zinc-600">
-                    Villa belge no:{' '}
-                    <span className="font-semibold text-zinc-800">{(villa.documentNo ?? '').trim()}</span>
-                  </p>
-                ) : null}
                 <p className="mt-2 flex items-start gap-2 text-base text-zinc-600">
                   <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" aria-hidden />
                   <span>{locationLine}</span>
                 </p>
+                {(villa.documentNo ?? '').trim() ? (
+                  <p className="mt-1 pl-7 text-xs text-zinc-500">
+                    Belge no: {(villa.documentNo ?? '').trim()}
+                  </p>
+                ) : null}
                 {villa.addressLine ? (
                   <p className="mt-1 pl-7 text-sm text-zinc-500">{villa.addressLine}</p>
                 ) : null}

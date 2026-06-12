@@ -139,7 +139,7 @@ export function VillasListingClient({
   const [bedroomsMin, setBedroomsMin] = useState('');
   const [priceMinInput, setPriceMinInput] = useState('');
   const [priceMaxInput, setPriceMaxInput] = useState('');
-  const [sortBy, setSortBy] = useState<SortKey>('recommended');
+  const [sortBy, setSortBy] = useState<SortKey>('priceAsc');
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const toggleRegion = (r: string) => {
