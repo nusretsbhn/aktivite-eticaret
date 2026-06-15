@@ -1117,6 +1117,45 @@ export function SettingsPageClient() {
             </section>
 
             <section className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
+              <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Aktivite satışı</h2>
+              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                Aktivite fiyatlarının sitede nasıl gösterileceğini yönetin.
+              </p>
+              <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-lg border border-zinc-200 px-3 py-3 text-sm dark:border-zinc-600">
+                <input
+                  type="checkbox"
+                  className="mt-0.5 h-4 w-4 rounded border-zinc-300"
+                  checked={Boolean(settings.siteManagement?.hideActivityPrices)}
+                  disabled={saving || !settings}
+                  onChange={(e) => {
+                    if (!settings) return;
+                    const sm = settings.siteManagement ?? { slides: [] };
+                    const next: AdminSettings = {
+                      ...settings,
+                      siteManagement: {
+                        ...sm,
+                        slides: (sm.slides ?? []).slice(),
+                        logoUrl: sm.logoUrl ?? '',
+                        darkLogoUrl: sm.darkLogoUrl ?? '',
+                        hideActivityPrices: e.target.checked,
+                      },
+                    };
+                    setSettings(next);
+                    void save(next);
+                  }}
+                />
+                <span>
+                  <span className="font-medium text-zinc-900 dark:text-zinc-50">Fiyat Gizle</span>
+                  <span className="mt-1 block text-xs text-zinc-500 dark:text-zinc-400">
+                    Açıkken aktivite fiyatları sitede görünmez; &quot;Fiyat için iletişime geçin&quot; metni gösterilir.
+                    Aktivite listesinde WhatsApp butonunun üstünde arama butonu çıkar (arama numarası: Arama telefon
+                    numarası).
+                  </span>
+                </span>
+              </label>
+            </section>
+
+            <section className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
               <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Site logosu</h2>
               <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
                 Normal logo açık (beyaz) header’da, koyu zemin logosu şeffaf/koyu header’da kullanılacak.

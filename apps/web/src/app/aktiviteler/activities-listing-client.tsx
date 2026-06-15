@@ -12,6 +12,7 @@ import {
   Filter,
   MapPin,
   Minus,
+  Phone,
   Plus,
   Search,
   SlidersHorizontal,
@@ -26,8 +27,9 @@ import { SiteDatePickerOverlay } from '@/components/site/site-date-picker-overla
 import { SiteAccountWithNotifications } from '@/components/site/site-account-with-notifications';
 import { SiteFooter } from '@/components/site/site-footer';
 import { computeActivityBookingTotal, resolveActivityPrices } from '@/lib/activity-pricing';
+import { ACTIVITY_PRICE_CONTACT_LABEL, isActivityPricesHidden } from '@/lib/activity-price-visibility';
 import { getAvailabilityForDate } from '@/lib/availability-helpers';
-import { buildWhatsAppChatUrl, normalizeWhatsAppDigits } from '@/lib/whatsapp-digits';
+import { buildTelUrl, buildWhatsAppChatUrl, normalizeWhatsAppDigits } from '@/lib/whatsapp-digits';
 import type { AdminActivity } from '@/types/admin-activity';
 import type { AdminSettings } from '@/types/admin-settings';
 
@@ -111,6 +113,12 @@ export function ActivitiesListingClient({
     () => normalizeWhatsAppDigits(settings.siteManagement?.whatsappPhoneDigits?.trim() ?? '') ?? '905536882734',
     [settings.siteManagement?.whatsappPhoneDigits],
   );
+  const hideActivityPrices = isActivityPricesHidden(settings);
+  const callPhoneDigits = useMemo(
+    () => normalizeWhatsAppDigits(settings.siteManagement?.callPhoneDigits?.trim() ?? ''),
+    [settings.siteManagement?.callPhoneDigits],
+  );
+  const callTelHref = callPhoneDigits ? buildTelUrl(callPhoneDigits) : null;
   const listingDateBtnRef = useRef<HTMLButtonElement>(null);
   const [listingDateOpen, setListingDateOpen] = useState(false);
   const initialDate =
@@ -195,7 +203,7 @@ export function ActivitiesListingClient({
       const subNames = (a.subCategoryIds ?? []).map((id) => subCategoryNameMap.get(id) ?? '');
       const joinedSub = subNames.join(' ').toLocaleLowerCase('tr');
       const todayPrice = (a.prices ?? []).find((p) => p.date === selectedDate)?.price;
-      if (typeof todayPrice !== 'number' || !Number.isFinite(todayPrice)) return false;
+      if (!hideActivityPrices && (typeof todayPrice !== 'number' || !Number.isFinite(todayPrice))) return false;
 
       if (search && !name.includes(search) && !description.includes(search) && !location.includes(search) && !joinedSub.includes(search)) {
         return false;
@@ -209,8 +217,14 @@ export function ActivitiesListingClient({
         return false;
       if (selectedTagIds.length && !(a.tagIds ?? []).some((id) => selectedTagIds.includes(id))) return false;
       if ((a.capacity ?? 0) < personCount) return false;
-      if (Number.isFinite(minPrice) && minPrice > 0 && (typeof todayPrice !== 'number' || todayPrice < minPrice)) return false;
-      if (Number.isFinite(maxPrice) && maxPrice > 0 && (typeof todayPrice !== 'number' || todayPrice > maxPrice)) return false;
+      if (!hideActivityPrices) {
+        if (Number.isFinite(minPrice) && minPrice > 0 && (typeof todayPrice !== 'number' || todayPrice < minPrice)) {
+          return false;
+        }
+        if (Number.isFinite(maxPrice) && maxPrice > 0 && (typeof todayPrice !== 'number' || todayPrice > maxPrice)) {
+          return false;
+        }
+      }
       return true;
     });
 
@@ -239,6 +253,7 @@ export function ActivitiesListingClient({
     selectedTagIds,
     sortBy,
     subCategoryNameMap,
+    hideActivityPrices,
   ]);
 
   const availabilityPartition = useMemo(() => {
@@ -388,6 +403,7 @@ export function ActivitiesListingClient({
           />
         </label>
 
+        {!hideActivityPrices && (
         <div>
           <p className="mb-2 text-sm font-semibold text-zinc-800">Bütçe (kişi başı)</p>
           <div className="grid grid-cols-2 gap-2">
@@ -409,6 +425,7 @@ export function ActivitiesListingClient({
             />
           </div>
         </div>
+        )}
       </div>
     </div>
   );
@@ -506,8 +523,12 @@ export function ActivitiesListingClient({
                     className="min-h-10 rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-medium text-zinc-900"
                   >
                     <option value="recommended">Önerilen</option>
-                    <option value="priceAsc">Fiyat (Artan)</option>
-                    <option value="priceDesc">Fiyat (Azalan)</option>
+                    {!hideActivityPrices && (
+                      <>
+                        <option value="priceAsc">Fiyat (Artan)</option>
+                        <option value="priceDesc">Fiyat (Azalan)</option>
+                      </>
+                    )}
                     <option value="nameAsc">İsim (A-Z)</option>
                   </select>
                 </label>
@@ -656,21 +677,28 @@ export function ActivitiesListingClient({
                       </p>
                       <p className="text-sm font-semibold text-zinc-800">{a.capacity} Kişi</p>
                       <div className="my-3 h-px bg-zinc-200" />
-                      <p className="text-sm text-zinc-600">Yetişkin (kişi başı)</p>
-                      <p className="text-3xl font-extrabold tracking-tight text-zinc-900">
-                        {hasPrice ? formatTry(adultUnit) : '-'}
-                        <span className="ml-1 text-base font-bold">TRY</span>
-                      </p>
-                      {(childUnit !== adultUnit || infantUnit !== adultUnit) && hasPrice && (
-                        <p className="mt-1 text-[11px] leading-snug text-zinc-500">
-                          Çocuk {formatTry(childUnit)} · Bebek {formatTry(infantUnit)} TRY
-                        </p>
+                      {hideActivityPrices ? (
+                        <p className="text-sm font-semibold leading-snug text-zinc-700">{ACTIVITY_PRICE_CONTACT_LABEL}</p>
+                      ) : (
+                        <>
+                          <p className="text-sm text-zinc-600">Yetişkin (kişi başı)</p>
+                          <p className="text-3xl font-extrabold tracking-tight text-zinc-900">
+                            {hasPrice ? formatTry(adultUnit) : '-'}
+                            <span className="ml-1 text-base font-bold">TRY</span>
+                          </p>
+                          {(childUnit !== adultUnit || infantUnit !== adultUnit) && hasPrice && (
+                            <p className="mt-1 text-[11px] leading-snug text-zinc-500">
+                              Çocuk {formatTry(childUnit)} · Bebek {formatTry(infantUnit)} TRY
+                            </p>
+                          )}
+                          <p className="mt-2 text-sm text-zinc-500">
+                            Toplam{' '}
+                            <span className="font-semibold text-zinc-800">{hasPrice ? formatTry(cardTotal) : '-'}</span> TRY
+                          </p>
+                        </>
                       )}
-                      <p className="mt-2 text-sm text-zinc-500">
-                        Toplam <span className="font-semibold text-zinc-800">{hasPrice ? formatTry(cardTotal) : '-'}</span> TRY
-                      </p>
 
-                      {isSelected && !bookingBlocked && (
+                      {!hideActivityPrices && isSelected && !bookingBlocked && (
                         <div className="mt-3 space-y-2 border-t border-zinc-200 pt-3 text-zinc-900">
                           <p className="text-xs font-semibold text-zinc-800">Misafir</p>
                           <div className="flex items-center justify-between gap-1 text-xs text-zinc-900">
@@ -799,6 +827,7 @@ export function ActivitiesListingClient({
                         </div>
                       )}
 
+                      {!hideActivityPrices && (
                       <button
                         type="button"
                         disabled={bookingBlocked}
@@ -828,11 +857,21 @@ export function ActivitiesListingClient({
                       >
                         {bookingBlocked ? 'Satın alınamaz' : isSelected ? 'Kapat' : 'Seç'}
                       </button>
+                      )}
+                      {hideActivityPrices && callTelHref ? (
+                        <a
+                          href={callTelHref}
+                          className="mt-4 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-blue-600 bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-500"
+                        >
+                          <Phone className="h-4 w-4 shrink-0" aria-hidden />
+                          Ara
+                        </a>
+                      ) : null}
                       <a
                         href={buildWhatsAppChatUrl(whatsappDigits, `${a.name} hakkında bilgi almak istiyorum`)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-2 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-[#25D366] bg-[#25D366] px-3 py-2 text-sm font-semibold text-white hover:bg-[#1ebe5d]"
+                        className={`${hideActivityPrices ? 'mt-2' : 'mt-2'} inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-[#25D366] bg-[#25D366] px-3 py-2 text-sm font-semibold text-white hover:bg-[#1ebe5d]`}
                       >
                         <WhatsAppIcon />
                         WhatsApp&apos;tan sor
@@ -840,7 +879,7 @@ export function ActivitiesListingClient({
                     </div>
                   </div>
 
-                  {isSelected && (
+                  {isSelected && !hideActivityPrices && (
                     <div className="border-t border-zinc-200 p-4">
                       <div className="grid gap-4 xl:grid-cols-2">
                         <div className="rounded-2xl border border-blue-300 bg-zinc-50 p-4">

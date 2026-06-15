@@ -158,6 +158,7 @@ function validateSettings(body: unknown): AdminSettings | null {
           const whatsappPhoneDigits = whatsappRaw ? normalizeWhatsAppDigits(whatsappRaw) ?? '' : '';
           const callRaw = String(o.callPhoneDigits ?? '').trim();
           const callPhoneDigits = callRaw ? normalizeWhatsAppDigits(callRaw) ?? '' : '';
+          const hideActivityPrices = Boolean(o.hideActivityPrices);
           return {
             siteTitle,
             faviconUrl,
@@ -165,6 +166,7 @@ function validateSettings(body: unknown): AdminSettings | null {
             ...(darkLogoUrl ? { darkLogoUrl } : {}),
             whatsappPhoneDigits,
             callPhoneDigits,
+            hideActivityPrices,
             enabledSiteProducts,
             slides,
             homePageSectionOrder,

@@ -80,7 +80,7 @@ function Section({
       return <HomeActivityMainCategoriesSection activities={activities} settings={settings} />;
     case 'packages':
       if (!showActivity) return null;
-      return <HomePackagesSection packages={packages} activities={activities} />;
+      return <HomePackagesSection packages={packages} activities={activities} settings={settings} />;
     case 'location':
       if (!showActivity) return null;
       return <HomeLocationWidget settings={settings} activities={activities} />;

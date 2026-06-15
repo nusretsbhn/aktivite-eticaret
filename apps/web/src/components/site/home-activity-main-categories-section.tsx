@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 import { collectActivityMainCategoryTiles } from '@/lib/activity-home-widgets';
+import { ACTIVITY_PRICE_CONTACT_LABEL, isActivityPricesHidden } from '@/lib/activity-price-visibility';
 import type { AdminActivity } from '@/types/admin-activity';
 import type { AdminSettings } from '@/types/admin-settings';
 
@@ -17,6 +18,7 @@ export function HomeActivityMainCategoriesSection({
   settings: AdminSettings;
 }) {
   const tiles = collectActivityMainCategoryTiles(activities, settings).slice(0, 8);
+  const hideActivityPrices = isActivityPricesHidden(settings);
   if (!tiles.length) return null;
 
   return (
@@ -48,8 +50,14 @@ export function HomeActivityMainCategoriesSection({
                 </span>
                 <p className="text-lg font-extrabold leading-tight text-white drop-shadow">{t.name}</p>
                 <p className="mt-2 text-sm font-semibold text-emerald-300">
-                  {t.minPrice !== null ? `${formatTry(t.minPrice)} TRY` : 'Fiyat yok'}{' '}
-                  <span className="text-xs font-medium text-white/85">’den başlayan fiyatlarla</span>
+                  {hideActivityPrices ? (
+                    ACTIVITY_PRICE_CONTACT_LABEL
+                  ) : (
+                    <>
+                      {t.minPrice !== null ? `${formatTry(t.minPrice)} TRY` : 'Fiyat yok'}{' '}
+                      <span className="text-xs font-medium text-white/85">’den başlayan fiyatlarla</span>
+                    </>
+                  )}
                 </p>
               </div>
             </Link>

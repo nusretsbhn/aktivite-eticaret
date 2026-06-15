@@ -5,6 +5,7 @@ import { SiteAccountWithNotifications } from '@/components/site/site-account-wit
 import { readActivities } from '@/lib/admin-activities-server';
 import { parseActivityGuestParams } from '@/lib/activity-booking-params';
 import { computeActivityBookingTotal, resolveActivityPrices } from '@/lib/activity-pricing';
+import { ACTIVITY_PRICE_CONTACT_LABEL, isActivityPricesHidden } from '@/lib/activity-price-visibility';
 import { formatActivityTripInfo } from '@/lib/activity-schedule';
 import { validateBookingRequest } from '@/lib/availability-helpers';
 import { readSettings } from '@/lib/admin-settings-server';
@@ -81,6 +82,7 @@ export default async function PaymentPage({
   })();
 
   const logoUrl = settings.siteManagement?.logoUrl;
+  const hideActivityPrices = isActivityPricesHidden(settings);
   const payment = settings.paymentManagement;
   const creditCardEnabled = Boolean(payment?.creditCardEnabled);
   const transferEnabled = payment?.transferEnabled ?? true;
@@ -178,14 +180,21 @@ export default async function PaymentPage({
               <p className="text-sm text-zinc-600">Tarih: {formatDate(date)}</p>
             </div>
             <div className="mt-3 border-t border-zinc-200 pt-3">
-              <p className="text-sm text-zinc-600">Yetişkin (kişi başı)</p>
-              <p className="text-3xl font-extrabold text-zinc-900">
-                {hasPrice ? formatTry(adultUnit) : '-'} <span className="text-lg">TRY</span>
-              </p>
-              <p className="text-sm text-zinc-600">
-                {adults} yetişkin · {children} çocuk · {infants} bebek (toplam {people} kişi)
-              </p>
+              {hideActivityPrices ? (
+                <p className="text-sm font-semibold text-zinc-700">{ACTIVITY_PRICE_CONTACT_LABEL}</p>
+              ) : (
+                <>
+                  <p className="text-sm text-zinc-600">Yetişkin (kişi başı)</p>
+                  <p className="text-3xl font-extrabold text-zinc-900">
+                    {hasPrice ? formatTry(adultUnit) : '-'} <span className="text-lg">TRY</span>
+                  </p>
+                  <p className="text-sm text-zinc-600">
+                    {adults} yetişkin · {children} çocuk · {infants} bebek (toplam {people} kişi)
+                  </p>
+                </>
+              )}
             </div>
+            {!hideActivityPrices && (
             <div className="mt-3 border-t border-zinc-200 pt-3">
               <p className={`text-xs font-semibold uppercase tracking-wide ${paymentPlan === 'prepayment' ? 'text-zinc-500' : 'text-zinc-500'}`}>
                 {paymentPlan === 'full' ? 'Toplam ödeme' : `Ön ödeme (%${prepaymentPercent})`}
@@ -196,6 +205,7 @@ export default async function PaymentPage({
               <p className="text-sm text-zinc-600">Kalan ödeme {formatTry(Math.max(0, grossTotal - payableAmount))} TRY</p>
               <p className="text-sm text-zinc-600">Toplam {formatTry(grossTotal)} TRY</p>
             </div>
+            )}
           </div>
 
           <div className="rounded-xl border border-zinc-200 bg-white p-3">

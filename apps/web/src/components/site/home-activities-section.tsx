@@ -2,6 +2,7 @@ import { MapPin } from 'lucide-react';
 import Link from 'next/link';
 
 import { ActivityScheduleTimes } from '@/components/site/activity-schedule-times';
+import { ACTIVITY_PRICE_CONTACT_LABEL, isActivityPricesHidden } from '@/lib/activity-price-visibility';
 import { sortActiveActivitiesForHome } from '@/lib/home-activity-order';
 import type { AdminActivity } from '@/types/admin-activity';
 import type { AdminSettings } from '@/types/admin-settings';
@@ -45,6 +46,7 @@ export function HomeActivitiesSection({
     settings.siteManagement?.homeActivityOrder,
     12,
   );
+  const hideActivityPrices = isActivityPricesHidden(settings);
 
   return (
     <section className="bg-white">
@@ -132,7 +134,11 @@ export function HomeActivitiesSection({
                   <div className="flex items-end justify-between gap-3">
                     <p className="text-xs font-medium text-zinc-600">Bugün</p>
                     <p className="text-sm font-extrabold text-emerald-700">
-                      {typeof todayPrice === 'number' ? `${formatTry(todayPrice)} TRY` : 'Fiyat yok'}
+                      {hideActivityPrices
+                        ? ACTIVITY_PRICE_CONTACT_LABEL
+                        : typeof todayPrice === 'number'
+                          ? `${formatTry(todayPrice)} TRY`
+                          : 'Fiyat yok'}
                     </p>
                   </div>
                 </div>

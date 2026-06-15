@@ -86,6 +86,8 @@ export type AdminSettings = {
      * Boşsa arama butonu gösterilmez.
      */
     callPhoneDigits?: string;
+    /** Açıksa sitede aktivite fiyatları gizlenir; iletişim metni gösterilir. */
+    hideActivityPrices?: boolean;
     /** Açık iş hatları: tekne turu, aktivite, villa kiralama */
     enabledSiteProducts?: SiteProductType[];
     slides: {

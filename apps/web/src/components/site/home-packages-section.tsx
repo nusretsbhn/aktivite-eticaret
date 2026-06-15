@@ -1,6 +1,8 @@
 import type { AdminActivity } from '@/types/admin-activity';
 import type { AdminPackage } from '@/types/admin-package';
+import type { AdminSettings } from '@/types/admin-settings';
 
+import { ACTIVITY_PRICE_CONTACT_LABEL, isActivityPricesHidden } from '@/lib/activity-price-visibility';
 import { computePackagePriceForDate } from '@/lib/package-pricing';
 
 function toIsoDate(d: Date) {
@@ -25,10 +27,13 @@ function shortText(s: string, max = 120) {
 export function HomePackagesSection({
   packages,
   activities,
+  settings,
 }: {
   packages: AdminPackage[];
   activities: AdminActivity[];
+  settings: AdminSettings;
 }) {
+  const hideActivityPrices = isActivityPricesHidden(settings);
   const today = toIsoDate(new Date());
   const list = (packages ?? [])
     .filter((p) => p && p.isActive)
@@ -78,7 +83,11 @@ export function HomePackagesSection({
                   <div className="flex items-end justify-between gap-3">
                     <p className="text-xs font-medium text-zinc-600">Bugün paket fiyatı</p>
                     <p className="text-sm font-extrabold text-emerald-700">
-                      {typeof pricing.total === 'number' ? `${formatTry(pricing.total)} TRY` : 'Hesaplanamadı'}
+                      {hideActivityPrices
+                        ? ACTIVITY_PRICE_CONTACT_LABEL
+                        : typeof pricing.total === 'number'
+                          ? `${formatTry(pricing.total)} TRY`
+                          : 'Hesaplanamadı'}
                     </p>
                   </div>
                 </div>
