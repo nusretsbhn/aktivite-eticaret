@@ -1,17 +1,20 @@
 import { randomUUID } from 'node:crypto';
 import { NextResponse } from 'next/server';
 
-import { requireAdminSession } from '@/lib/admin-api-auth';
+import {
+  canManageVilla,
+  isAltBayi,
+  requireAdminSession,
+  unauthorized,
+} from '@/lib/admin-api-auth';
 import { normalizeVillaBody, validateVillaRequired } from '@/lib/admin-villa-normalize';
 import { readVillas, writeVillas } from '@/lib/admin-villas-server';
 import type { AdminVilla, AdminVillaInput } from '@/types/admin-villa';
 
-function unauthorized() {
-  return NextResponse.json({ error: 'Yetkisiz' }, { status: 401 });
-}
+const VILLA_ROLES = ['admin', 'alt_bayi'] as const;
 
 export async function GET(request: Request) {
-  const session = await requireAdminSession();
+  const session = await requireAdminSession({ allowRoles: [...VILLA_ROLES] });
   if (!session) return unauthorized();
 
   const { searchParams } = new URL(request.url);
@@ -20,6 +23,10 @@ export async function GET(request: Request) {
   const isActiveParam = searchParams.get('isActive');
 
   let list = await readVillas();
+
+  if (isAltBayi(session)) {
+    list = list.filter((v) => canManageVilla(session, v));
+  }
 
   if (q) {
     const hay = (s: unknown) => String(s ?? '').toLocaleLowerCase('tr-TR');
@@ -54,7 +61,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const session = await requireAdminSession();
+  const session = await requireAdminSession({ allowRoles: [...VILLA_ROLES] });
   if (!session) return unauthorized();
 
   let body: unknown;
@@ -77,6 +84,8 @@ export async function POST(request: Request) {
   const created: AdminVilla = {
     id: randomUUID(),
     ...input,
+    createdByUserId: session.userId,
+    createdByEmail: session.email,
     createdAt: now,
     updatedAt: now,
   };

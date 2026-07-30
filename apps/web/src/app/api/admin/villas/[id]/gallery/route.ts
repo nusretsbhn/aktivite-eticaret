@@ -4,15 +4,11 @@ import { join } from 'node:path';
 
 import { NextResponse } from 'next/server';
 
-import { requireAdminSession } from '@/lib/admin-api-auth';
+import { requireAdminSession, canManageVilla, forbidden, unauthorized } from '@/lib/admin-api-auth';
 import { formDataBlobName, getFormDataBlob } from '@/lib/form-data-file';
 import { getUploadsDir } from '@/lib/next-public-dir';
 import { readVillas, writeVillas } from '@/lib/admin-villas-server';
 import type { GalleryItem } from '@/types/admin-activity';
-
-function unauthorized() {
-  return NextResponse.json({ error: 'Yetkisiz' }, { status: 401 });
-}
 
 function notFound() {
   return NextResponse.json({ error: 'Bulunamadı' }, { status: 404 });
@@ -31,13 +27,17 @@ type RouteContext = { params: Promise<{ id: string }> };
 
 export async function POST(request: Request, context: RouteContext) {
   try {
-    const session = await requireAdminSession();
+    const session = await requireAdminSession({ allowRoles: ['admin', 'alt_bayi'] });
     if (!session) return unauthorized();
 
     const { id } = await context.params;
     const all = await readVillas();
     const idx = all.findIndex((v) => v.id === id);
     if (idx === -1) return notFound();
+
+    const villa = all[idx];
+    if (!villa) return notFound();
+    if (!canManageVilla(session, villa)) return forbidden();
 
     const form = await request.formData();
     const blob = getFormDataBlob(form.get('file'));
@@ -61,8 +61,6 @@ export async function POST(request: Request, context: RouteContext) {
     }
 
     const buf = Buffer.from(await blob.arrayBuffer());
-    const villa = all[idx];
-    if (!villa) return notFound();
 
     const uploadDir = join(getUploadsDir(), 'uploads', 'villas', villa.id);
     await mkdir(uploadDir, { recursive: true });

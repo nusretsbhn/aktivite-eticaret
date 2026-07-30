@@ -1,13 +1,16 @@
 import { NextResponse } from 'next/server';
 
-import { requireAdminSession } from '@/lib/admin-api-auth';
+import {
+  canManageVilla,
+  forbidden,
+  requireAdminSession,
+  unauthorized,
+} from '@/lib/admin-api-auth';
 import { normalizeVillaBody, validateVillaRequired } from '@/lib/admin-villa-normalize';
 import { readVillas, writeVillas } from '@/lib/admin-villas-server';
 import type { AdminVilla, AdminVillaInput } from '@/types/admin-villa';
 
-function unauthorized() {
-  return NextResponse.json({ error: 'Yetkisiz' }, { status: 401 });
-}
+const VILLA_ROLES = ['admin', 'alt_bayi'] as const;
 
 function notFound() {
   return NextResponse.json({ error: 'Bulunamadı' }, { status: 404 });
@@ -16,18 +19,19 @@ function notFound() {
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function GET(_request: Request, context: RouteContext) {
-  const session = await requireAdminSession();
+  const session = await requireAdminSession({ allowRoles: [...VILLA_ROLES] });
   if (!session) return unauthorized();
 
   const { id } = await context.params;
   const all = await readVillas();
   const villa = all.find((v) => v.id === id);
   if (!villa) return notFound();
+  if (!canManageVilla(session, villa)) return forbidden();
   return NextResponse.json({ villa });
 }
 
 export async function PATCH(request: Request, context: RouteContext) {
-  const session = await requireAdminSession();
+  const session = await requireAdminSession({ allowRoles: [...VILLA_ROLES] });
   if (!session) return unauthorized();
 
   const { id } = await context.params;
@@ -44,6 +48,7 @@ export async function PATCH(request: Request, context: RouteContext) {
 
   const current = all[idx];
   if (!current) return notFound();
+  if (!canManageVilla(session, current)) return forbidden();
 
   const normalized = normalizeVillaBody({ ...current, ...body });
   const err = validateVillaRequired(normalized);
@@ -57,6 +62,8 @@ export async function PATCH(request: Request, context: RouteContext) {
     ...current,
     ...normalized,
     id: current.id,
+    createdByUserId: current.createdByUserId,
+    createdByEmail: current.createdByEmail,
     createdAt: current.createdAt,
     updatedAt: new Date().toISOString(),
   };
@@ -67,13 +74,16 @@ export async function PATCH(request: Request, context: RouteContext) {
 }
 
 export async function DELETE(_request: Request, context: RouteContext) {
-  const session = await requireAdminSession();
+  const session = await requireAdminSession({ allowRoles: [...VILLA_ROLES] });
   if (!session) return unauthorized();
 
   const { id } = await context.params;
   const all = await readVillas();
+  const current = all.find((v) => v.id === id);
+  if (!current) return notFound();
+  if (!canManageVilla(session, current)) return forbidden();
+
   const next = all.filter((v) => v.id !== id);
-  if (next.length === all.length) return notFound();
   await writeVillas(next);
   return NextResponse.json({ ok: true });
 }

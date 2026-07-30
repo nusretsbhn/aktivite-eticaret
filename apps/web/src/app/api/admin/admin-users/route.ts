@@ -1,11 +1,7 @@
 import { NextResponse } from 'next/server';
 
-import { requireAdminSession } from '@/lib/admin-api-auth';
-import { createAdminUser, readAdminUsers } from '@/lib/admin-users-server';
-
-function unauthorized() {
-  return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-}
+import { requireAdminSession, unauthorized } from '@/lib/admin-api-auth';
+import { createAdminUser, normalizeAdminRole, readAdminUsers } from '@/lib/admin-users-server';
 
 export async function GET() {
   const session = await requireAdminSession();
@@ -20,6 +16,7 @@ export async function GET() {
         id: u.id,
         fullName: u.fullName,
         email: u.email,
+        role: u.role,
         isActive: u.isActive,
         createdAt: u.createdAt,
         updatedAt: u.updatedAt,
@@ -31,7 +28,7 @@ export async function POST(request: Request) {
   const session = await requireAdminSession();
   if (!session) return unauthorized();
 
-  let body: { fullName?: string; email?: string; password?: string };
+  let body: { fullName?: string; email?: string; password?: string; role?: string };
   try {
     body = (await request.json()) as typeof body;
   } catch {
@@ -42,6 +39,7 @@ export async function POST(request: Request) {
     fullName: String(body.fullName ?? ''),
     email: String(body.email ?? ''),
     password: String(body.password ?? ''),
+    role: normalizeAdminRole(body.role),
   });
   if (result.error) {
     return NextResponse.json({ error: result.error }, { status: result.status ?? 400 });
@@ -51,6 +49,7 @@ export async function POST(request: Request) {
       id: result.user!.id,
       fullName: result.user!.fullName,
       email: result.user!.email,
+      role: result.user!.role,
       isActive: result.user!.isActive,
       createdAt: result.user!.createdAt,
       updatedAt: result.user!.updatedAt,

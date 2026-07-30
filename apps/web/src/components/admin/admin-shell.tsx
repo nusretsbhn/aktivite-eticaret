@@ -12,6 +12,7 @@ import {
   SITE_PRODUCT_VILLA_RENTAL,
   type SiteProductType,
 } from '@/lib/site-product-types';
+import type { AdminRole } from '@/lib/admin-users-server';
 
 const SUMMARY_POLL_MS = 15_000;
 
@@ -82,18 +83,22 @@ function MenuIcon({ open }: { open: boolean }) {
 
 export function AdminShell({
   email,
+  role = 'admin',
   children,
   enabledSiteProducts,
 }: {
   email: string;
+  role?: AdminRole;
   children: React.ReactNode;
   enabledSiteProducts: SiteProductType[];
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [counts, setCounts] = useState({ newOrder: 0, cancelRequest: 0, totalUnread: 0 });
+  const isAltBayi = role === 'alt_bayi';
 
   const refreshSummary = useCallback(async () => {
+    if (isAltBayi) return;
     try {
       const res = await fetch('/api/admin/notifications?summary=1', { credentials: 'include', cache: 'no-store' });
       if (!res.ok) return;
@@ -109,13 +114,19 @@ export function AdminShell({
     } catch {
       /* ignore */
     }
-  }, []);
+  }, [isAltBayi]);
 
   useEffect(() => {
+    if (isAltBayi) return;
     void refreshSummary();
     const t = setInterval(() => void refreshSummary(), SUMMARY_POLL_MS);
     return () => clearInterval(t);
-  }, [refreshSummary]);
+  }, [refreshSummary, isAltBayi]);
+
+  const visibleNav = nav.filter((item) => {
+    if (isAltBayi) return item.href === '/admin/villalar';
+    return !item.requiresProduct || enabledSiteProducts.includes(item.requiresProduct);
+  });
 
   return (
     <div className="min-h-[100dvh] bg-zinc-100 dark:bg-zinc-950">
@@ -137,12 +148,12 @@ export function AdminShell({
           <p className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
             Bodrum Aktivite
           </p>
-          <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Yönetim paneli</p>
+          <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+            {isAltBayi ? 'Alt bayi paneli' : 'Yönetim paneli'}
+          </p>
         </div>
         <nav className="flex flex-1 flex-col gap-1 p-3">
-          {nav
-            .filter((item) => !item.requiresProduct || enabledSiteProducts.includes(item.requiresProduct))
-            .map((item) => {
+          {visibleNav.map((item) => {
             const isActive = (() => {
               if (item.href === '/admin/dashboard') return pathname === '/admin/dashboard';
               if (item.href === '/admin/siparisler') return pathname === '/admin/siparisler';
@@ -211,7 +222,9 @@ export function AdminShell({
             <span className="hidden max-w-[200px] truncate text-sm text-zinc-600 sm:inline dark:text-zinc-400">
               {email}
             </span>
-            <AdminNotificationBell totalUnread={counts.totalUnread} onMarkedRead={refreshSummary} />
+            {!isAltBayi && (
+              <AdminNotificationBell totalUnread={counts.totalUnread} onMarkedRead={refreshSummary} />
+            )}
             <AdminLogoutButton />
           </div>
         </header>

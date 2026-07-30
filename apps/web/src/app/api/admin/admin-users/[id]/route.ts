@@ -1,11 +1,7 @@
 import { NextResponse } from 'next/server';
 
-import { requireAdminSession } from '@/lib/admin-api-auth';
+import { requireAdminSession, unauthorized } from '@/lib/admin-api-auth';
 import { readAdminUsers, writeAdminUsers } from '@/lib/admin-users-server';
-
-function unauthorized() {
-  return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-}
 
 export async function DELETE(_: Request, context: { params: Promise<{ id: string }> }) {
   const session = await requireAdminSession();

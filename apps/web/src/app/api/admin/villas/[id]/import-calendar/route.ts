@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server';
 
-import { requireAdminSession } from '@/lib/admin-api-auth';
+import {
+  canManageVilla,
+  forbidden,
+  requireAdminSession,
+  unauthorized,
+} from '@/lib/admin-api-auth';
 import {
   applyLegacyAvailability,
   applyLegacyPrices,
@@ -12,10 +17,6 @@ import { readVillas, writeVillas } from '@/lib/admin-villas-server';
 import type { AdminVilla, AdminVillaInput } from '@/types/admin-villa';
 
 const MAX_FILE_BYTES = 8 * 1024 * 1024;
-
-function unauthorized() {
-  return NextResponse.json({ error: 'Yetkisiz' }, { status: 401 });
-}
 
 function notFound() {
   return NextResponse.json({ error: 'Bulunamadı' }, { status: 404 });
@@ -29,7 +30,7 @@ function parseMode(v: FormDataEntryValue | null): 'merge' | 'replace' {
 }
 
 export async function POST(request: Request, context: RouteContext) {
-  const session = await requireAdminSession();
+  const session = await requireAdminSession({ allowRoles: ['admin', 'alt_bayi'] });
   if (!session) return unauthorized();
 
   const { id } = await context.params;
@@ -88,6 +89,7 @@ export async function POST(request: Request, context: RouteContext) {
 
   const current = all[idx];
   if (!current) return notFound();
+  if (!canManageVilla(session, current)) return forbidden();
 
   let nextPrices = current.prices;
   let nextAvailability = current.availability;
@@ -130,6 +132,8 @@ export async function POST(request: Request, context: RouteContext) {
     ...current,
     ...normalized,
     id: current.id,
+    createdByUserId: current.createdByUserId,
+    createdByEmail: current.createdByEmail,
     createdAt: current.createdAt,
     updatedAt: new Date().toISOString(),
   };

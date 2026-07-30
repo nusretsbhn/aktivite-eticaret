@@ -2,14 +2,21 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
+import type { AdminRole } from '@/lib/admin-users-server';
+
 type AdminUserRow = {
   id: string;
   fullName: string;
   email: string;
+  role: AdminRole;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
 };
+
+function roleLabel(role: AdminRole) {
+  return role === 'alt_bayi' ? 'Alt bayi' : 'Admin';
+}
 
 export function AdminUsersPageClient() {
   const [rows, setRows] = useState<AdminUserRow[]>([]);
@@ -19,6 +26,7 @@ export function AdminUsersPageClient() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState<AdminRole>('admin');
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
 
@@ -29,7 +37,14 @@ export function AdminUsersPageClient() {
       const res = await fetch('/api/admin/admin-users', { credentials: 'include', cache: 'no-store' });
       const data = (await res.json()) as { users?: AdminUserRow[]; error?: string };
       if (!res.ok) throw new Error(data.error ?? 'Kullanıcılar alınamadı');
-      setRows(Array.isArray(data.users) ? data.users : []);
+      setRows(
+        Array.isArray(data.users)
+          ? data.users.map((u) => ({
+              ...u,
+              role: u.role === 'alt_bayi' ? 'alt_bayi' : 'admin',
+            }))
+          : [],
+      );
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Hata');
     } finally {
@@ -53,7 +68,7 @@ export function AdminUsersPageClient() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ fullName, email, password }),
+        body: JSON.stringify({ fullName, email, password, role }),
       });
       const data = (await res.json()) as { error?: string };
       if (!res.ok) {
@@ -63,6 +78,7 @@ export function AdminUsersPageClient() {
       setFullName('');
       setEmail('');
       setPassword('');
+      setRole('admin');
       void load();
     } catch {
       setCreateError('Ağ hatası.');
@@ -72,7 +88,7 @@ export function AdminUsersPageClient() {
   }
 
   async function removeUser(id: string) {
-    if (!confirm('Bu admin kullanıcıyı silmek istediğinize emin misiniz?')) return;
+    if (!confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?')) return;
     const res = await fetch(`/api/admin/admin-users/${id}`, { method: 'DELETE', credentials: 'include' });
     const data = (await res.json()) as { error?: string };
     if (!res.ok) {
@@ -89,8 +105,8 @@ export function AdminUsersPageClient() {
       </div>
 
       <div className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
-        <p className="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">Yeni admin kullanıcı tanımla</p>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <p className="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">Yeni kullanıcı tanımla</p>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <label className="block text-sm">
             <span className="text-zinc-500 dark:text-zinc-400">Ad Soyad</span>
             <input
@@ -117,7 +133,21 @@ export function AdminUsersPageClient() {
               className="mt-1 min-h-10 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-50"
             />
           </label>
+          <label className="block text-sm">
+            <span className="text-zinc-500 dark:text-zinc-400">Rol</span>
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value === 'alt_bayi' ? 'alt_bayi' : 'admin')}
+              className="mt-1 min-h-10 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-50"
+            >
+              <option value="admin">Admin</option>
+              <option value="alt_bayi">Alt bayi</option>
+            </select>
+          </label>
         </div>
+        <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+          Alt bayi yalnızca Villalar menüsünü görür ve sadece kendi eklediği villaları yönetebilir.
+        </p>
         <div className="mt-3">
           <button
             type="button"
@@ -138,6 +168,7 @@ export function AdminUsersPageClient() {
               <tr className="border-b border-zinc-200 text-left dark:border-zinc-800">
                 <th className="px-4 py-3 font-semibold">Ad Soyad</th>
                 <th className="px-4 py-3 font-semibold">E-posta</th>
+                <th className="px-4 py-3 font-semibold">Rol</th>
                 <th className="px-4 py-3 font-semibold">Durum</th>
                 <th className="px-4 py-3 font-semibold">Oluşturulma</th>
                 <th className="px-4 py-3 font-semibold text-right">İşlem</th>
@@ -148,6 +179,7 @@ export function AdminUsersPageClient() {
                 <tr key={r.id} className="border-b border-zinc-100 dark:border-zinc-800/60">
                   <td className="px-4 py-3">{r.fullName}</td>
                   <td className="px-4 py-3">{r.email}</td>
+                  <td className="px-4 py-3">{roleLabel(r.role)}</td>
                   <td className="px-4 py-3">{r.isActive ? 'Aktif' : 'Pasif'}</td>
                   <td className="px-4 py-3">{new Date(r.createdAt).toLocaleString('tr-TR')}</td>
                   <td className="px-4 py-3 text-right">
@@ -163,8 +195,8 @@ export function AdminUsersPageClient() {
               ))}
               {!loading && rows.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-sm text-zinc-500">
-                    Admin kullanıcı kaydı yok.
+                  <td colSpan={6} className="px-4 py-8 text-center text-sm text-zinc-500">
+                    Kullanıcı kaydı yok.
                   </td>
                 </tr>
               )}

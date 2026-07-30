@@ -20,12 +20,12 @@ export function AdminLoginForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-      const data = (await res.json()) as { success?: boolean; message?: string };
+      const data = (await res.json()) as { success?: boolean; message?: string; role?: string };
       if (!res.ok) {
         setError(data.message ?? 'Giriş başarısız');
         return;
       }
-      router.replace('/admin/dashboard');
+      router.replace(data.role === 'alt_bayi' ? '/admin/villalar' : '/admin/dashboard');
       router.refresh();
     } catch {
       setError('Bağlantı hatası');

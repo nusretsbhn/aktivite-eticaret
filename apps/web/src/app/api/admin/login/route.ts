@@ -16,8 +16,12 @@ export async function POST(request: Request) {
 
   const adminUser = await findAdminUserByCredentials(email, password);
   if (adminUser) {
-    const token = signAdminSession(adminUser.email);
-    const res = NextResponse.json({ success: true });
+    const token = signAdminSession({
+      email: adminUser.email,
+      role: adminUser.role,
+      userId: adminUser.id,
+    });
+    const res = NextResponse.json({ success: true, role: adminUser.role });
     res.cookies.set(ADMIN_SESSION_COOKIE, token, {
       httpOnly: true,
       sameSite: 'lax',
@@ -42,8 +46,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false, message: 'E-posta veya şifre hatalı.' }, { status: 401 });
   }
 
-  const token = signAdminSession(email);
-  const res = NextResponse.json({ success: true });
+  const token = signAdminSession({
+    email,
+    role: 'admin',
+    userId: 'env-admin',
+  });
+  const res = NextResponse.json({ success: true, role: 'admin' as const });
   res.cookies.set(ADMIN_SESSION_COOKIE, token, {
     httpOnly: true,
     sameSite: 'lax',

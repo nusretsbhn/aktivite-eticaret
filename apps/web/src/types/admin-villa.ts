@@ -73,8 +73,14 @@ export type AdminVilla = {
   gallery: GalleryItem[];
   prices: PriceEntry[];
   availability: AvailabilityEntry[];
+  /** Paneli oluşturan admin kullanıcı kimliği (alt bayi sahipliği için) */
+  createdByUserId?: string;
+  createdByEmail?: string;
   createdAt: string;
   updatedAt: string;
 };
 
-export type AdminVillaInput = Omit<AdminVilla, 'id' | 'createdAt' | 'updatedAt'>;
+export type AdminVillaInput = Omit<
+  AdminVilla,
+  'id' | 'createdAt' | 'updatedAt' | 'createdByUserId' | 'createdByEmail'
+>;

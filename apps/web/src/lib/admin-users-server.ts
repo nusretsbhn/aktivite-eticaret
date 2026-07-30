@@ -6,22 +6,48 @@ import { hashPassword, validatePasswordPolicy, verifyPassword } from '@/lib/publ
 
 const DATA_PATH = appDataFile('admin-users.json');
 
+export type AdminRole = 'admin' | 'alt_bayi';
+
 export type AdminUser = {
   id: string;
   fullName: string;
   email: string;
   passwordHash: string;
   passwordSalt: string;
+  role: AdminRole;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
 };
 
+export function normalizeAdminRole(value: unknown): AdminRole {
+  return value === 'alt_bayi' ? 'alt_bayi' : 'admin';
+}
+
+function normalizeAdminUser(raw: unknown): AdminUser | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const o = raw as Record<string, unknown>;
+  const id = String(o.id ?? '').trim();
+  const email = String(o.email ?? '').trim().toLowerCase();
+  if (!id || !email) return null;
+  return {
+    id,
+    fullName: String(o.fullName ?? '').trim(),
+    email,
+    passwordHash: String(o.passwordHash ?? ''),
+    passwordSalt: String(o.passwordSalt ?? ''),
+    role: normalizeAdminRole(o.role),
+    isActive: o.isActive !== false,
+    createdAt: String(o.createdAt ?? ''),
+    updatedAt: String(o.updatedAt ?? ''),
+  };
+}
+
 export async function readAdminUsers(): Promise<AdminUser[]> {
   try {
     const parsed = await readJsonStore<unknown[]>('admin-users', () => [], DATA_PATH);
     if (!Array.isArray(parsed)) return [];
-    return parsed as AdminUser[];
+    return parsed.map(normalizeAdminUser).filter((u): u is AdminUser => Boolean(u));
   } catch {
     return [];
   }
@@ -45,10 +71,12 @@ export async function createAdminUser(input: {
   fullName: string;
   email: string;
   password: string;
+  role?: AdminRole;
 }): Promise<{ user?: AdminUser; error?: string; status?: number }> {
   const fullName = input.fullName.trim();
   const email = input.email.trim().toLowerCase();
   const password = input.password;
+  const role = normalizeAdminRole(input.role);
 
   if (!fullName || !email || !password) {
     return { error: 'Ad soyad, e-posta ve şifre zorunludur.', status: 400 };
@@ -72,6 +100,7 @@ export async function createAdminUser(input: {
     email,
     passwordHash: hash,
     passwordSalt: salt,
+    role,
     isActive: true,
     createdAt: now,
     updatedAt: now,

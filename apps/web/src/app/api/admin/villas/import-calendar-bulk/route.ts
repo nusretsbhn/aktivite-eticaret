@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 
-import { requireAdminSession } from '@/lib/admin-api-auth';
+import {
+  canManageVilla,
+  requireAdminSession,
+  unauthorized,
+} from '@/lib/admin-api-auth';
 import { normalizeVillaBody, validateVillaRequired } from '@/lib/admin-villa-normalize';
 import {
   applyLegacyAvailability,
@@ -13,10 +17,6 @@ import { readVillas, writeVillas } from '@/lib/admin-villas-server';
 import type { AdminVilla, AdminVillaInput } from '@/types/admin-villa';
 
 const MAX_FILE_BYTES = 8 * 1024 * 1024;
-
-function unauthorized() {
-  return NextResponse.json({ error: 'Yetkisiz' }, { status: 401 });
-}
 
 function parseMode(v: FormDataEntryValue | null): 'merge' | 'replace' {
   const s = String(v ?? '').toLowerCase();
@@ -38,7 +38,7 @@ function deepCloneVilla(v: AdminVilla): AdminVilla {
 }
 
 export async function POST(request: Request) {
-  const session = await requireAdminSession();
+  const session = await requireAdminSession({ allowRoles: ['admin', 'alt_bayi'] });
   if (!session) return unauthorized();
 
   let form: FormData;
@@ -104,7 +104,8 @@ export async function POST(request: Request) {
   }
 
   const all = await readVillas();
-  const working = new Map<string, AdminVilla>(all.map((v) => [v.id, deepCloneVilla(v)]));
+  const scoped = all.filter((v) => canManageVilla(session, v));
+  const working = new Map<string, AdminVilla>(scoped.map((v) => [v.id, deepCloneVilla(v)]));
 
   const priceResult = hasPrices ? emptyPart() : null;
   const availabilityResult = hasAvailability ? emptyPart() : null;
@@ -112,7 +113,7 @@ export async function POST(request: Request) {
   if (hasPrices && pricesDoc && priceResult) {
     const obj = pricesDoc as Record<string, unknown>;
     for (const rawKey of Object.keys(obj)) {
-      const matched = matchVillaByDisplayName(all, rawKey);
+      const matched = matchVillaByDisplayName(scoped, rawKey);
       if (!matched.ok) {
         priceResult.failed += 1;
         priceResult.failedKeys.push(rawKey);
@@ -145,6 +146,8 @@ export async function POST(request: Request) {
         ...cur,
         ...normalized,
         id: cur.id,
+        createdByUserId: cur.createdByUserId,
+        createdByEmail: cur.createdByEmail,
         createdAt: cur.createdAt,
         updatedAt: new Date().toISOString(),
       });
@@ -155,7 +158,7 @@ export async function POST(request: Request) {
   if (hasAvailability && availabilityDoc && availabilityResult) {
     const obj = availabilityDoc as Record<string, unknown>;
     for (const rawKey of Object.keys(obj)) {
-      const matched = matchVillaByDisplayName(all, rawKey);
+      const matched = matchVillaByDisplayName(scoped, rawKey);
       if (!matched.ok) {
         availabilityResult.failed += 1;
         availabilityResult.failedKeys.push(rawKey);
@@ -188,6 +191,8 @@ export async function POST(request: Request) {
         ...cur,
         ...normalized,
         id: cur.id,
+        createdByUserId: cur.createdByUserId,
+        createdByEmail: cur.createdByEmail,
         createdAt: cur.createdAt,
         updatedAt: new Date().toISOString(),
       });
